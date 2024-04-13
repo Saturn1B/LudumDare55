@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CharacterController : MonoBehaviour
 {
@@ -90,4 +91,12 @@ public class CharacterController : MonoBehaviour
 
         return Mathf.Clamp(angle, min, max);
     }
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("Kill") || other.CompareTag("Laser"))
+		{
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+		}
+	}
 }
