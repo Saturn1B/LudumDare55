@@ -37,11 +37,13 @@ public class CharacterController : MonoBehaviour
 
 	void Update()
     {
-        HandleMouseLook();
-        Move();
-
         RaycastHit hit;
         bool isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, checkDistance, groundLayer);
+
+        float currSpeed = isGrounded ? speed : speed / 4;
+
+        HandleMouseLook();
+        Move(currSpeed);
 
         if (isGrounded)
         {
@@ -49,7 +51,7 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-	private void Move()
+	private void Move(float currSpeed)
 	{
         float xInput = Input.GetAxisRaw("Horizontal");
         float zInput = Input.GetAxisRaw("Vertical");
@@ -57,7 +59,8 @@ public class CharacterController : MonoBehaviour
         Vector3 forwardDirection = transform.forward;
         Vector3 movementDirection = (forwardDirection * zInput + transform.right * xInput).normalized;
 
-        rb.AddForce(movementDirection * speed * Time.deltaTime, ForceMode.VelocityChange);
+
+        rb.AddForce(movementDirection * currSpeed * Time.deltaTime, ForceMode.VelocityChange);
 
         //rb.velocity = new Vector3(movementDirection.x * speed, rb.velocity.y, movementDirection.z * speed);
 	}

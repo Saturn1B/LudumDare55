@@ -10,6 +10,12 @@ public class MaterialDispenser : MonoBehaviour
 	[SerializeField] private Materials dispenserMaterial;
 	[SerializeField, Range(0, 5)] private int availableMaterial;
 
+	[SerializeField] private GameObject[] barGraph;
+	[SerializeField] private GameObject center;
+
+	[SerializeField] private Material[] matOn;
+	[SerializeField] private Material[] matOff;
+
 	public Materials GetMaterials()
 	{
 		return dispenserMaterial;
@@ -18,6 +24,22 @@ public class MaterialDispenser : MonoBehaviour
 	public void AddMaterial(int value)
 	{
 		availableMaterial += value;
+		UpdateGraph();
+	}
+
+	private void Start()
+	{
+		UpdateGraph();
+	}
+
+	private void UpdateGraph()
+	{
+		for (int i = 0; i < barGraph.Length; i++)
+		{
+			barGraph[i].GetComponent<MeshRenderer>().material = i + 1 <= availableMaterial ? matOn[(int)dispenserMaterial - 1] : matOff[(int)dispenserMaterial - 1];
+		}
+
+		center.GetComponent<MeshRenderer>().material = availableMaterial <= 0 ? matOff[(int)dispenserMaterial - 1] : matOn[(int)dispenserMaterial - 1];
 	}
 
 	private void Update()
@@ -26,6 +48,9 @@ public class MaterialDispenser : MonoBehaviour
 		{
 			playerTransform.GetComponentInChildren<CreationGun>().SwitchMaterials(dispenserMaterial);
 			availableMaterial--;
+			if (availableMaterial <= 0)
+				HUDManager.Instance.HideIndication();
+			UpdateGraph();
 		}
 	}
 
@@ -35,6 +60,8 @@ public class MaterialDispenser : MonoBehaviour
 		{
 			hasPlayer = true;
 			playerTransform = other.transform;
+			if(availableMaterial > 0)
+				HUDManager.Instance.DiplayIndication();
 		}
 	}
 
@@ -44,6 +71,7 @@ public class MaterialDispenser : MonoBehaviour
 		{
 			hasPlayer = false;
 			playerTransform = null;
+			HUDManager.Instance.HideIndication();
 		}
 	}
 }

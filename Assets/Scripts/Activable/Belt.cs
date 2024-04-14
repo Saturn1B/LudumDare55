@@ -5,15 +5,31 @@ using UnityEngine;
 public class Belt : Activable
 {
 	private bool moveBelt;
+	[SerializeField] Material on, off;
+	[SerializeField] GameObject[] arrows;
 
 	protected override void DoPowered()
 	{
-		moveBelt = true;
+		if(moveBelt == false)
+		{
+			moveBelt = true;
+			foreach (var arrow in arrows)
+			{
+				arrow.GetComponent<MeshRenderer>().material = on;
+			}
+		}
 	}
 
 	protected override void DoUnpowered()
 	{
-		moveBelt = false;
+		if(moveBelt == true)
+		{
+			moveBelt = false;
+			foreach (var arrow in arrows)
+			{
+				arrow.GetComponent<MeshRenderer>().material = off;
+			}
+		}
 	}
 
 

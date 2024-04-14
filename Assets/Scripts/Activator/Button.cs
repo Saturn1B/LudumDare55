@@ -7,12 +7,15 @@ public class Button : Activator
 	private bool hasPlayer;
 	private bool isPressed;
 	private Transform playerTransform;
+	[SerializeField] private Animator animator;
 
 	private void Update()
 	{
 		if (hasPlayer && Input.GetKeyDown(KeyCode.E) && !isPressed)
 		{
-			StartCoroutine(ButtonPress());
+			animator.Play("Base Layer.ButtonPress", 0, 0);
+			PowerUp();
+			isPressed = true;
 		}
 	}
 
@@ -21,6 +24,7 @@ public class Button : Activator
 		if (other.CompareTag("Player"))
 		{
 			hasPlayer = true;
+			HUDManager.Instance.DiplayIndication();
 		}
 	}
 
@@ -29,15 +33,7 @@ public class Button : Activator
 		if (other.CompareTag("Player"))
 		{
 			hasPlayer = false;
+			HUDManager.Instance.HideIndication();
 		}
-	}
-
-	private IEnumerator ButtonPress()
-	{
-		PowerUp();
-		isPressed = true;
-		yield return new WaitForSeconds(2f);
-		PowerDown();
-		isPressed = false;
 	}
 }

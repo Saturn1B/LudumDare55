@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum Materials
 {
-	EMPTY,
-	COMPOSITE,
-	ALUMINUM,
-	GLASS
+	EMPTY = 0,
+	COMPOSITE = 1,
+	ALUMINUM = 2,
+	GLASS = 3
 }
 
 public class CreationGun : MonoBehaviour
@@ -25,7 +26,21 @@ public class CreationGun : MonoBehaviour
 	[SerializeField] private GameObject[] aluminumObjects;
 	[SerializeField] private GameObject[] glassObjects;
 
+	[SerializeField] private Material[] ringColor;
+	[SerializeField] private GameObject[] rings;
+
+	[SerializeField] private Image objectIcon;
+	[SerializeField] private Sprite emptyIcon;
+
 	public int test;
+
+	private void Start()
+	{
+		foreach (var ring in rings)
+		{
+			ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
+		}
+	}
 
 	private void Update()
 	{
@@ -38,7 +53,7 @@ public class CreationGun : MonoBehaviour
 			//Right clic
 			if (Input.GetKeyDown(KeyCode.Mouse1) && materials != Materials.EMPTY)
 			{
-				Vector3 objectSize = prefabObject.GetComponent<Renderer>().bounds.size;
+				Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
 
 				Vector3 offset = objectSize * 0.5f;
 				var offsety = objectSize.y * 0.5f;
@@ -47,6 +62,11 @@ public class CreationGun : MonoBehaviour
 				GameObject go = Instantiate(currentObject[currentIndex], summonPoint, Quaternion.identity);
 				go.transform.localEulerAngles = playerCamera.transform.parent.localEulerAngles;
 				materials = Materials.EMPTY;
+				foreach (var ring in rings)
+				{
+					ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
+				}
+				objectIcon.sprite = emptyIcon;
 			}
 
 			//Middle clic
@@ -63,7 +83,7 @@ public class CreationGun : MonoBehaviour
 		//Left clic
 		if (Input.GetKeyDown(KeyCode.Mouse0) && materials != Materials.EMPTY)
 		{
-			Vector3 objectSize = prefabObject.GetComponent<Renderer>().bounds.size;
+			Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
 
 			Vector3 offset = objectSize * 0.5f;
 
@@ -74,9 +94,14 @@ public class CreationGun : MonoBehaviour
 			go.GetComponent<Rigidbody>().AddForce(playerCamera.transform.forward * 20, ForceMode.Impulse);
 
 			materials = Materials.EMPTY;
+			foreach (var ring in rings)
+			{
+				ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
+			}
+			objectIcon.sprite = emptyIcon;
 		}
 
-		if(materials != Materials.EMPTY)
+		if (materials != Materials.EMPTY)
 		{
 			//MouseScroll
 			if (Input.GetAxis("Mouse ScrollWheel") > 0f)
@@ -87,6 +112,8 @@ public class CreationGun : MonoBehaviour
 			{
 				currentIndex = (currentIndex - 1) < 0 ? currentObject.Length - 1 : currentIndex - 1;
 			}
+
+			objectIcon.sprite = currentObject[currentIndex].GetComponent<Object>().objectImage;
 		}
 	}
 
@@ -113,5 +140,11 @@ public class CreationGun : MonoBehaviour
 		}
 
 		currentIndex = 0;
+		objectIcon.sprite = currentObject[currentIndex].GetComponent<Object>().objectImage;
+
+		foreach (var ring in rings)
+		{
+			ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
+		}
 	}
 }

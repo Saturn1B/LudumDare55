@@ -9,6 +9,8 @@ public class Object : MonoBehaviour
 	public Platform platform;
 	public LaserReceiver receiver;
 
+	public Sprite objectImage;
+
 	private void OnDestroy()
 	{
 		if(plate != null)
@@ -23,21 +25,21 @@ public class Object : MonoBehaviour
 		{
 			receiver.GlobalPowerDown();
 		}
-
-		MaterialDispenser[] dispensers = FindObjectsOfType<MaterialDispenser>();
-		foreach (MaterialDispenser dispenser in dispensers)
-		{
-			if(dispenser.GetMaterials() == objectMaterial)
-			{
-				dispenser.AddMaterial(1);
-			}
-		}
 	}
 
 	private void OnTriggerEnter(Collider other)
 	{
 		if ((other.CompareTag("Kill") || other.CompareTag("Laser")) && objectMaterial == Materials.COMPOSITE)
 		{
+			MaterialDispenser[] dispensers = FindObjectsOfType<MaterialDispenser>();
+			foreach (MaterialDispenser dispenser in dispensers)
+			{
+				if (dispenser.GetMaterials() == objectMaterial)
+				{
+					dispenser.AddMaterial(1);
+				}
+			}
+
 			Destroy(this.gameObject);
 		}
 	}

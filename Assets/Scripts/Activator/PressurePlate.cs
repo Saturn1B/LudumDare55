@@ -5,11 +5,16 @@ using UnityEngine;
 public class PressurePlate : Activator
 {
 	private int objectCounter;
+	[SerializeField] private Animator animator;
 
 	public void RemoveOneObject()
 	{
 		objectCounter--;
-		if (objectCounter == 0) PowerDown();
+		if (objectCounter == 0)
+		{
+			animator.Play("Base Layer.PlateUp", 0, 0);
+			PowerDown();
+		}
 	}
 
 	private void OnCollisionEnter(Collision collision)
@@ -21,7 +26,11 @@ public class PressurePlate : Activator
 				collision.transform.GetComponent<Object>().plate = this;
 			}
 
-			if (objectCounter == 0) PowerUp();
+			if (objectCounter == 0)
+			{
+				animator.Play("Base Layer.PlateDown", 0, 0);
+				PowerUp();
+			}
 			objectCounter++;
 		}
 	}
@@ -36,7 +45,11 @@ public class PressurePlate : Activator
 			}
 
 			objectCounter--;
-			if (objectCounter == 0) PowerDown();
+			if (objectCounter == 0)
+			{
+				animator.Play("Base Layer.PlateUp", 0, 0);
+				PowerDown();
+			}
 		}
 	}
 }
