@@ -70,7 +70,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9, y: 0.9, z: 0.1}
+  m_Size: {x: 0.9, y: 1, z: 0.1}
   m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!114 &8803976420434371595
 MonoBehaviour:
@@ -85,6 +85,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reflectedLaser: {fileID: 6772028809851115698}
+  detectionSides:
+  - {fileID: 6390586122746130370}
+  - {fileID: 1430850205222319873}
+  - {fileID: 4084813288152277582}
 --- !u!1 &1430850205222319873
 GameObject:
   m_ObjectHideFlags: 0
@@ -113,8 +117,8 @@ Transform:
   m_GameObject: {fileID: 1430850205222319873}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 50}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7257123070549896147}
@@ -260,7 +264,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9, y: 0.9, z: 0.1}
+  m_Size: {x: 1, y: 1, z: 0.1}
   m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!114 &8224823173068994657
 MonoBehaviour:
@@ -275,6 +279,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reflectedLaser: {fileID: 1430850205222319873}
+  detectionSides:
+  - {fileID: 6390586122746130370}
+  - {fileID: 4084813288152277582}
+  - {fileID: 6772028809851115698}
 --- !u!1 &4084813288152277582
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,8 +311,8 @@ Transform:
   m_GameObject: {fileID: 4084813288152277582}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 50}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2383072074280490492}
@@ -408,8 +416,8 @@ Transform:
   m_GameObject: {fileID: 6390586122746130370}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 50}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1040321263335188164}
@@ -555,7 +563,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9, y: 0.9, z: 0.1}
+  m_Size: {x: 0.9, y: 1, z: 0.1}
   m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!114 &6713134720838222212
 MonoBehaviour:
@@ -570,6 +578,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reflectedLaser: {fileID: 4084813288152277582}
+  detectionSides:
+  - {fileID: 6390586122746130370}
+  - {fileID: 1430850205222319873}
+  - {fileID: 6772028809851115698}
 --- !u!1 &6729371482480237169
 GameObject:
   m_ObjectHideFlags: 0
@@ -640,7 +652,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9, y: 0.9, z: 0.1}
+  m_Size: {x: 1, y: 1, z: 0.1}
   m_Center: {x: 0, y: 0, z: -0.05}
 --- !u!114 &8337965061938653418
 MonoBehaviour:
@@ -655,6 +667,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reflectedLaser: {fileID: 6390586122746130370}
+  detectionSides:
+  - {fileID: 1430850205222319873}
+  - {fileID: 4084813288152277582}
+  - {fileID: 6772028809851115698}
 --- !u!1 &6772028809851115698
 GameObject:
   m_ObjectHideFlags: 0
@@ -683,8 +699,8 @@ Transform:
   m_GameObject: {fileID: 6772028809851115698}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 10}
+  m_LocalPosition: {x: 0, y: 0, z: 50}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5684988971006347462}
