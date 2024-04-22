@@ -1406,7 +1406,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: <color=grey>*To improve our efficiency, we at</color> MatLab <color=grey>may
-    have stolen some technology from</color> Aperture science
+    have stolen some technology from</color> Aperture Laboratories
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
   m_sharedMaterial: {fileID: 4823370150762382916, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
@@ -1663,7 +1663,10 @@ MonoBehaviour:
 
 
     <color=grey>Vaporise Object: </color> Middle
-    Click'
+    Click
+
+
+    <color=grey>Switch Object: </color> Scroll'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
   m_sharedMaterial: {fileID: 4823370150762382916, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
@@ -1690,7 +1693,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.15
+  m_fontSize: 45.45
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2652,7 +2655,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '> CONROLS'
+  m_text: '> CONTROLS'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
   m_sharedMaterial: {fileID: 4823370150762382916, guid: ce6ef9fbc9ac0a74b8f1c74b15c1dc6d, type: 2}
@@ -3427,9 +3430,9 @@ RectTransform:
   - {fileID: 546604315}
   m_Father: {fileID: 82374357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -529.0941}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1634504833
@@ -3633,7 +3636,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1759459371
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4167,9 +4170,9 @@ RectTransform:
   - {fileID: 2003866622}
   m_Father: {fileID: 82374357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -209.69804}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1914313222
@@ -4253,7 +4256,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1935135780
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4416,9 +4419,9 @@ RectTransform:
   - {fileID: 1241485127}
   m_Father: {fileID: 82374357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -369.3961}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1942516941
@@ -4832,9 +4835,9 @@ RectTransform:
   - {fileID: 1202339519}
   m_Father: {fileID: 82374357}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 250, y: -50}
   m_SizeDelta: {x: 500, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2012505262

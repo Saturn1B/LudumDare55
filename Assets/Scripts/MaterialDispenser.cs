@@ -46,7 +46,7 @@ public class MaterialDispenser : MonoBehaviour
 	{
 		if(hasPlayer && Input.GetKeyDown(KeyCode.E) && availableMaterial > 0)
 		{
-			playerTransform.GetComponentInChildren<CreationGun>().SwitchMaterials(dispenserMaterial);
+			if(!playerTransform.GetComponentInChildren<CreationGun>().SwitchMaterials(dispenserMaterial)) return;
 			availableMaterial--;
 			if (availableMaterial <= 0)
 				HUDManager.Instance.HideIndication();

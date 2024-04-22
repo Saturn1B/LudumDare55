@@ -20,7 +20,7 @@ public class CreationGun : MonoBehaviour
 	private Materials materials;
 
 	private GameObject[] currentObject;
-	private int currentIndex;
+	private int[] currentIndex;
 
 	[SerializeField] private GameObject[] compositeObjects;
 	[SerializeField] private GameObject[] aluminumObjects;
@@ -32,14 +32,14 @@ public class CreationGun : MonoBehaviour
 	[SerializeField] private Image objectIcon;
 	[SerializeField] private Sprite emptyIcon;
 
-	public int test;
-
 	private void Start()
 	{
 		foreach (var ring in rings)
 		{
 			ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
 		}
+
+		currentIndex = new int[3];
 	}
 
 	private void Update()
@@ -59,7 +59,7 @@ public class CreationGun : MonoBehaviour
 				var offsety = objectSize.y * 0.5f;
 
 				Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
-				GameObject go = Instantiate(currentObject[currentIndex], summonPoint, Quaternion.identity);
+				GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
 				go.transform.localEulerAngles = playerCamera.transform.parent.localEulerAngles;
 				materials = Materials.EMPTY;
 				foreach (var ring in rings)
@@ -89,7 +89,7 @@ public class CreationGun : MonoBehaviour
 
 			Vector3 summonPoint = barrelEnd.transform.position + barrelEnd.transform.forward * offset.z;
 
-			GameObject go = Instantiate(currentObject[currentIndex], summonPoint, Quaternion.identity);
+			GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
 			go.transform.localEulerAngles = playerCamera.transform.parent.localEulerAngles;
 			go.GetComponent<Rigidbody>().AddForce(playerCamera.transform.forward * 20, ForceMode.Impulse);
 
@@ -106,20 +106,20 @@ public class CreationGun : MonoBehaviour
 			//MouseScroll
 			if (Input.GetAxis("Mouse ScrollWheel") > 0f)
 			{
-				currentIndex = (currentIndex + 1) >= currentObject.Length ? 0 : currentIndex + 1;
+				currentIndex[(int)materials - 1] = (currentIndex[(int)materials - 1] + 1) >= currentObject.Length ? 0 : currentIndex[(int)materials - 1] + 1;
 			}
 			else if (Input.GetAxis("Mouse ScrollWheel") < 0f)
 			{
-				currentIndex = (currentIndex - 1) < 0 ? currentObject.Length - 1 : currentIndex - 1;
+				currentIndex[(int)materials - 1] = (currentIndex[(int)materials - 1] - 1) < 0 ? currentObject.Length - 1 : currentIndex[(int)materials - 1] - 1;
 			}
 
-			objectIcon.sprite = currentObject[currentIndex].GetComponent<Object>().objectImage;
+			objectIcon.sprite = currentObject[currentIndex[(int)materials - 1]].GetComponent<Object>().objectImage;
 		}
 	}
 
-	public void SwitchMaterials(Materials newMat)
+	public bool SwitchMaterials(Materials newMat)
 	{
-		if (materials != Materials.EMPTY) return;
+		if (materials != Materials.EMPTY) return false;
 
 		materials = newMat;
 
@@ -139,12 +139,13 @@ public class CreationGun : MonoBehaviour
 				break;
 		}
 
-		currentIndex = 0;
-		objectIcon.sprite = currentObject[currentIndex].GetComponent<Object>().objectImage;
+		objectIcon.sprite = currentObject[currentIndex[(int)materials - 1]].GetComponent<Object>().objectImage;
 
 		foreach (var ring in rings)
 		{
 			ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
 		}
+
+		return true;
 	}
 }
