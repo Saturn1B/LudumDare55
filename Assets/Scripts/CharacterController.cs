@@ -38,12 +38,9 @@ public class CharacterController : MonoBehaviour
 	void Update()
     {
         RaycastHit hit;
-        bool isGrounded = Physics.Raycast(transform.position, Vector3.down, out hit, checkDistance, groundLayer);
-
-        float currSpeed = isGrounded ? speed : speed / 4;
+        bool isGrounded = Physics.SphereCast(transform.position, 0.5f, Vector3.down, out hit, checkDistance, groundLayer);
 
         HandleMouseLook();
-        Move(currSpeed);
 
         if (isGrounded)
         {
@@ -51,7 +48,17 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-	private void Move(float currSpeed)
+	private void FixedUpdate()
+	{
+        RaycastHit hit;
+        bool isGrounded = Physics.SphereCast(transform.position, 0.5f, Vector3.down, out hit, checkDistance, groundLayer);
+
+        float currSpeed = isGrounded ? speed : speed / 16;
+
+        Move(currSpeed);
+    }
+
+    private void Move(float currSpeed)
 	{
         float xInput = Input.GetAxisRaw("Horizontal");
         float zInput = Input.GetAxisRaw("Vertical");
@@ -59,10 +66,7 @@ public class CharacterController : MonoBehaviour
         Vector3 forwardDirection = transform.forward;
         Vector3 movementDirection = (forwardDirection * zInput + transform.right * xInput).normalized;
 
-
-        rb.AddForce(movementDirection * currSpeed * Time.deltaTime, ForceMode.VelocityChange);
-
-        //rb.velocity = new Vector3(movementDirection.x * speed, rb.velocity.y, movementDirection.z * speed);
+        rb.AddForce(movementDirection * currSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
 	}
 
     private void Jump()
@@ -73,16 +77,22 @@ public class CharacterController : MonoBehaviour
 		}
 	}
 
+    private float smoothedYaw;
+    private float smoothedPitch;
+
     private void HandleMouseLook()
     {
         // Camera Look
-        yaw += Input.GetAxisRaw("Mouse X") * lookSensitivity;
-        pitch -= Input.GetAxisRaw("Mouse Y") * lookSensitivity;
+        yaw += Input.GetAxis("Mouse X") * lookSensitivity;
+        pitch -= Input.GetAxis("Mouse Y") * lookSensitivity;
 
         pitch = ClampAngle(pitch, minPitch, maxPitch);
 
-        transform.eulerAngles = new Vector3(0.0f, yaw, 0.0f);
-        playerCamera.transform.localEulerAngles = new Vector3(pitch, 0.0f, 0.0f);
+        smoothedYaw = Mathf.Lerp(smoothedYaw, yaw, 50 * Time.deltaTime);
+        smoothedPitch = Mathf.Lerp(smoothedPitch, pitch, 50 * Time.deltaTime);
+
+        transform.eulerAngles = new Vector3(0.0f, smoothedYaw, 0.0f);
+        playerCamera.transform.localEulerAngles = new Vector3(smoothedPitch, 0.0f, 0.0f);
     }
 
     private float ClampAngle(float angle, float min, float max)
