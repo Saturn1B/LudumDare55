@@ -15,6 +15,14 @@ public class MainMenu : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (PlayerPrefs.HasKey($"Level{i + 1}"))
+			{
+				PlayerPrefs.SetInt($"Level{i + 1}", 0);
+			}
+		}
 	}
 
 	public void SwitchPanel(GameObject newPanel)
