@@ -9,6 +9,9 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float speed;
     [SerializeField] private float maxStepHeight;
+    [SerializeField] private Transform middleCheck, rightCheck, leftCheck;
+    [SerializeField] private LayerMask laserLayer;
+
 
     [Space]
 
@@ -69,11 +72,17 @@ public class CharacterController : MonoBehaviour
         Vector3 movementDirection = (forwardDirection * zInput + transform.right * xInput).normalized;
 
         RaycastHit hit;
-        Vector3 bottom = transform.position - new Vector3(0, GetComponent<CapsuleCollider>().bounds.extents.y, 0);
-        bool onStep = Physics.Raycast(bottom, movementDirection, out hit, .5f);
+        bool onStep = Physics.Raycast(middleCheck.position, movementDirection, out hit, .5f, ~laserLayer);
+        if(!onStep)
+            onStep = Physics.Raycast(rightCheck.position, movementDirection, out hit, .5f, ~laserLayer);
+        if (!onStep)
+            onStep = Physics.Raycast(leftCheck.position, movementDirection, out hit, .5f, ~laserLayer);
+
 
         if (onStep && hit.transform.GetComponent<Collider>() && hit.transform.GetComponent<Collider>().bounds.extents.y * 2 <= maxStepHeight)
         {
+            if (hit.transform.GetComponent<JumpPad>()) return;
+
             Vector3 stepOffset = new Vector3(0, hit.transform.GetComponent<Collider>().bounds.extents.y * 2, 0);
             transform.position += stepOffset;
         }
