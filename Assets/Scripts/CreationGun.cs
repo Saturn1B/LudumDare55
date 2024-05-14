@@ -32,6 +32,8 @@ public class CreationGun : MonoBehaviour
 	[SerializeField] private Image objectIcon;
 	[SerializeField] private Sprite emptyIcon;
 
+	[SerializeField] private LayerMask layer;
+
 	private void Start()
 	{
 		foreach (var ring in rings)
@@ -47,8 +49,8 @@ public class CreationGun : MonoBehaviour
 		shoulder.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, 0, 0);
 
 		RaycastHit hit;
-		Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * 100, Color.red, 1);
-		if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 100))
+		//Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * 100, Color.red, 1);
+		if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 100, ~layer))
 		{
 			//Right clic
 			if (Input.GetKeyDown(KeyCode.Mouse1) && materials != Materials.EMPTY)

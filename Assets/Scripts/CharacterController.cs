@@ -8,6 +8,7 @@ public class CharacterController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float speed;
+    [SerializeField] private float maxStepHeight;
 
     [Space]
 
@@ -64,7 +65,18 @@ public class CharacterController : MonoBehaviour
         float zInput = Input.GetAxisRaw("Vertical");
 
         Vector3 forwardDirection = transform.forward;
+
         Vector3 movementDirection = (forwardDirection * zInput + transform.right * xInput).normalized;
+
+        RaycastHit hit;
+        Vector3 bottom = transform.position - new Vector3(0, GetComponent<CapsuleCollider>().bounds.extents.y, 0);
+        bool onStep = Physics.Raycast(bottom, movementDirection, out hit, .5f);
+
+        if (onStep && hit.transform.GetComponent<Collider>() && hit.transform.GetComponent<Collider>().bounds.extents.y * 2 <= maxStepHeight)
+        {
+            Vector3 stepOffset = new Vector3(0, hit.transform.GetComponent<Collider>().bounds.extents.y * 2, 0);
+            transform.position += stepOffset;
+        }
 
         rb.AddForce(movementDirection * currSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
 	}
