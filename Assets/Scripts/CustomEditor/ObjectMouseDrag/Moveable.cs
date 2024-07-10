@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class Moveable : ObjectMouseDrag
 {
+	private void Awake()
+	{
+		ObjectRegister.Instance.moveableObjects.Add(this);
+		this.enabled = false;
+	}
+
 	protected override void ObjectModification(Vector3 vectorDirection, int vectorDir)
 	{
 		int camRotx = 1;
