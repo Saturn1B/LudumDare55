@@ -31,9 +31,11 @@ public class EditorHUDManager : MonoBehaviour
 	private void Start()
 	{
 		SwitchMouseDragMode((int)MouseDragMode.MOVEABLE);
+		PopulateObjectSelecter();
 	}
 
 	private MouseDragMode _mouseDragMode;
+	[Header("Mouse Drag Mode")]
 	[SerializeField] private GameObject[] mouseDragModeImages;
 
 	public void SwitchMouseDragMode(int mode)
@@ -58,6 +60,25 @@ public class EditorHUDManager : MonoBehaviour
 				mouseDragModeImages[i].SetActive(true);
 			else
 				mouseDragModeImages[i].SetActive(false);
+		}
+	}
+
+	[Space]
+
+	[Header("Object Selecter")]
+	[SerializeField] private Transform objectSelecterTransform;
+	[SerializeField] private GameObject objectButtonPrefab;
+	private UnityEngine.Object[] sceneObjectSOs;
+
+	private void PopulateObjectSelecter()
+	{
+		sceneObjectSOs = Resources.LoadAll("SceneObjects", typeof(SceneObjectSO));
+		Debug.Log(sceneObjectSOs.Length);
+		foreach (var sObject in sceneObjectSOs)
+		{
+			SceneObjectSO currentObject = (SceneObjectSO)sObject;
+			GameObject o = Instantiate(objectButtonPrefab, objectSelecterTransform);
+			o.GetComponent<ObjectButton>().ButtonSetter(currentObject.objectName, currentObject.objectPrefab, currentObject.objectSprite);
 		}
 	}
 }
