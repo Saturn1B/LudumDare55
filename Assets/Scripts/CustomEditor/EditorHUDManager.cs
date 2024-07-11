@@ -69,16 +69,36 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private Transform objectSelecterTransform;
 	[SerializeField] private GameObject objectButtonPrefab;
 	private UnityEngine.Object[] sceneObjectSOs;
+	[SerializeField] private List<ObjectButton> objectButtons;
 
 	private void PopulateObjectSelecter()
 	{
 		sceneObjectSOs = Resources.LoadAll("SceneObjects", typeof(SceneObjectSO));
-		Debug.Log(sceneObjectSOs.Length);
+
 		foreach (var sObject in sceneObjectSOs)
 		{
 			SceneObjectSO currentObject = (SceneObjectSO)sObject;
 			GameObject o = Instantiate(objectButtonPrefab, objectSelecterTransform);
 			o.GetComponent<ObjectButton>().ButtonSetter(currentObject.objectName, currentObject.objectPrefab, currentObject.objectSprite);
+			objectButtons.Add(o.GetComponent<ObjectButton>());
+		}
+
+		for (int i = 0; i < objectButtons.Count; i++)
+		{
+			objectButtons[i].id = i;
+		}
+
+		SwitchCurrentObject(0);
+	}
+
+	public void SwitchCurrentObject(int id)
+	{
+		foreach (var sObject in objectButtons)
+		{
+			if (sObject.id == id)
+				sObject.ChangeSelectedState(true);
+			else
+				sObject.ChangeSelectedState(false);
 		}
 	}
 }
