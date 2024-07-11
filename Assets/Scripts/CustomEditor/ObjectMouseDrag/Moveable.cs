@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Moveable : ObjectMouseDrag
 {
-	private void Awake()
+	protected override void Start()
 	{
+		base.Start();
 		ObjectRegister.Instance.moveableObjects.Add(this);
-		this.enabled = false;
 	}
 
 	protected override void ObjectModification(Vector3 vectorDirection, int vectorDir)

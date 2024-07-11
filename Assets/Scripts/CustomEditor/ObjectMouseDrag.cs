@@ -24,7 +24,7 @@ public class ObjectMouseDrag : MonoBehaviour
 
 	CurrentFaceDirection faceDirection;
 
-	private void Start()
+	protected virtual void Start()
 	{
 		editorCam = FindObjectOfType<FreeEditorCam>();
 	}

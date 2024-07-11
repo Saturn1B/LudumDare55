@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Scaleable : ObjectMouseDrag
 {
-	private void Awake()
+	protected override void Start()
 	{
+		base.Start();
 		ObjectRegister.Instance.scaleableObjects.Add(this);
-		this.enabled = false;
 	}
 
 	protected override void ObjectModification(Vector3 vectorDirection, int vectorDir)
