@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
+//[ExecuteInEditMode]
 public class ReCalcCubeTexture : MonoBehaviour
 {
     private Vector3 _currentScale;

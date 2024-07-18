@@ -21,6 +21,8 @@ public class ObjectRegister : MonoBehaviour
 	[HideInInspector] public List<Moveable> moveableObjects = new List<Moveable>();
 	[HideInInspector] public List<Scaleable> scaleableObjects = new List<Scaleable>();
 
+	private MouseDragMode _mouseDragMode;
+
 	public void SetMoveableMode()
 	{
 		//Deactivate other component
@@ -34,6 +36,8 @@ public class ObjectRegister : MonoBehaviour
 		{
 			moveable.enabled = true;
 		}
+
+		_mouseDragMode = MouseDragMode.MOVEABLE;
 	}
 
 	public void SetScaleableMode()
@@ -48,6 +52,25 @@ public class ObjectRegister : MonoBehaviour
 		foreach (Scaleable scaleable in scaleableObjects)
 		{
 			scaleable.enabled = true;
+		}
+
+		_mouseDragMode = MouseDragMode.SCALEABLE;
+	}
+
+	public void RefreshMode()
+	{
+		switch (_mouseDragMode)
+		{
+			case MouseDragMode.MOVEABLE:
+				SetMoveableMode();
+				break;
+			case MouseDragMode.SCALEABLE:
+				SetScaleableMode();
+				break;
+			case MouseDragMode.PIVOTABLE:
+				break;
+			default:
+				break;
 		}
 	}
 }

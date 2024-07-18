@@ -10,6 +10,10 @@ public class ObjectButton : MonoBehaviour
 	[SerializeField] private GameObject outline;
 	[HideInInspector] public int id;
 
+	[Header("Specials")]
+	[SerializeField] bool isNone;
+	[SerializeField] bool isDelete;
+
 	private void Awake()
 	{
 		GetComponent<UnityEngine.UI.Button>().onClick.AddListener(SwitchToObject);
@@ -25,6 +29,12 @@ public class ObjectButton : MonoBehaviour
 	private void SwitchToObject()
 	{
 		EditorHUDManager.Instance.SwitchCurrentObject(id);
+		if (isNone || isDelete)
+			ObjectPlacer.Instance.SetCurrentObject(null);
+		else
+			ObjectPlacer.Instance.SetCurrentObject(objectPrefab);
+
+		ObjectPlacer.Instance.isDelete = isDelete;
 	}
 
 	public void ChangeSelectedState(bool isSelected)

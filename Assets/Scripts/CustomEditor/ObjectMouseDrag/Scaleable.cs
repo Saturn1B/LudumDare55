@@ -6,8 +6,8 @@ public class Scaleable : ObjectMouseDrag
 {
 	protected override void Start()
 	{
-		base.Start();
 		ObjectRegister.Instance.scaleableObjects.Add(this);
+		base.Start();
 	}
 
 	protected override void ObjectModification(Vector3 vectorDirection, int vectorDir)

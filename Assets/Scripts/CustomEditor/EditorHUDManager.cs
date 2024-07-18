@@ -28,6 +28,8 @@ public class EditorHUDManager : MonoBehaviour
 		}
 	}
 
+	private int selectedId;
+
 	private void Start()
 	{
 		SwitchMouseDragMode((int)MouseDragMode.MOVEABLE);
@@ -61,6 +63,11 @@ public class EditorHUDManager : MonoBehaviour
 			else
 				mouseDragModeImages[i].SetActive(false);
 		}
+
+		if (selectedId == 0) return;
+
+		SwitchCurrentObject(0);
+		ObjectPlacer.Instance.SetCurrentObject(null);
 	}
 
 	[Space]
@@ -93,6 +100,7 @@ public class EditorHUDManager : MonoBehaviour
 
 	public void SwitchCurrentObject(int id)
 	{
+		selectedId = id;
 		foreach (var sObject in objectButtons)
 		{
 			if (sObject.id == id)
