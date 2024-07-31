@@ -24,6 +24,9 @@ public class ObjectMouseDrag : MonoBehaviour
 
 	CurrentFaceDirection faceDirection;
 
+	public bool wasSelected;
+	public bool isSelected;
+
 	protected virtual void Start()
 	{
 		editorCam = FindObjectOfType<FreeEditorCam>();
@@ -40,6 +43,7 @@ public class ObjectMouseDrag : MonoBehaviour
 
 		if (mousePressed)
 		{
+
 			Vector2 newDelta = new Vector2(-Mathf.RoundToInt(initMousePos.x - Input.mousePosition.x) / 100, -Mathf.RoundToInt(initMousePos.y - Input.mousePosition.y) / 100);
 			if (oldDelta != newDelta)
 			{
@@ -65,8 +69,9 @@ public class ObjectMouseDrag : MonoBehaviour
 		Vector3 mouse = Input.mousePosition;
 		Ray castPoint = Camera.main.ScreenPointToRay(mouse);
 
-		if (Physics.Raycast(castPoint, out hit, 100) && (Input.GetMouseButtonDown(0)))
+		if (Physics.Raycast(castPoint, out hit, 100) && (Input.GetMouseButtonDown(0)) && wasSelected == isSelected)
 		{
+			Debug.Log("test2");
 			if (hit.transform.gameObject != gameObject)
 			{
 				return;

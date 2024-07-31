@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ObjectButton : MonoBehaviour
 {
-	private GameObject objectPrefab;
+	[HideInInspector] public GameObject objectPrefab;
 	[SerializeField] private Image objectImage;
 	[SerializeField] private GameObject outline;
 	[HideInInspector] public int id;

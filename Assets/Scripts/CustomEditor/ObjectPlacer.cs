@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+public enum SelectionMode
+{
+	NONE = 0,
+	DELETE = 1,
+	OBJECT = 2
+}
+
 public class ObjectPlacer : MonoBehaviour
 {
 	public static ObjectPlacer Instance { get; private set; }
@@ -28,16 +35,31 @@ public class ObjectPlacer : MonoBehaviour
 
 	/*[HideInInspector]*/ public bool isDelete;
 	[HideInInspector] public bool mouseOverSelecterUI;
+	[HideInInspector] public bool mouseOverDragUI;
 
 	public void SetCurrentObject(GameObject currentObject)
 	{
 		currentObjectPrefab = currentObject;
+	}
+	public SelectionMode GetSelectionMode()
+	{
+		SelectionMode _mode;
+
+		if(currentObjectPrefab != null)
+			_mode = SelectionMode.OBJECT;
+		else if (isDelete)
+			_mode = SelectionMode.DELETE;
+		else
+			_mode = SelectionMode.NONE;
+
+		return _mode;
 	}
 
 	private void Update()
 	{
 		if (currentObjectPrefab == null && isDelete == false) return;
 		if (mouseOverSelecterUI == true) return;
+		if (mouseOverDragUI == true) return;
 
 		if (Input.GetKeyDown(KeyCode.Mouse0))
 		{

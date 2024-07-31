@@ -101,12 +101,27 @@ public class EditorHUDManager : MonoBehaviour
 	public void SwitchCurrentObject(int id)
 	{
 		selectedId = id;
+		ObjectButton sButton = null;
 		foreach (var sObject in objectButtons)
 		{
 			if (sObject.id == id)
+			{
 				sObject.ChangeSelectedState(true);
+				sButton = sObject;
+			}
 			else
 				sObject.ChangeSelectedState(false);
 		}
+
+		if (id == 1)
+			ObjectPlacer.Instance.isDelete = true;
+		else
+			ObjectPlacer.Instance.isDelete = false;
+
+		if (id == 0 || id == 1)
+			ObjectPlacer.Instance.SetCurrentObject(null);
+		else
+			ObjectPlacer.Instance.SetCurrentObject(sButton.objectPrefab);
+
 	}
 }

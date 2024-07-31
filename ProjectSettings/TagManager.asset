@@ -9,6 +9,7 @@ TagManager:
   - PlatformEndPoint
   - Kill
   - Laser
+  - Selectable
   layers:
   - Default
   - TransparentFX
