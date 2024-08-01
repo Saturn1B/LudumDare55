@@ -71,7 +71,6 @@ public class ObjectMouseDrag : MonoBehaviour
 
 		if (Physics.Raycast(castPoint, out hit, 100) && (Input.GetMouseButtonDown(0)) && wasSelected == isSelected)
 		{
-			Debug.Log("test2");
 			if (hit.transform.gameObject != gameObject)
 			{
 				return;
