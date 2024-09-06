@@ -39,6 +39,8 @@ public class GizmoControl : MonoBehaviour
 		{
 			mousePressed = false;
 			currentAxis = null;
+
+			EndObjectModification();
 		}
 
 		if (mousePressed)
@@ -131,6 +133,11 @@ public class GizmoControl : MonoBehaviour
 	}
 
 	protected virtual void ObjectModification(Vector3 vectorDirection)
+	{
+
+	}
+
+	protected virtual void EndObjectModification()
 	{
 
 	}
