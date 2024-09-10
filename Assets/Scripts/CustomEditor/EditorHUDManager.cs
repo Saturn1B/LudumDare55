@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 
 [System.Serializable]
-public enum MouseDragMode
+public enum GizmoMode
 {
 	MOVEABLE = 0,
 	SCALEABLE = 1,
@@ -32,29 +32,17 @@ public class EditorHUDManager : MonoBehaviour
 
 	private void Start()
 	{
-		SwitchMouseDragMode((int)MouseDragMode.MOVEABLE);
+		SwitchGizmoMode((int)GizmoMode.MOVEABLE);
 		PopulateObjectSelecter();
 	}
 
-	private MouseDragMode _mouseDragMode;
+	private GizmoMode _gizmoMode;
 	[Header("Mouse Drag Mode")]
 	[SerializeField] private GameObject[] mouseDragModeImages;
 
-	public void SwitchMouseDragMode(int mode)
+	public void SwitchGizmoMode(int mode)
 	{
-		switch ((MouseDragMode)mode)
-		{
-			case MouseDragMode.MOVEABLE:
-				ObjectRegister.Instance.SetMoveableMode();
-				break;
-			case MouseDragMode.SCALEABLE:
-				ObjectRegister.Instance.SetScaleableMode();
-				break;
-			case MouseDragMode.PIVOTABLE:
-				break;
-			default:
-				break;
-		}
+		GizmoGestion.Instance.RefreshGizmoMode((GizmoMode)mode);
 
 		for (int i = 0; i < mouseDragModeImages.Length; i++)
 		{

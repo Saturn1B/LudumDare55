@@ -30,7 +30,6 @@ public class ObjectMouseDrag : MonoBehaviour
 	protected virtual void Start()
 	{
 		editorCam = FindObjectOfType<FreeEditorCam>();
-		ObjectRegister.Instance.RefreshMode();
 	}
 
 	private void Update()

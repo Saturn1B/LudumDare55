@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 8687777856372754254}
   - component: {fileID: 6363885597033370801}
   - component: {fileID: 4862114414560750682}
-  - component: {fileID: 8733361004684145028}
-  - component: {fileID: 8439568084485733744}
+  - component: {fileID: 7666161360654603193}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Selectable
@@ -126,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e2d1a1ed46ede04e9ad8743922d478a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8733361004684145028
+--- !u!114 &7666161360654603193
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -135,21 +134,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 850536429210657331}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0a89f4a30507e5409f3f3a88f34b2cf, type: 3}
+  m_Script: {fileID: 11500000, guid: 150c2f8eb6802584cae7f51ffc6519b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8439568084485733744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 850536429210657331}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec30d84f383f2614395916b49d0cdfae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  canTranslate: 1
+  canScale: 1
+  canRotate: 0
+  X: 0
+  Y: 1
+  Z: 0
 --- !u!1 &2711610120960682088
 GameObject:
   m_ObjectHideFlags: 0

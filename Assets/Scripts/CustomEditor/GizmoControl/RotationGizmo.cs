@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RotationGizmo : GizmoControl
 {
-    [SerializeField] private bool allowXRot, allowYRot, allowZRot;
+    public bool allowXRot, allowYRot, allowZRot;
 
 	private GameObject objectTransform;
 

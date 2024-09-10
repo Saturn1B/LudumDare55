@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class Scaleable : ObjectMouseDrag
 {
-	protected override void Start()
-	{
-		ObjectRegister.Instance.scaleableObjects.Add(this);
-		base.Start();
-	}
-
 	protected override void ObjectModification(Vector3 vectorDirection, int vectorDir)
 	{
 		int camRotx = 1;

@@ -71,10 +71,6 @@ public class ObjectPlacer : MonoBehaviour
 				{
 					if (!hit.transform.GetComponent<Undeletable>())
 					{
-						if (hit.transform.GetComponent<Scaleable>())
-							ObjectRegister.Instance.scaleableObjects.Remove(hit.transform.GetComponent<Scaleable>());
-						if (hit.transform.GetComponent<Moveable>())
-							ObjectRegister.Instance.moveableObjects.Remove(hit.transform.GetComponent<Moveable>());
 						Destroy(hit.transform.gameObject);
 					}
 				}

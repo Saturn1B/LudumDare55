@@ -37,14 +37,13 @@ public class ObjectSelection : MonoBehaviour
                 {
                     if (selected == hit.transform)
 					{
-                        SelectObject(selected, true);
                         return;
                     }
 
                     if(selected != null)
 					{
                         selected.gameObject.GetComponent<Outline>().enabled = false;
-                        SelectObject(selected, false);
+                        GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
                     }
 
                     selected = hit.transform;
@@ -60,17 +59,21 @@ public class ObjectSelection : MonoBehaviour
                         selected.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
                     }
 
-                    SelectObject(selected, true);
+                    GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
                 }
-				else
+                else if (hit.transform.gameObject.layer == 8)
 				{
+                    //DO NOTHING
+				}
+				else
+                {
                     if (selected != null)
                     {
                         selected.gameObject.GetComponent<Outline>().enabled = false;
-                        SelectObject(selected, false);
                     }
 
                     selected = null;
+                    GizmoGestion.Instance.DeactivateGizmo();
                 }
             }
 			else
@@ -78,21 +81,11 @@ public class ObjectSelection : MonoBehaviour
                 if (selected != null)
                 {
                     selected.gameObject.GetComponent<Outline>().enabled = false;
-                    SelectObject(selected, false);
                 }
 
                 selected = null;
+                GizmoGestion.Instance.DeactivateGizmo();
             }
-        }
-    }
-
-    void SelectObject(Transform s, bool isSelected)
-	{
-        ObjectMouseDrag[] objectMouseDrags = s.GetComponents<ObjectMouseDrag>();
-        foreach (var drag in objectMouseDrags)
-        {
-            drag.wasSelected = drag.isSelected;
-            drag.isSelected = isSelected;
         }
     }
 }
