@@ -30,7 +30,7 @@ public class PositionGizmo : GizmoControl
 		if (Input.GetMouseButton(0))
 		{
 			Vector3 originalePosition = affectedObject.transform.position;
-			Vector3 tempPosition = originalePosition + new Vector3(axis.x * usedMouseDelta * vectorDir * camRotx, axis.y * usedMouseDelta * vectorDir, axis.z * usedMouseDelta * vectorDir * camRotz);
+			Vector3 tempPosition = originalePosition + new Vector3(axis.x * usedMouseDelta * vectorDir * camRotx, axis.y * usedMouseDelta * vectorDir, axis.z * usedMouseDelta * vectorDir * camRotz) * .5f;
 
 			affectedObject.transform.position = tempPosition;
 		}

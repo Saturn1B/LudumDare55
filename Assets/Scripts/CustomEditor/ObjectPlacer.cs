@@ -82,6 +82,13 @@ public class ObjectPlacer : MonoBehaviour
 
 					Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
 					summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
+
+					if (currentObjectPrefab.GetComponent<ModifiableObject>() && !currentObjectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
+						summonPoint -= Vector3.up * .5f;
+
+					if (currentObjectPrefab.GetComponent<ModifiableObject>() && currentObjectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
+						summonPoint += Vector3.forward * .5f;
+
 					GameObject go = Instantiate(currentObjectPrefab, summonPoint, Quaternion.identity);
 				}
 			}

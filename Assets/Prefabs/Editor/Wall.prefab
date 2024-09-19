@@ -137,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 150c2f8eb6802584cae7f51ffc6519b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isGroundOrWall: 1
   canTranslate: 1
   canScale: 1
   canRotate: 0
