@@ -7,6 +7,7 @@ public class ObjectSelection : MonoBehaviour
 {
     [HideInInspector] public Transform selected;
     [HideInInspector] public bool mouseOverDragUI;
+    public LayerMask gizmoLayer;
 
     public static ObjectSelection Instance { get; private set; }
 
@@ -26,10 +27,19 @@ public class ObjectSelection : MonoBehaviour
     {
         if (ObjectPlacer.Instance.GetSelectionMode() != SelectionMode.NONE) return;
         if (mouseOverDragUI) return;
+        if (ObjectPlacer.Instance.mouseOverSelecterUI) return;
 
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
+            RaycastHit gizmoHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+
+            if (Physics.Raycast(ray, out gizmoHit, 100, gizmoLayer))
+			{
+                if (gizmoHit.transform != null) return;
+			}
+
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100))
 			{

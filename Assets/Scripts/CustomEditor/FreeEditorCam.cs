@@ -52,8 +52,11 @@ public class FreeEditorCam : MonoBehaviour
 				parentTransform.Translate(new Vector3(mouseX, mouseY, 0));
 			}
 
-			float scroll = Input.GetAxis("Mouse ScrollWheel") * scrollSpeed * Time.deltaTime;
-			parentTransform.Translate(transform.forward * scroll, Space.World);
+			if (!ObjectPlacer.Instance.mouseOverSelecterUI)
+			{
+				float scroll = Input.GetAxis("Mouse ScrollWheel") * scrollSpeed * Time.deltaTime;
+				parentTransform.Translate(transform.forward * scroll, Space.World);
+			}
 		}
 	}
 }
