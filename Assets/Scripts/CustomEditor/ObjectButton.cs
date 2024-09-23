@@ -29,10 +29,23 @@ public class ObjectButton : MonoBehaviour
 	private void SwitchToObject()
 	{
 		EditorHUDManager.Instance.SwitchCurrentObject(id);
-		if (isNone || isDelete)
+		if (isNone)
+		{
 			ObjectPlacer.Instance.SetCurrentObject(null);
+			EditorHUDManager.Instance.SwitchGizmoMode(0);
+		}
+		else if (isDelete)
+		{
+			ObjectPlacer.Instance.SetCurrentObject(null);
+			EditorHUDManager.Instance.SwitchGizmoMode();
+			ObjectSelection.Instance.DeselectObject();
+		}
 		else
+		{
 			ObjectPlacer.Instance.SetCurrentObject(objectPrefab);
+			EditorHUDManager.Instance.SwitchGizmoMode();
+			ObjectSelection.Instance.DeselectObject();
+		}
 
 		ObjectPlacer.Instance.isDelete = isDelete;
 	}

@@ -10,6 +10,11 @@ public class RotationGizmo : GizmoControl
 
 	private void OnEnable()
 	{
+		RefreshGizmo();
+	}
+
+	public void RefreshGizmo()
+	{
 		objectTransform = affectedObject.transform.GetChild(0).gameObject;
 
 		if (allowXRot) xControl[0].gameObject.SetActive(true);

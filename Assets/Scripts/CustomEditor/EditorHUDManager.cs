@@ -39,9 +39,19 @@ public class EditorHUDManager : MonoBehaviour
 	private GizmoMode _gizmoMode;
 	[Header("Mouse Drag Mode")]
 	[SerializeField] private GameObject[] mouseDragModeImages;
+	[SerializeField] private UnityEngine.UI.Button translateButton, scaleButton, rotationButton;
 
-	public void SwitchGizmoMode(int mode)
+	public void SwitchGizmoMode(int mode = -1)
 	{
+		if(mode == -1)
+		{
+			foreach (var gizmoMode in mouseDragModeImages)
+			{
+				gizmoMode.SetActive(false);
+			}
+			return;
+		}
+
 		GizmoGestion.Instance.RefreshGizmoMode((GizmoMode)mode);
 
 		for (int i = 0; i < mouseDragModeImages.Length; i++)
@@ -56,6 +66,13 @@ public class EditorHUDManager : MonoBehaviour
 
 		SwitchCurrentObject(0);
 		ObjectPlacer.Instance.SetCurrentObject(null);
+	}
+
+	public void GizmoSelectionButton(bool translateState, bool scaleState, bool rotationState)
+	{
+		translateButton.interactable = translateState;
+		scaleButton.interactable = scaleState;
+		rotationButton.interactable = rotationState;
 	}
 
 	[Space]

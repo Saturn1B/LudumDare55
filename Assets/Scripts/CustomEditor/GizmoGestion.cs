@@ -20,6 +20,7 @@ public class GizmoGestion : MonoBehaviour
 
 	[SerializeField] private GameObject positionGizmoObject, scaleGizmoObject, rotationGizmoObject, gizmoCenter;
 	[SerializeField] private RotationGizmo rotationGizmo;
+	[SerializeField] private ScaleGizmo scaleGizmo;
 	[SerializeField] private Transform modifiableObjectParent;
 
 	private ModifiableObject currentModifiableObject;
@@ -37,6 +38,8 @@ public class GizmoGestion : MonoBehaviour
 
 		if (currentModifiableObject == null) return;
 
+		bool isGizmoSet = false;
+
 		switch (_gizmoMode)
 		{
 			case GizmoMode.MOVEABLE:
@@ -45,13 +48,19 @@ public class GizmoGestion : MonoBehaviour
 				positionGizmoObject.SetActive(true);
 				scaleGizmoObject.SetActive(false);
 				rotationGizmoObject.SetActive(false);
+
+				isGizmoSet = true;
 				break;
 			case GizmoMode.SCALEABLE:
 				if (!currentModifiableObject.canScale) break;
 
+				scaleGizmo.RefreshGizmo();
+
 				positionGizmoObject.SetActive(false);
 				scaleGizmoObject.SetActive(true);
 				rotationGizmoObject.SetActive(false);
+
+				isGizmoSet = true;
 				break;
 			case GizmoMode.PIVOTABLE:
 				if (!currentModifiableObject.canRotate) break;
@@ -60,10 +69,19 @@ public class GizmoGestion : MonoBehaviour
 				rotationGizmo.allowYRot = currentModifiableObject.Y;
 				rotationGizmo.allowZRot = currentModifiableObject.Z;
 
+				rotationGizmo.RefreshGizmo();
+
 				positionGizmoObject.SetActive(false);
 				scaleGizmoObject.SetActive(false);
 				rotationGizmoObject.SetActive(true);
+
+				isGizmoSet = true;
 				break;
+		}
+
+		if (!isGizmoSet)
+		{
+			EditorHUDManager.Instance.SwitchGizmoMode(0);
 		}
 	}
 
@@ -81,6 +99,10 @@ public class GizmoGestion : MonoBehaviour
 
 		gizmoCenter.SetActive(true);
 
+		EditorHUDManager.Instance.GizmoSelectionButton(currentModifiableObject.canTranslate, currentModifiableObject.canScale, currentModifiableObject.canRotate);
+
+		bool isGizmoSet = false;
+
 		switch (_gizmoMode)
 		{
 			case GizmoMode.MOVEABLE:
@@ -89,13 +111,19 @@ public class GizmoGestion : MonoBehaviour
 				positionGizmoObject.SetActive(true);
 				scaleGizmoObject.SetActive(false);
 				rotationGizmoObject.SetActive(false);
+
+				isGizmoSet = true;
 				break;
 			case GizmoMode.SCALEABLE:
 				if (!currentModifiableObject.canScale) break;
 
+				scaleGizmo.RefreshGizmo();
+
 				positionGizmoObject.SetActive(false);
 				scaleGizmoObject.SetActive(true);
 				rotationGizmoObject.SetActive(false);
+
+				isGizmoSet = true;
 				break;
 			case GizmoMode.PIVOTABLE:
 				if (!currentModifiableObject.canRotate) break;
@@ -104,10 +132,19 @@ public class GizmoGestion : MonoBehaviour
 				rotationGizmo.allowYRot = currentModifiableObject.Y;
 				rotationGizmo.allowZRot = currentModifiableObject.Z;
 
+				rotationGizmo.RefreshGizmo();
+
 				positionGizmoObject.SetActive(false);
 				scaleGizmoObject.SetActive(false);
 				rotationGizmoObject.SetActive(true);
+
+				isGizmoSet = true;
 				break;
+		}
+
+		if (!isGizmoSet)
+		{
+			EditorHUDManager.Instance.SwitchGizmoMode(0);
 		}
 	}
 

@@ -10,6 +10,11 @@ public class ScaleGizmo : GizmoControl
 
 	private void OnEnable()
 	{
+		RefreshGizmo();
+	}
+
+	public void RefreshGizmo()
+	{
 		objectTransform = affectedObject.transform.GetChild(0).gameObject;
 	}
 

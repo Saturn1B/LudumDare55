@@ -23,6 +23,18 @@ public class ObjectSelection : MonoBehaviour
         }
     }
 
+    public void DeselectObject()
+	{
+        if (selected != null)
+        {
+            selected.gameObject.GetComponent<Outline>().enabled = false;
+        }
+
+        selected = null;
+        GizmoGestion.Instance.DeactivateGizmo();
+        EditorHUDManager.Instance.GizmoSelectionButton(true, true, true);
+    }
+
     void Update()
     {
         if (ObjectPlacer.Instance.GetSelectionMode() != SelectionMode.NONE) return;
@@ -77,24 +89,12 @@ public class ObjectSelection : MonoBehaviour
 				}
 				else
                 {
-                    if (selected != null)
-                    {
-                        selected.gameObject.GetComponent<Outline>().enabled = false;
-                    }
-
-                    selected = null;
-                    GizmoGestion.Instance.DeactivateGizmo();
+                    DeselectObject();
                 }
             }
 			else
 			{
-                if (selected != null)
-                {
-                    selected.gameObject.GetComponent<Outline>().enabled = false;
-                }
-
-                selected = null;
-                GizmoGestion.Instance.DeactivateGizmo();
+                DeselectObject();
             }
         }
     }

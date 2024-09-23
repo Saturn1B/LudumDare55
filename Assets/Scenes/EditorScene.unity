@@ -188,7 +188,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.8301887, g: 0.46600214, b: 0.46600214, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -322,7 +322,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.8301887, g: 0.46600214, b: 0.46600214, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -893,6 +893,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1243171990994505351, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
   m_PrefabInstance: {fileID: 8387642084021031411}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &529701180 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1879610680000588490, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
+  m_PrefabInstance: {fileID: 8387642084021031411}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529701179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a29fadc119551242a89e11aec9000ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &567873794
 GameObject:
   m_ObjectHideFlags: 0
@@ -2146,7 +2157,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 0.8301887, g: 0.46600214, b: 0.46600214, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -2251,6 +2262,9 @@ MonoBehaviour:
   - {fileID: 1828908405}
   - {fileID: 1018818367}
   - {fileID: 1403374902}
+  translateButton: {fileID: 22569665}
+  scaleButton: {fileID: 1432458752}
+  rotationButton: {fileID: 51381456}
   objectSelecterTransform: {fileID: 1369329156}
   objectButtonPrefab: {fileID: 6105782769007730499, guid: 919c3efe384beb5419a852814ed07b1b, type: 3}
   objectButtons:
@@ -2599,6 +2613,7 @@ MonoBehaviour:
   rotationGizmoObject: {fileID: 1944427534}
   gizmoCenter: {fileID: 874590149}
   rotationGizmo: {fileID: 1944427536}
+  scaleGizmo: {fileID: 529701180}
   modifiableObjectParent: {fileID: 299564239}
   _gizmoMode: 0
 --- !u!1 &1828908405
