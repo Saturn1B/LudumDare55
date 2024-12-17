@@ -7,23 +7,30 @@ public class ObjectButton : MonoBehaviour
 {
 	[HideInInspector] public GameObject objectPrefab;
 	[SerializeField] private Image objectImage;
+	[SerializeField] private string objectName;
 	[SerializeField] private GameObject outline;
 	[HideInInspector] public int id;
 
 	[Header("Specials")]
 	[SerializeField] bool isNone;
+	[SerializeField] bool isEditor;
 	[SerializeField] bool isDelete;
+
+	bool isButtonActive = true;
 
 	private void Awake()
 	{
 		GetComponent<UnityEngine.UI.Button>().onClick.AddListener(SwitchToObject);
+		EditorHUDManager.Instance._openInteractionEditor.AddListener(SwitchButtonActiveState);
+		EditorHUDManager.Instance._closeInteractionEditor.AddListener(SwitchButtonActiveState);
 	}
 
 	public void ButtonSetter(string objectName, GameObject objectPrefab, Sprite objectSprite)
 	{
 		this.objectPrefab = objectPrefab;
 		objectImage.sprite = objectSprite;
-		transform.name = $"Button_{objectName}";
+		this.objectName = objectName;
+		transform.name = $"Button_{this.objectName}";
 	}
 
 	private void SwitchToObject()
@@ -34,7 +41,7 @@ public class ObjectButton : MonoBehaviour
 			ObjectPlacer.Instance.SetCurrentObject(null);
 			EditorHUDManager.Instance.SwitchGizmoMode(0);
 		}
-		else if (isDelete)
+		else if (isDelete || isEditor)
 		{
 			ObjectPlacer.Instance.SetCurrentObject(null);
 			EditorHUDManager.Instance.SwitchGizmoMode();
@@ -42,16 +49,23 @@ public class ObjectButton : MonoBehaviour
 		}
 		else
 		{
-			ObjectPlacer.Instance.SetCurrentObject(objectPrefab);
+			ObjectPlacer.Instance.SetCurrentObject(objectPrefab, objectName);
 			EditorHUDManager.Instance.SwitchGizmoMode();
 			ObjectSelection.Instance.DeselectObject();
 		}
 
 		ObjectPlacer.Instance.isDelete = isDelete;
+		ObjectPlacer.Instance.isEditor = isEditor;
 	}
 
 	public void ChangeSelectedState(bool isSelected)
 	{
 		outline.SetActive(isSelected);
+	}
+
+	void SwitchButtonActiveState()
+	{
+		isButtonActive = !isButtonActive;
+		GetComponent<UnityEngine.UI.Button>().interactable = isButtonActive;
 	}
 }

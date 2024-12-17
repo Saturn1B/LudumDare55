@@ -7,7 +7,13 @@ public class ObjectSelection : MonoBehaviour
 {
     [HideInInspector] public Transform selected;
     [HideInInspector] public bool mouseOverDragUI;
+    [HideInInspector] public bool mouseOverEditorUI;
     public LayerMask gizmoLayer;
+
+    [HideInInspector] public bool editorOpened = false;
+    private ActivatorEditor currentActivator;
+    public ActivatorEditor GetCurrentActivator() { return currentActivator; }
+    public void RemoveCurrentActivator() { currentActivator = null; }
 
     public static ObjectSelection Instance { get; private set; }
 
@@ -37,64 +43,101 @@ public class ObjectSelection : MonoBehaviour
 
     void Update()
     {
-        if (ObjectPlacer.Instance.GetSelectionMode() != SelectionMode.NONE) return;
         if (mouseOverDragUI) return;
+        if (mouseOverEditorUI) return;
         if (ObjectPlacer.Instance.mouseOverSelecterUI) return;
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if ((ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.NONE || ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR) && Input.GetKeyDown(KeyCode.Mouse0))
         {
-            RaycastHit gizmoHit;
+            RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-
-            if (Physics.Raycast(ray, out gizmoHit, 100, gizmoLayer))
+            if(ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.NONE)
 			{
-                if (gizmoHit.transform != null) return;
-			}
-
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100))
-			{
-                if (hit.transform.CompareTag("Selectable"))
+                RaycastHit gizmoHit;
+                if (Physics.Raycast(ray, out gizmoHit, 100, gizmoLayer))
                 {
-                    if (selected == hit.transform)
-					{
-                        return;
-                    }
+                    if (gizmoHit.transform != null) return;
+                }
 
-                    if(selected != null)
-					{
-                        selected.gameObject.GetComponent<Outline>().enabled = false;
+                if (Physics.Raycast(ray, out hit, 100))
+                {
+                    if (hit.transform.CompareTag("Selectable"))
+                    {
+                        if (selected == hit.transform)
+                        {
+                            return;
+                        }
+
+                        if (selected != null)
+                        {
+                            selected.gameObject.GetComponent<Outline>().enabled = false;
+                            GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
+                        }
+
+                        selected = hit.transform;
+                        if (selected.gameObject.GetComponent<Outline>() != null)
+                        {
+                            selected.gameObject.GetComponent<Outline>().enabled = true;
+                        }
+                        else
+                        {
+                            Outline outline = selected.gameObject.AddComponent<Outline>();
+                            outline.enabled = true;
+                            selected.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+                            selected.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
+                        }
+
                         GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
                     }
-
-                    selected = hit.transform;
-                    if (selected.gameObject.GetComponent<Outline>() != null)
+                    else if (hit.transform.gameObject.layer == 8)
                     {
-                        selected.gameObject.GetComponent<Outline>().enabled = true;
+                        //DO NOTHING
                     }
                     else
                     {
-                        Outline outline = selected.gameObject.AddComponent<Outline>();
-                        outline.enabled = true;
-                        selected.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
-                        selected.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
+                        DeselectObject();
                     }
-
-                    GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
                 }
-                else if (hit.transform.gameObject.layer == 8)
-				{
-                    //DO NOTHING
-				}
-				else
+                else
                 {
                     DeselectObject();
                 }
             }
-			else
+            else if(ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR)
 			{
-                DeselectObject();
+                if (Physics.Raycast(ray, out hit, 100))
+				{
+                    if (hit.transform.GetComponent<ActivatorEditor>())
+					{
+                        if (!currentActivator && !editorOpened)
+						{
+                            currentActivator = hit.transform.GetComponent<ActivatorEditor>();
+
+                            EditorHUDManager.Instance.OpenInteractionEditor(currentActivator);
+                            editorOpened = true;
+                        }
+
+
+                    }
+                    else if (hit.transform.GetComponent<ActivableEditor>())
+					{
+                        ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
+
+                        if (currentActivator)
+						{
+                            if (currentActivable.activators.Count == 0)
+                                EditorHUDManager.Instance.AddActivableInteractionEditor(hit.transform.GetComponent<ActivableEditor>());
+                            else
+                                DisplayMessage.Instance.ErrorMessage($"Activable - {currentActivable.activableName} - already linked to another Activator - {currentActivable.activators[0].activatorName} -");
+						}
+						else if (!editorOpened)
+						{
+                            EditorHUDManager.Instance.OpenInteractionEditor(currentActivable);
+                            editorOpened = true;
+                        }
+                    }
+				}
             }
         }
     }

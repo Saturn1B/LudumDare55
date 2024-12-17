@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 [System.Serializable]
 public enum GizmoMode
@@ -118,15 +119,112 @@ public class EditorHUDManager : MonoBehaviour
 				sObject.ChangeSelectedState(false);
 		}
 
-		if (id == 1)
+		if (id == 2)
 			ObjectPlacer.Instance.isDelete = true;
 		else
 			ObjectPlacer.Instance.isDelete = false;
 
-		if (id == 0 || id == 1)
+		if (id == 1)
+			ObjectPlacer.Instance.isEditor = true;
+		else
+			ObjectPlacer.Instance.isEditor = false;
+
+		if (id == 0 || id == 1 || id == 2)
 			ObjectPlacer.Instance.SetCurrentObject(null);
 		else
 			ObjectPlacer.Instance.SetCurrentObject(sButton.objectPrefab);
 
+	}
+
+	[Space]
+
+	[Header("Interaction Editor")]
+	[SerializeField] private GameObject editorPanel;
+	[SerializeField] private TMP_Text activatorName;
+	[SerializeField] private GameObject interactableLister;
+	[SerializeField] private Transform activableListPanel;
+	private List<InteractableLister> interactables = new List<InteractableLister>();
+	[HideInInspector] public UnityEvent _openInteractionEditor;
+	[HideInInspector] public UnityEvent _closeInteractionEditor;
+
+	public void OpenInteractionEditor(ActivatorEditor activatorEditor)
+	{
+		editorPanel.SetActive(true);
+		activatorName.text = "> " + activatorEditor.activatorName;
+
+		foreach (var activable in activatorEditor.activables)
+		{
+			GameObject go = Instantiate(interactableLister, activableListPanel);
+			go.GetComponent<InteractableLister>().Setup(activable);
+			interactables.Add(go.GetComponent<InteractableLister>());
+		}
+
+		_openInteractionEditor.Invoke();
+	}
+	public void OpenInteractionEditor(ActivableEditor activableEditor)
+	{
+		editorPanel.SetActive(true);
+		activatorName.text = "> " + activableEditor.activableName;
+
+		foreach (var activator in activableEditor.activators)
+		{
+			GameObject go = Instantiate(interactableLister, activableListPanel);
+			go.GetComponent<InteractableLister>().Setup(activator);
+			interactables.Add(go.GetComponent<InteractableLister>());
+		}
+
+		_openInteractionEditor.Invoke();
+	}
+
+	public void CloseInteractionEditor()
+	{
+		HideAllCurrentActivableHighlight();
+
+		for (int i = activableListPanel.transform.childCount - 1; i >= 0; i--)
+		{
+			Destroy(activableListPanel.transform.GetChild(i).gameObject);
+		}
+
+		interactables.Clear();
+
+		editorPanel.SetActive(false);
+		activatorName.text = "";
+		ObjectSelection.Instance.RemoveCurrentActivator();
+		ObjectSelection.Instance.editorOpened = false;
+
+		_closeInteractionEditor.Invoke();
+	}
+
+	public void AddActivableInteractionEditor(ActivableEditor activableEditor)
+	{
+		foreach (var acti in ObjectSelection.Instance.GetCurrentActivator().activables)
+		{
+			if (acti == activableEditor)
+			{
+				return;
+			}
+		}
+
+		GameObject activable = Instantiate(interactableLister, activableListPanel);
+		activable.GetComponent<InteractableLister>().Setup(activableEditor);
+		ObjectSelection.Instance.GetCurrentActivator().activables.Add(activableEditor);
+		activableEditor.activators.Add(ObjectSelection.Instance.GetCurrentActivator());
+		interactables.Add(activable.GetComponent<InteractableLister>());
+	}
+
+	public void RemoveActivableInteractionEditor(InteractableLister interactableLister)
+	{
+		ObjectSelection.Instance.GetCurrentActivator().activables.Remove(interactableLister.activableEditor);
+		interactableLister.activableEditor.activators.Remove(ObjectSelection.Instance.GetCurrentActivator());
+		interactables.Remove(interactableLister);
+		Destroy(interactableLister.gameObject);
+	}
+
+	public void HideAllCurrentActivableHighlight()
+	{
+		foreach (var interactable in interactables)
+		{
+			interactable.RemoveHighlight();
+		}
 	}
 }

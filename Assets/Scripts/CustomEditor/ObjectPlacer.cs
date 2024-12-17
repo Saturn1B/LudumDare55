@@ -7,7 +7,8 @@ public enum SelectionMode
 {
 	NONE = 0,
 	DELETE = 1,
-	OBJECT = 2
+	OBJECT = 2,
+	EDITOR = 3
 }
 
 public class ObjectPlacer : MonoBehaviour
@@ -31,15 +32,17 @@ public class ObjectPlacer : MonoBehaviour
 
 	private FreeEditorCam freeEditorCam;
 	private GameObject currentObjectPrefab;
+	private string currentObjectName;
 	private EventSystem eventSystem;
 
-	/*[HideInInspector]*/ public bool isDelete;
+	/*[HideInInspector]*/ public bool isDelete, isEditor;
 	[HideInInspector] public bool mouseOverSelecterUI;
 	[HideInInspector] public bool mouseOverDragUI;
 
-	public void SetCurrentObject(GameObject currentObject)
+	public void SetCurrentObject(GameObject currentObject, string objectName = "")
 	{
 		currentObjectPrefab = currentObject;
+		currentObjectName = objectName;
 	}
 	public SelectionMode GetSelectionMode()
 	{
@@ -49,6 +52,8 @@ public class ObjectPlacer : MonoBehaviour
 			_mode = SelectionMode.OBJECT;
 		else if (isDelete)
 			_mode = SelectionMode.DELETE;
+		else if (isEditor)
+			_mode = SelectionMode.EDITOR;
 		else
 			_mode = SelectionMode.NONE;
 
@@ -71,6 +76,16 @@ public class ObjectPlacer : MonoBehaviour
 				{
 					if (!hit.transform.GetComponent<Undeletable>())
 					{
+						if (hit.transform.GetComponent<ActivableEditor>())
+						{
+							ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
+							currentActivable.RemoveFromActivator();
+						}
+						if (hit.transform.GetComponent<ActivatorEditor>())
+						{
+							ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
+							currentActivator.RemoveFromActivable();
+						}
 						Destroy(hit.transform.gameObject);
 					}
 				}
@@ -90,6 +105,15 @@ public class ObjectPlacer : MonoBehaviour
 						summonPoint += Vector3.forward * .5f;
 
 					GameObject go = Instantiate(currentObjectPrefab, summonPoint, Quaternion.identity);
+
+					if (go.GetComponent<ActivatorEditor>())
+					{
+						go.GetComponent<ActivatorEditor>().activatorName = currentObjectName;
+					}
+					if (go.GetComponent<ActivableEditor>())
+					{
+						go.GetComponent<ActivableEditor>().activableName = currentObjectName;
+					}
 				}
 			}
 		}

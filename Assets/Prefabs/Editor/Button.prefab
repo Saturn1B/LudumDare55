@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2446023092559238948}
   - component: {fileID: 6599636386206651523}
   - component: {fileID: 2304864474953297579}
+  - component: {fileID: 2394556215520131406}
   m_Layer: 0
   m_Name: Button
   m_TagString: Selectable
@@ -75,6 +76,20 @@ MonoBehaviour:
   X: 0
   Y: 1
   Z: 0
+--- !u!114 &2394556215520131406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6062109063433080279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52bd695bda954884682c73a08832e801, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activatorName: 
+  activables: []
 --- !u!1001 &5525187905956796130
 PrefabInstance:
   m_ObjectHideFlags: 0
