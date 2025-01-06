@@ -74,7 +74,7 @@ public class ObjectPlacer : MonoBehaviour
 			{
 				if (isDelete)
 				{
-					if (!hit.transform.GetComponent<Undeletable>())
+					if (!hit.transform.GetComponent<Undeletable>() && hit.transform.GetComponent<ModifiableObject>())
 					{
 						if (hit.transform.GetComponent<ActivableEditor>())
 						{
@@ -86,36 +86,68 @@ public class ObjectPlacer : MonoBehaviour
 							ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
 							currentActivator.RemoveFromActivable();
 						}
+						SaveSystem.Instance.objectInScene.Remove(hit.transform.GetComponent<ModifiableObject>());
 						Destroy(hit.transform.gameObject);
 					}
 				}
 				else
 				{
-					Vector3 objectSize = currentObjectPrefab.GetComponentInChildren<Renderer>().bounds.size;
-
-					Vector3 offset = objectSize * 0.1f;
-
-					Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
-					summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
-
-					if (currentObjectPrefab.GetComponent<ModifiableObject>() && !currentObjectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
-						summonPoint -= Vector3.up * .5f;
-
-					if (currentObjectPrefab.GetComponent<ModifiableObject>() && currentObjectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
-						summonPoint += Vector3.forward * .5f;
-
-					GameObject go = Instantiate(currentObjectPrefab, summonPoint, Quaternion.identity);
-
-					if (go.GetComponent<ActivatorEditor>())
-					{
-						go.GetComponent<ActivatorEditor>().activatorName = currentObjectName;
-					}
-					if (go.GetComponent<ActivableEditor>())
-					{
-						go.GetComponent<ActivableEditor>().activableName = currentObjectName;
-					}
+					CreateObject(hit, currentObjectPrefab, currentObjectName);
 				}
 			}
 		}
+	}
+
+	public void CreateObject(RaycastHit hit, GameObject objectPrefab, string objectName)
+	{
+		Vector3 objectSize = objectPrefab.GetComponentInChildren<Renderer>().bounds.size;
+
+		Vector3 offset = objectSize * 0.1f;
+
+		Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
+		summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
+
+		if (objectPrefab.GetComponent<ModifiableObject>() && !objectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
+			summonPoint -= Vector3.up * .5f;
+
+		if (objectPrefab.GetComponent<ModifiableObject>() && objectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
+			summonPoint += Vector3.forward * .5f;
+
+		GameObject go = Instantiate(objectPrefab, summonPoint, Quaternion.identity);
+
+		go.name = currentObjectName;
+
+		SaveSystem.Instance.objectInScene.Add(go.GetComponent<ModifiableObject>());
+
+		if (go.GetComponent<ActivatorEditor>())
+		{
+			go.GetComponent<ActivatorEditor>().activatorName = objectName;
+		}
+		if (go.GetComponent<ActivableEditor>())
+		{
+			go.GetComponent<ActivableEditor>().activableName = objectName;
+		}
+	}
+	public ModifiableObject CreateObject(Vector3 position, Vector3 rotation, Vector3 scale, GameObject objectPrefab, string objectName)
+	{
+		GameObject go = Instantiate(objectPrefab);
+		go.transform.position = position;
+		go.transform.eulerAngles = rotation;
+		go.transform.localScale = scale;
+
+		SaveSystem.Instance.objectInScene.Add(go.GetComponent<ModifiableObject>());
+
+		go.name = objectName;
+
+		if (go.GetComponent<ActivatorEditor>())
+		{
+			go.GetComponent<ActivatorEditor>().activatorName = objectName;
+		}
+		if (go.GetComponent<ActivableEditor>())
+		{
+			go.GetComponent<ActivableEditor>().activableName = objectName;
+		}
+
+		return go.GetComponent<ModifiableObject>();
 	}
 }
