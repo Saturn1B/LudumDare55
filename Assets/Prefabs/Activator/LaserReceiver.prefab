@@ -71,6 +71,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkedActivable: {fileID: 0}
   animator: {fileID: 4865177155583492978}
+  centerRenderer: {fileID: 4930071090698043296}
+  on: {fileID: 2100000, guid: a8e6900b267a11e4eb21fb7c30e719ea, type: 2}
+  off: {fileID: 2100000, guid: c4e12eb70fad3d84e8341e9528b28573, type: 2}
 --- !u!65 &5007416253093334131
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -90,7 +93,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8, y: 0.8, z: 0.2}
+  m_Size: {x: 1.2, y: 1.2, z: 0.2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &7410144876848763424
 Rigidbody:
@@ -199,6 +202,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 4865177155583492978}
   m_SourcePrefab: {fileID: 100100000, guid: 43ad909e7f26a1346abff1e2b5d515d4, type: 3}
+--- !u!23 &4930071090698043296 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4287405866783128512, guid: 43ad909e7f26a1346abff1e2b5d515d4, type: 3}
+  m_PrefabInstance: {fileID: 9157169766898730080}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8346758574113765681 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 43ad909e7f26a1346abff1e2b5d515d4, type: 3}
