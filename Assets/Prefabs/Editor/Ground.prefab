@@ -141,10 +141,10 @@ MonoBehaviour:
   isStuckToWall: 0
   canTranslate: 1
   canScale: 1
-  canRotate: 0
-  X: 0
+  canRotate: 1
+  X: 1
   Y: 1
-  Z: 0
+  Z: 1
 --- !u!1 &2711610120960682088
 GameObject:
   m_ObjectHideFlags: 0

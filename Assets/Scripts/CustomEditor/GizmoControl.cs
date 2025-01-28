@@ -34,6 +34,8 @@ public class GizmoControl : MonoBehaviour
 
 	private void Update()
 	{
+		if (EditorHUDManager.Instance.isPaused) return;
+
 		if (Input.GetMouseButtonUp(0))
 		{
 			mousePressed = false;

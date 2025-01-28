@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 using UnityEngine;
 
 public class SaveSystem : MonoBehaviour
 {
+	[SerializeField] Canvas editorCanvas;
+
 	[HideInInspector] public List<ModifiableObject> objectInScene = new List<ModifiableObject>();
 
 	public static SaveSystem Instance { get; private set; }
 
-	string saveFilePath;
+	public static string saveFilePath;
 
 	private void Awake()
 	{
@@ -22,7 +25,19 @@ public class SaveSystem : MonoBehaviour
 			Instance = this;
 		}
 
-		saveFilePath = Application.persistentDataPath + "/SceneData.json";
+		GenerateSaveFilePath();
+	}
+
+	private void Start()
+	{
+		if (LevelDataTransfer.SceneDataToLoad != null)
+			Load(LevelDataTransfer.SceneDataToLoad);
+	}
+
+	public static void GenerateSaveFilePath()
+	{
+		if (string.IsNullOrEmpty(saveFilePath))
+			saveFilePath = Application.persistentDataPath + "/EditorLevelsData/";
 	}
 
 	[ContextMenu("Save")]
@@ -67,17 +82,52 @@ public class SaveSystem : MonoBehaviour
 			i++;
 		}
 
+		string saveFileName;
+		string saveFileId;
+
+		if (string.IsNullOrEmpty(LevelDataTransfer.levelName))
+			saveFileName = "unknownSave-" + System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+		else
+			saveFileName = LevelDataTransfer.levelName;
+
+		saveFileId = (DateTime.Now.Millisecond * DateTime.Now.Second).ToString();
+
+		sceneData.levelName = saveFileName;
+		sceneData.levelId = saveFileId;
+
 		string sceneDataString = JsonUtility.ToJson(sceneData);
-		System.IO.File.WriteAllText(saveFilePath, sceneDataString);
+
+		string saveFileNameId = saveFileName + saveFileId;
+
+		if (!Directory.Exists(saveFilePath))
+			Directory.CreateDirectory(saveFilePath);
+
+		if(LevelDataTransfer.SceneDataToLoad != null)
+		{
+			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".json");
+			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".png");
+			LevelDataTransfer.SceneDataToLoad = sceneData;
+		}
+
+		System.IO.File.WriteAllText(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
+		StartCoroutine(CaptureScreen(saveFileNameId));
 	}
 
-	[ContextMenu("Load")]
-	public void Load()
+	public void Load(SceneData selectedSceneData = null)
 	{
-		if (!File.Exists(saveFilePath)) return;
+		SceneData sceneData;
 
-		string sceneDataString = File.ReadAllText(saveFilePath);
-		SceneData sceneData = JsonUtility.FromJson<SceneData>(sceneDataString);
+		if (selectedSceneData == null)
+		{
+			if (!File.Exists(saveFilePath + "SceneData.json")) return;
+
+			string sceneDataString = File.ReadAllText(saveFilePath + "SceneData.json");
+			sceneData = JsonUtility.FromJson<SceneData>(sceneDataString);
+		}
+		else
+		{
+			sceneData = selectedSceneData;
+		}
 
 		UnityEngine.Object[] prefabObjectSOs = Resources.LoadAll("SceneObjects", typeof(SceneObjectSO));
 
@@ -148,11 +198,25 @@ public class SaveSystem : MonoBehaviour
 
 		return null;
 	}
+
+	private IEnumerator CaptureScreen(string saveFileNameId)
+	{
+		yield return null;
+		editorCanvas.enabled = false;
+
+		yield return new WaitForEndOfFrame();
+
+		ScreenCapture.CaptureScreenshot(saveFilePath + $"{saveFileNameId}.png");
+
+		editorCanvas.enabled = true;
+	}
 }
 
 [System.Serializable]
 public class SceneData
 {
+	public string levelName;
+	public string levelId;
 	public ModifiableObjectData[] objectsInScene;
 }
 

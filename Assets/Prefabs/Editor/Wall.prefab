@@ -138,12 +138,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGroundOrWall: 1
+  isStuckToWall: 0
   canTranslate: 1
   canScale: 1
-  canRotate: 0
-  X: 0
-  Y: 0
-  Z: 0
+  canRotate: 1
+  X: 1
+  Y: 1
+  Z: 1
 --- !u!1 &2711610120960682088
 GameObject:
   m_ObjectHideFlags: 0

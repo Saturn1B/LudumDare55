@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public enum GizmoMode
@@ -36,6 +37,26 @@ public class EditorHUDManager : MonoBehaviour
 		SwitchGizmoMode((int)GizmoMode.MOVEABLE);
 		PopulateObjectSelecter();
 	}
+
+	[Header("Menu Mode")]
+	[SerializeField] private GameObject menuPanel;
+	public bool isPaused { get; private set; }
+
+	public void PauseGame()
+	{
+		isPaused = !isPaused;
+		menuPanel.SetActive(isPaused);
+	}
+	public void SaveLevel()
+	{
+		SaveSystem.Instance.Save();
+	}
+	public void MainMenu()
+	{
+		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+	}
+
+	[Space]
 
 	private GizmoMode _gizmoMode;
 	[Header("Mouse Drag Mode")]

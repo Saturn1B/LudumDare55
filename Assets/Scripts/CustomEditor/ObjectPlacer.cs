@@ -62,6 +62,8 @@ public class ObjectPlacer : MonoBehaviour
 
 	private void Update()
 	{
+		if (EditorHUDManager.Instance.isPaused) return;
+
 		if (currentObjectPrefab == null && isDelete == false) return;
 		if (mouseOverSelecterUI == true) return;
 		if (mouseOverDragUI == true) return;

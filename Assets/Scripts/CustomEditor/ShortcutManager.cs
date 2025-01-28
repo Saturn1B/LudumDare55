@@ -1,0 +1,52 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ShortcutManager : MonoBehaviour
+{
+    // Update is called once per frame
+    void Update()
+    {
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			EditorHUDManager.Instance.PauseGame();
+		}
+
+		if (EditorHUDManager.Instance.isPaused) return;
+
+		if (Input.GetKey(KeyCode.LeftControl))
+		{
+			//Save shortcut
+			if (Input.GetKeyDown(KeyCode.S))
+			{
+				SaveSystem.Instance.Save();
+			}
+			//Duplicate shortcut
+			else if (Input.GetKeyDown(KeyCode.D))
+			{
+				if(ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR || ObjectSelection.Instance.selected != null)
+				{
+					Transform toDuplicate = ObjectSelection.Instance.selected;
+
+					ObjectSelection.Instance.DeselectObject();
+
+					ModifiableObject duplicate = ObjectPlacer.Instance.CreateObject(toDuplicate.position + Vector3.one, toDuplicate.rotation.eulerAngles, toDuplicate.localScale, toDuplicate.gameObject, toDuplicate.name);
+
+					ObjectSelection.Instance.SelectObject(duplicate.transform);
+
+					if (duplicate.GetComponent<ActivatorEditor>() != null)
+					{
+						duplicate.GetComponent<ActivatorEditor>().RemoveFromActivable();
+						duplicate.GetComponent<ActivatorEditor>().activables.Clear();
+					}
+
+					if (duplicate.GetComponent<ActivableEditor>() != null)
+					{
+						duplicate.GetComponent<ActivableEditor>().RemoveFromActivator();
+						duplicate.GetComponent<ActivableEditor>().activators.Clear();
+					}
+				}
+			}
+		}
+    }
+}

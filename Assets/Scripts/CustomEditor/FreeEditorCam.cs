@@ -15,6 +15,8 @@ public class FreeEditorCam : MonoBehaviour
 
 	private void Update()
 	{
+		if (EditorHUDManager.Instance.isPaused) return;
+
 		if (Input.GetMouseButtonDown(1))
 			isRightMouseButtonPressed = true;
 		else if (Input.GetMouseButtonUp(1))
