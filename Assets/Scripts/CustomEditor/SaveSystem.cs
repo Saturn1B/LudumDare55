@@ -10,6 +10,10 @@ public class SaveSystem : MonoBehaviour
 
 	[HideInInspector] public List<ModifiableObject> objectInScene = new List<ModifiableObject>();
 
+	[SerializeField] private Transform cameraHolder, cameraMain;
+
+	[SerializeField] private Undeletable[] permanentObjects;
+
 	public static SaveSystem Instance { get; private set; }
 
 	public static string saveFilePath;
@@ -76,11 +80,35 @@ public class SaveSystem : MonoBehaviour
 					objectData.activatorsId.Add(item.GetComponent<ModifiableObject>().objectId);
 				}
 			}
+			else if (modifiable.GetComponent<DispenserEditor>() != null)
+			{
+				DispenserEditor dispenser = modifiable.GetComponent<DispenserEditor>();
+				objectData.materialType = (int)dispenser.materialType;
+				objectData.materialNumber = dispenser.materialNumber;
+			}
 
 			sceneData.objectsInScene[i] = objectData;
 
 			i++;
 		}
+
+		sceneData.permanentObjectsInScene = new PermanentObjectData[permanentObjects.Length];
+
+		int j = 0;
+		foreach (Undeletable permanentObj in permanentObjects)
+		{
+			PermanentObjectData permanentData = new PermanentObjectData();
+			permanentData.position = permanentObj.transform.position;
+			permanentData.rotation = permanentObj.transform.eulerAngles;
+			permanentData.scale = permanentObj.transform.localScale;
+
+			sceneData.permanentObjectsInScene[j] = permanentData;
+
+			j++;
+		}
+
+		sceneData.camPosition = cameraHolder.position;
+		sceneData.camRotation = new Vector3(cameraMain.localRotation.eulerAngles.x, cameraHolder.rotation.eulerAngles.y, 0);
 
 		string saveFileName;
 		string saveFileId;
@@ -133,6 +161,16 @@ public class SaveSystem : MonoBehaviour
 
 		Dictionary<ModifiableObject, string> loadedObjects = new Dictionary<ModifiableObject, string>();
 
+		int j = 0;
+		foreach (var permanentData in sceneData.permanentObjectsInScene)
+		{
+			permanentObjects[j].transform.position = permanentData.position;
+			permanentObjects[j].transform.eulerAngles = permanentData.rotation;
+			permanentObjects[j].transform.localScale = permanentData.scale;
+
+			j++;
+		}
+
 		foreach (var objectData in sceneData.objectsInScene)
 		{
 			SceneObjectSO objectPrefabSO = null;
@@ -150,6 +188,13 @@ public class SaveSystem : MonoBehaviour
 				ModifiableObject modifiable = ObjectPlacer.Instance.CreateObject(objectData.position, objectData.rotation, objectData.scale, objectPrefabSO.objectPrefab, objectPrefabSO.objectName);
 				modifiable.OverrideID(objectData.objectId);
 				loadedObjects.Add(modifiable, modifiable.objectId);
+
+				if(modifiable.GetComponent<DispenserEditor>() != null)
+				{
+					DispenserEditor dispenser = modifiable.GetComponent<DispenserEditor>();
+					dispenser.SetMaterial(objectData.materialType, false);
+					dispenser.SetNumber(objectData.materialNumber);
+				}
 			}
 		}
 
@@ -171,6 +216,10 @@ public class SaveSystem : MonoBehaviour
 				}
 			}
 		}
+
+		cameraHolder.position = sceneData.camPosition;
+		cameraHolder.eulerAngles = new Vector3(0, sceneData.camRotation.y, 0);
+		cameraMain.localEulerAngles = new Vector3(sceneData.camRotation.x, 0, 0);
 	}
 
 	ModifiableObjectData GetObjectDataById(string objectId, SceneData sceneData)
@@ -217,7 +266,10 @@ public class SceneData
 {
 	public string levelName;
 	public string levelId;
+	public Vector3 camPosition;
+	public Vector3 camRotation;
 	public ModifiableObjectData[] objectsInScene;
+	public PermanentObjectData[] permanentObjectsInScene;
 }
 
 [System.Serializable]
@@ -231,4 +283,14 @@ public class ModifiableObjectData
 	public bool canDelete;
 	public List<string> activatorsId = new List<string>();
 	public List<string> activablesId = new List<string>();
+	public int materialType;
+	public int materialNumber;
+}
+
+[System.Serializable]
+public class PermanentObjectData
+{
+	public Vector3 position;
+	public Vector3 rotation;
+	public Vector3 scale;
 }

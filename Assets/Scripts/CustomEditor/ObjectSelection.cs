@@ -135,8 +135,14 @@ public class ObjectSelection : MonoBehaviour
 						{
                             if (currentActivable.activators.Count == 0)
                                 EditorHUDManager.Instance.AddActivableInteractionEditor(hit.transform.GetComponent<ActivableEditor>());
-                            else
-                                DisplayMessage.Instance.ErrorMessage($"Activable - {currentActivable.activableName} - already linked to another Activator - {currentActivable.activators[0].activatorName} -");
+							else
+							{
+                                if (currentActivable.activators[0] = currentActivator)
+                                    DisplayMessage.Instance.WarningMessage($"Activable - {currentActivable.activableName} - already linked to this Activator");
+
+                                else
+                                    DisplayMessage.Instance.ErrorMessage($"Activable - {currentActivable.activableName} - already linked to another Activator - {currentActivable.activators[0].activatorName} -");
+                            }
 						}
 						else if (!editorOpened)
 						{
@@ -144,6 +150,14 @@ public class ObjectSelection : MonoBehaviour
                             editorOpened = true;
                         }
                     }
+                    else if (hit.transform.GetComponent<DispenserEditor>())
+					{
+						if (!editorOpened)
+						{
+                            EditorHUDManager.Instance.OpenDispenserEditor(hit.transform.GetComponent<DispenserEditor>());
+                            editorOpened = true;
+						}
+					}
 				}
             }
         }

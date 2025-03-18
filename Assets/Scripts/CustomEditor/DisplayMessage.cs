@@ -25,18 +25,21 @@ public class DisplayMessage : MonoBehaviour
 	public void NormalMessage(string message)
 	{
 		customMessage = message;
+		StopAllCoroutines();
 		StartCoroutine(Display());
 	}
 
 	public void WarningMessage(string message)
 	{
-		customMessage = $"<color=yellow>WARNING: {message}</color>";
+		customMessage = $"<color=#FFD700>WARNING: {message}</color>";
+		StopAllCoroutines();
 		StartCoroutine(Display());
 	}
 
 	public void ErrorMessage(string message)
 	{
 		customMessage = $"<color=red>ERROR: {message}</color>";
+		StopAllCoroutines();
 		StartCoroutine(Display());
 	}
 

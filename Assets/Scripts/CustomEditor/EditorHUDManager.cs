@@ -50,6 +50,7 @@ public class EditorHUDManager : MonoBehaviour
 	public void SaveLevel()
 	{
 		SaveSystem.Instance.Save();
+		PauseGame();
 	}
 	public void MainMenu()
 	{
@@ -247,5 +248,38 @@ public class EditorHUDManager : MonoBehaviour
 		{
 			interactable.RemoveHighlight();
 		}
+	}
+
+	[Space]
+
+	[Header("Dispenser Editor")]
+	[SerializeField] private GameObject dispenserPanel;
+	[SerializeField] private TMP_Dropdown typeDropdown, numberDropdown;
+	private DispenserEditor currentDispenserEditor;
+
+	public void OpenDispenserEditor(DispenserEditor dispenserEditor)
+	{
+		dispenserPanel.SetActive(true);
+		currentDispenserEditor = dispenserEditor;
+		typeDropdown.value = (int)dispenserEditor.materialType - 1;
+		numberDropdown.value = dispenserEditor.materialNumber;
+	}
+
+	public void CloseDispenserEditor()
+	{
+		dispenserPanel.SetActive(false);
+
+		ObjectSelection.Instance.editorOpened = false;
+		currentDispenserEditor = null;
+	}
+
+	public void ChangeDispenserType(int type)
+	{
+		currentDispenserEditor.SetMaterial(type);
+	}
+
+	public void ChangeDispenserNumber(int number)
+	{
+		currentDispenserEditor.SetNumber(number);
 	}
 }

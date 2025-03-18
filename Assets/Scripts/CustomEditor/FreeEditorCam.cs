@@ -54,7 +54,7 @@ public class FreeEditorCam : MonoBehaviour
 				parentTransform.Translate(new Vector3(mouseX, mouseY, 0));
 			}
 
-			if (!ObjectPlacer.Instance.mouseOverSelecterUI)
+			if (!ObjectPlacer.Instance.mouseOverSelecterUI && !ObjectSelection.Instance.mouseOverEditorUI)
 			{
 				float scroll = Input.GetAxis("Mouse ScrollWheel") * scrollSpeed * Time.deltaTime;
 				parentTransform.Translate(transform.forward * scroll, Space.World);

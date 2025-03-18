@@ -5,8 +5,8 @@ using UnityEngine.EventSystems;
 
 public class InteractionEditorUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-	[SerializeField] private UnityEngine.UI.Button acceptButton;
-
+	[SerializeField] private UnityEngine.UI.Button acceptInteractionButton;
+	[SerializeField] private UnityEngine.UI.Button acceptDispenserButton;
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		ObjectSelection.Instance.mouseOverEditorUI = true;
@@ -17,14 +17,18 @@ public class InteractionEditorUI : MonoBehaviour, IPointerEnterHandler, IPointer
 		ObjectSelection.Instance.mouseOverEditorUI = false;
 	}
 
-	private void OnEnable()
-	{
-		acceptButton.onClick.RemoveAllListeners();
-		acceptButton.onClick.AddListener(() => EditorHUDManager.Instance.CloseInteractionEditor());
-	}
+	//private void OnEnable()
+	//{
+	//	acceptInteractionButton.onClick.RemoveAllListeners();
+	//	acceptInteractionButton.onClick.AddListener(() => EditorHUDManager.Instance.CloseInteractionEditor());
 
-	private void OnDisable()
-	{
-		acceptButton.onClick.RemoveAllListeners();
-	}
+	//	acceptDispenserButton.onClick.RemoveAllListeners();
+	//	acceptDispenserButton.onClick.AddListener(() => EditorHUDManager.Instance.CloseDispenserEditor());
+	//}
+
+	//private void OnDisable()
+	//{
+	//	acceptInteractionButton.onClick.RemoveAllListeners();
+	//	acceptDispenserButton.onClick.RemoveAllListeners();
+	//}
 }

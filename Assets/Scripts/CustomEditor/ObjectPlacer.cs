@@ -91,6 +91,10 @@ public class ObjectPlacer : MonoBehaviour
 						SaveSystem.Instance.objectInScene.Remove(hit.transform.GetComponent<ModifiableObject>());
 						Destroy(hit.transform.gameObject);
 					}
+					else
+					{
+						DisplayMessage.Instance.ErrorMessage($"- {hit.transform.name} - cannot be removed");
+					}
 				}
 				else
 				{

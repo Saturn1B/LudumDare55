@@ -39,13 +39,13 @@ public class ScaleGizmo : GizmoControl
 		if (Input.GetMouseButton(0))
 		{
 			Vector3 originaleScale = objectTransform.transform.lossyScale;
-			Vector3 tempScale = originaleScale + new Vector3(axis.x * usedMouseDelta * camRotx, axis.y * usedMouseDelta, axis.z * usedMouseDelta * -1 * camRotz);
+			Vector3 tempScale = originaleScale + new Vector3(axis.x * usedMouseDelta * camRotx, axis.y * usedMouseDelta, axis.z * usedMouseDelta * -1 * camRotz) * isInverted;
 
 			if (tempScale.x < 1 || tempScale.y < 1 || tempScale.z < 1) return;
 
 			objectTransform.transform.localScale = tempScale;
 			Vector3 newScale = objectTransform.transform.lossyScale;
-			objectTransform.transform.position += new Vector3((newScale.x / 2) - (originaleScale.x / 2), (newScale.y / 2) - (originaleScale.y / 2), (newScale.z / 2) - (originaleScale.z / 2));
+			objectTransform.transform.position += new Vector3((newScale.x / 2) - (originaleScale.x / 2), (newScale.y / 2) - (originaleScale.y / 2), (newScale.z / 2) - (originaleScale.z / 2)) * isInverted;
 
 			Vector3 tempPos = objectTransform.transform.localPosition;
 			gizmoControl.position = gizmoControl.position + tempPos;

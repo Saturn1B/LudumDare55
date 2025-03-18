@@ -18,11 +18,13 @@ public class GizmoControl : MonoBehaviour
 	bool mousePressed;
 	Vector2 oldDelta;
 	protected Vector2 mouseDelta;
+	protected int isInverted;
 
 	public bool wasSelected;
 	public bool isSelected;
 
 	public Transform[] xControl, yControl, zControl;
+	public Transform[] normalControl, invertedControl;
 	public LayerMask gizmoLayer;
 	public GameObject affectedObject;
 	private CurrentAxis currentAxis;
@@ -112,6 +114,18 @@ public class GizmoControl : MonoBehaviour
 
 	private Axis GetHitAxis(RaycastHit hit)
 	{
+		foreach (Transform control in normalControl)
+		{
+			if (hit.transform == control)
+				isInverted = 1;
+		}
+
+		foreach (Transform control in invertedControl)
+		{
+			if (hit.transform == control)
+				isInverted = -1;
+		}
+
 		foreach (Transform control in xControl)
 		{
 			if (hit.transform == control)
