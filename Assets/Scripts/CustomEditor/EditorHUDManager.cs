@@ -105,6 +105,8 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private GameObject objectButtonPrefab;
 	private UnityEngine.Object[] sceneObjectSOs;
 	[SerializeField] private List<ObjectButton> objectButtons;
+	[SerializeField] private List<GameObject> typeSelectionButtons;
+	[SerializeField] private Color highColor, lowColor;
 
 	private void PopulateObjectSelecter()
 	{
@@ -113,6 +115,10 @@ public class EditorHUDManager : MonoBehaviour
 		foreach (var sObject in sceneObjectSOs)
 		{
 			SceneObjectSO currentObject = (SceneObjectSO)sObject;
+
+			if (currentObject.objectType == SceneObjectType.HIDE)
+				continue;
+
 			GameObject o = Instantiate(objectButtonPrefab, objectSelecterTransform);
 			o.GetComponent<ObjectButton>().ButtonSetter(currentObject.objectName, currentObject.objectPrefab, currentObject.objectSprite);
 			objectButtons.Add(o.GetComponent<ObjectButton>());
@@ -124,6 +130,52 @@ public class EditorHUDManager : MonoBehaviour
 		}
 
 		SwitchCurrentObject(0);
+	}
+	public void PopulateObjectSelecter(int objectType)
+	{
+
+		for (int i = objectButtons.Count - 1; i >= 3; i--)
+		{
+			ObjectButton toDelete = objectButtons[i];
+			objectButtons.RemoveAt(i);
+			Destroy(toDelete.transform.gameObject);
+		}
+
+		sceneObjectSOs = Resources.LoadAll("SceneObjects", typeof(SceneObjectSO));
+
+		foreach (var sObject in sceneObjectSOs)
+		{
+			SceneObjectSO currentObject = (SceneObjectSO)sObject;
+
+			if (currentObject.objectType == SceneObjectType.HIDE)
+				continue;
+
+			if ((SceneObjectType)objectType != SceneObjectType.ALL && currentObject.objectType != (SceneObjectType)objectType)
+				continue;
+
+			GameObject o = Instantiate(objectButtonPrefab, objectSelecterTransform);
+			o.GetComponent<ObjectButton>().ButtonSetter(currentObject.objectName, currentObject.objectPrefab, currentObject.objectSprite);
+			objectButtons.Add(o.GetComponent<ObjectButton>());
+		}
+
+		for (int i = 0; i < objectButtons.Count; i++)
+		{
+			objectButtons[i].id = i;
+		}
+
+		SwitchCurrentObject(0);
+	}
+
+	public void SetColor(GameObject thisButton)
+	{
+		foreach (GameObject b in typeSelectionButtons)
+		{
+			b.GetComponent<Image>().color = lowColor;
+			b.GetComponentInChildren<TMP_Text>().color = highColor;
+		}
+
+		thisButton.GetComponent<Image>().color = highColor;
+		thisButton.GetComponentInChildren<TMP_Text>().color = lowColor;
 	}
 
 	public void SwitchCurrentObject(int id)

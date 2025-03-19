@@ -15,3 +15,4 @@ MonoBehaviour:
   objectName: Platform
   objectPrefab: {fileID: 1868690942137267676, guid: ec0870f21bd750e49b272d3eb58857a0, type: 3}
   objectSprite: {fileID: 21300000, guid: 79705d5f9d564184aa6e14e50925dda4, type: 3}
+  objectType: 2

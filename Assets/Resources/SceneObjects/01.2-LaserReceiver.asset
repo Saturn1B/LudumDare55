@@ -15,3 +15,4 @@ MonoBehaviour:
   objectName: Laser Receiver
   objectPrefab: {fileID: 6098149384425379202, guid: 5daaeef1ecf1f674aa9a66f5de781d55, type: 3}
   objectSprite: {fileID: 21300000, guid: f39ab29e8651860488b1fe02123fe175, type: 3}
+  objectType: 1

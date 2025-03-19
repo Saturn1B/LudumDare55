@@ -15,3 +15,4 @@ MonoBehaviour:
   objectName: Teleporter
   objectPrefab: {fileID: 5383912226043811686, guid: 7f93b7b99c3de8f4695b86fcc5c097b1, type: 3}
   objectSprite: {fileID: 21300000, guid: 57931191e137f7843978f28e314840f2, type: 3}
+  objectType: 4
