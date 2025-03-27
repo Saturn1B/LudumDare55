@@ -8,6 +8,8 @@ public class RotationGizmo : GizmoControl
 
 	private GameObject objectTransform;
 
+	Quaternion startRotation;
+
 	private void OnEnable()
 	{
 		RefreshGizmo();
@@ -71,5 +73,17 @@ public class RotationGizmo : GizmoControl
 				objectTransform.transform.Rotate(Vector3.forward, axis.z * usedMouseDelta * rotPower * camRotz, Space.World);
 			}
 		}
+	}
+
+	protected override void StartObjectModification()
+	{
+		startRotation = affectedObject.transform.GetChild(0).transform.rotation;
+	}
+
+	protected override void EndObjectModification()
+	{
+		GameObject target = affectedObject.transform.GetChild(0).gameObject;
+		RotateCommand rotateCommand = new RotateCommand(target, target.GetComponent<ModifiableObject>().objectId, startRotation, target.transform.rotation);
+		HystoryCommand.Instance.ExecuteCommand(rotateCommand);
 	}
 }

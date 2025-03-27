@@ -35,6 +35,16 @@ public class DispenserEditor : MonoBehaviour
 		SetNumber(materialNumber);
 	}
 
+	public void SetMaterialCommand(int typeId)
+	{
+		Materials startMaterialType = materialType;
+		Materials endMaterialType = (Materials)(typeId + 1);
+
+		DispenserTypeCommand dispenserTypeCommand = new DispenserTypeCommand(this.gameObject, this.GetComponent<ModifiableObject>().objectId, startMaterialType, endMaterialType);
+
+		HystoryCommand.Instance.ExecuteCommand(dispenserTypeCommand);
+	}
+
 	public void SetNumber(int number)
 	{
 		materialNumber = number;
@@ -53,5 +63,15 @@ public class DispenserEditor : MonoBehaviour
 		{
 			stackBars[i].material = materialsColor[(int)materialType - 1];
 		}
+	}
+
+	public void SetNumberCommand(int number)
+	{
+		int startMaterialNumber = materialNumber;
+		int endMaterialNumber = number;
+
+		DispenserNumberCommand dispenserNumberCommand = new DispenserNumberCommand(this.gameObject, this.GetComponent<ModifiableObject>().objectId, startMaterialNumber, endMaterialNumber);
+
+		HystoryCommand.Instance.ExecuteCommand(dispenserNumberCommand);
 	}
 }

@@ -78,18 +78,49 @@ public class ObjectPlacer : MonoBehaviour
 				{
 					if (!hit.transform.GetComponent<Undeletable>() && hit.transform.GetComponent<ModifiableObject>())
 					{
+						//if (hit.transform.GetComponent<ActivableEditor>())
+						//{
+						//	ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
+						//	currentActivable.RemoveFromActivator();
+						//}
+						//if (hit.transform.GetComponent<ActivatorEditor>())
+						//{
+						//	ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
+						//	currentActivator.RemoveFromActivable();
+						//}
+						//SaveSystem.Instance.objectInScene.Remove(hit.transform.GetComponent<ModifiableObject>());
+						//Destroy(hit.transform.gameObject);
+
+						DeleteCommand deleteCommand;
+
 						if (hit.transform.GetComponent<ActivableEditor>())
 						{
 							ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
-							currentActivable.RemoveFromActivator();
+							ActivableSave activableSave = new ActivableSave(currentActivable.activators);
+							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
+								hit.transform.GetComponent<ModifiableObject>().parentPrefab, activableSave);
 						}
-						if (hit.transform.GetComponent<ActivatorEditor>())
+						else if (hit.transform.GetComponent<ActivatorEditor>())
 						{
 							ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
-							currentActivator.RemoveFromActivable();
+							ActivatorSave activatorSave = new ActivatorSave(currentActivator.activables);
+							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
+								hit.transform.GetComponent<ModifiableObject>().parentPrefab, activatorSave);
 						}
-						SaveSystem.Instance.objectInScene.Remove(hit.transform.GetComponent<ModifiableObject>());
-						Destroy(hit.transform.gameObject);
+						else if (hit.transform.GetComponent<DispenserEditor>())
+						{
+							DispenserEditor currentDispenser = hit.transform.GetComponent<DispenserEditor>();
+							DispenserSave dispenserSave = new DispenserSave(currentDispenser.materialType, currentDispenser.materialNumber);
+							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
+								hit.transform.GetComponent<ModifiableObject>().parentPrefab, dispenserSave);
+						}
+						else
+						{
+							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
+								hit.transform.GetComponent<ModifiableObject>().parentPrefab);
+						}
+
+						HystoryCommand.Instance.ExecuteCommand(deleteCommand);
 					}
 					else
 					{
@@ -104,36 +135,17 @@ public class ObjectPlacer : MonoBehaviour
 		}
 	}
 
+	//Create object manually using command stack
 	public void CreateObject(RaycastHit hit, GameObject objectPrefab, string objectName)
 	{
-		Vector3 objectSize = objectPrefab.GetComponentInChildren<Renderer>().bounds.size;
+		Debug.Log(objectName + " " + currentObjectName);
 
-		Vector3 offset = objectSize * 0.1f;
+		CreateCommand createCommand = new CreateCommand(hit, objectPrefab, objectName, currentObjectName);
 
-		Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
-		summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
-
-		if (objectPrefab.GetComponent<ModifiableObject>() && !objectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
-			summonPoint -= Vector3.up * .5f;
-
-		if (objectPrefab.GetComponent<ModifiableObject>() && objectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
-			summonPoint += Vector3.forward * .5f;
-
-		GameObject go = Instantiate(objectPrefab, summonPoint, Quaternion.identity);
-
-		go.name = currentObjectName;
-
-		SaveSystem.Instance.objectInScene.Add(go.GetComponent<ModifiableObject>());
-
-		if (go.GetComponent<ActivatorEditor>())
-		{
-			go.GetComponent<ActivatorEditor>().activatorName = objectName;
-		}
-		if (go.GetComponent<ActivableEditor>())
-		{
-			go.GetComponent<ActivableEditor>().activableName = objectName;
-		}
+		HystoryCommand.Instance.ExecuteCommand(createCommand);
 	}
+
+	//Create object at scene loading
 	public ModifiableObject CreateObject(Vector3 position, Vector3 rotation, Vector3 scale, GameObject objectPrefab, string objectName)
 	{
 		GameObject go = Instantiate(objectPrefab);

@@ -47,6 +47,16 @@ public class ShortcutManager : MonoBehaviour
 					}
 				}
 			}
+			//Undo shortcut
+			else if (Input.GetKeyDown(KeyCode.Z))
+			{
+				HystoryCommand.Instance.Undo();
+			}
+			//Redo shortcut
+			else if (Input.GetKeyDown(KeyCode.Y))
+			{
+				HystoryCommand.Instance.Redo();
+			}
 		}
-    }
+	}
 }

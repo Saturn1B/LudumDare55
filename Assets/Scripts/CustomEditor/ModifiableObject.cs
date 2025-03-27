@@ -13,6 +13,8 @@ public class ModifiableObject : MonoBehaviour
 
 	public string objectId { get; private set; }
 
+	public GameObject parentPrefab;
+
 	private void Awake()
 	{
 		objectId = GenerateUniqueID();

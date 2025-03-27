@@ -150,6 +150,7 @@ public class GizmoGestion : MonoBehaviour
 
 	public void DeactivateGizmo()
 	{
+		Debug.Log("test");
 		if (currentModifiableObject)
 		{
 			currentModifiableObject.transform.SetParent(null);

@@ -8,6 +8,9 @@ public class ScaleGizmo : GizmoControl
 
 	private GameObject objectTransform;
 
+	Vector3 startScale;
+	Vector3 startPosition;
+
 	private void OnEnable()
 	{
 		RefreshGizmo();
@@ -51,5 +54,20 @@ public class ScaleGizmo : GizmoControl
 			gizmoControl.position = gizmoControl.position + tempPos;
 			objectTransform.transform.localPosition = Vector3.zero;
 		}
+	}
+
+	protected override void StartObjectModification()
+	{
+		startScale = affectedObject.transform.GetChild(0).transform.localScale;
+		startPosition = affectedObject.transform.GetChild(0).transform.position;
+	}
+
+	protected override void EndObjectModification()
+	{
+		GameObject target = affectedObject.transform.GetChild(0).gameObject;
+		ScaleCommand scaleCommand = new ScaleCommand(target, target.GetComponent<ModifiableObject>().objectId,
+			startScale, target.transform.localScale,
+			startPosition, target.transform.position);
+		HystoryCommand.Instance.ExecuteCommand(scaleCommand);
 	}
 }

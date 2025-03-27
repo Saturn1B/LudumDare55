@@ -2890,6 +2890,50 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &384495772
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 384495774}
+  - component: {fileID: 384495773}
+  m_Layer: 0
+  m_Name: HystoryCommand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &384495773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384495772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e180867eb4e6d08429870a9ba8ff7748, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &384495774
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384495772}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &385676406
 GameObject:
   m_ObjectHideFlags: 0
@@ -4456,6 +4500,11 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &648521090 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1482742044143230567, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
+  m_PrefabInstance: {fileID: 8387642084021031411}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &651314700
 GameObject:
   m_ObjectHideFlags: 0
@@ -12864,6 +12913,7 @@ MonoBehaviour:
   X: 0
   Y: 0
   Z: 0
+  parentPrefab: {fileID: 0}
 --- !u!23 &481577759367538037
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -13622,6 +13672,7 @@ MonoBehaviour:
   X: 0
   Y: 0
   Z: 0
+  parentPrefab: {fileID: 0}
 --- !u!4 &4962294551335292614
 Transform:
   m_ObjectHideFlags: 0
@@ -14093,6 +14144,7 @@ MonoBehaviour:
   X: 0
   Y: 1
   Z: 0
+  parentPrefab: {fileID: 0}
 --- !u!33 &8357789995491612091
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -14205,6 +14257,10 @@ PrefabInstance:
       propertyPath: invertedControl.Array.data[5]
       value: 
       objectReference: {fileID: 1968403455}
+    - target: {fileID: 4254045123801773785, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
+      propertyPath: commandAffectedObject
+      value: 
+      objectReference: {fileID: 648521090}
     - target: {fileID: 6730148585116259174, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -14374,3 +14430,4 @@ SceneRoots:
   - {fileID: 8387642084021031411}
   - {fileID: 2059498317}
   - {fileID: 84022790}
+  - {fileID: 384495774}

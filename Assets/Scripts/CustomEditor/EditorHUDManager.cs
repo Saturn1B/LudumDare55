@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 [System.Serializable]
 public enum GizmoMode
@@ -63,6 +64,7 @@ public class EditorHUDManager : MonoBehaviour
 	[Header("Mouse Drag Mode")]
 	[SerializeField] private GameObject[] mouseDragModeImages;
 	[SerializeField] private UnityEngine.UI.Button translateButton, scaleButton, rotationButton;
+	private bool isGizmoButtonActive = true;
 
 	public void SwitchGizmoMode(int mode = -1)
 	{
@@ -98,6 +100,17 @@ public class EditorHUDManager : MonoBehaviour
 		rotationButton.interactable = rotationState;
 	}
 
+	private void SwitchGizmoButtonActiveState()
+	{
+		SwitchGizmoMode();
+
+		isGizmoButtonActive = !isGizmoButtonActive;
+
+		translateButton.interactable = isGizmoButtonActive;
+		scaleButton.interactable = isGizmoButtonActive;
+		rotationButton.interactable = isGizmoButtonActive;
+	}
+
 	[Space]
 
 	[Header("Object Selecter")]
@@ -107,6 +120,7 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private List<ObjectButton> objectButtons;
 	[SerializeField] private List<GameObject> typeSelectionButtons;
 	[SerializeField] private Color highColor, lowColor;
+	private bool isTypeButtonActive = true;
 
 	private void PopulateObjectSelecter()
 	{
@@ -210,6 +224,16 @@ public class EditorHUDManager : MonoBehaviour
 
 	}
 
+	private void SwitchTypeButtonActiveState()
+	{
+		isTypeButtonActive = !isTypeButtonActive;
+
+		foreach (var button in typeSelectionButtons)
+		{
+			button.GetComponent<UnityEngine.UI.Button>().interactable = isTypeButtonActive;
+		}
+	}
+
 	[Space]
 
 	[Header("Interaction Editor")]
@@ -234,6 +258,8 @@ public class EditorHUDManager : MonoBehaviour
 		}
 
 		_openInteractionEditor.Invoke();
+		SwitchGizmoButtonActiveState();
+		SwitchTypeButtonActiveState();
 	}
 	public void OpenInteractionEditor(ActivableEditor activableEditor)
 	{
@@ -248,6 +274,8 @@ public class EditorHUDManager : MonoBehaviour
 		}
 
 		_openInteractionEditor.Invoke();
+		SwitchGizmoButtonActiveState();
+		SwitchTypeButtonActiveState();
 	}
 
 	public void CloseInteractionEditor()
@@ -267,6 +295,8 @@ public class EditorHUDManager : MonoBehaviour
 		ObjectSelection.Instance.editorOpened = false;
 
 		_closeInteractionEditor.Invoke();
+		SwitchGizmoButtonActiveState();
+		SwitchTypeButtonActiveState();
 	}
 
 	public void AddActivableInteractionEditor(ActivableEditor activableEditor)
@@ -279,19 +309,66 @@ public class EditorHUDManager : MonoBehaviour
 			}
 		}
 
+		List<ActivableEditor> startActivables = ListCloner.CloneMonoBehaviourListReference(ObjectSelection.Instance.GetCurrentActivator().activables); //HERE
+		List<ActivatorEditor> startActivators = ListCloner.CloneMonoBehaviourListReference(activableEditor.activators); //HERE
+
+		List<ActivableEditor> endActivables = ListCloner.CloneMonoBehaviourListReference(startActivables); //HERE
+		List<ActivatorEditor> endActivators = ListCloner.CloneMonoBehaviourListReference(startActivators); //HERE
+		endActivables.Add(activableEditor);
+		endActivators.Add(ObjectSelection.Instance.GetCurrentActivator());
+
+		ActivatorCommand activatorCommand = new ActivatorCommand(
+			ObjectSelection.Instance.GetCurrentActivator().gameObject, ObjectSelection.Instance.GetCurrentActivator().transform.GetComponent<ModifiableObject>().objectId,
+			activableEditor.gameObject, activableEditor.transform.GetComponent<ModifiableObject>().objectId,
+			startActivables, startActivators, endActivables, endActivators);
+
+		HystoryCommand.Instance.ExecuteCommand(activatorCommand);
+
+		AddActivableUILister(activableEditor);
+
+		//ObjectSelection.Instance.GetCurrentActivator().activables.Add(activableEditor);
+		//activableEditor.activators.Add(ObjectSelection.Instance.GetCurrentActivator());
+	}
+	public void AddActivableUILister(ActivableEditor activableEditor)
+	{
 		GameObject activable = Instantiate(interactableLister, activableListPanel);
 		activable.GetComponent<InteractableLister>().Setup(activableEditor);
-		ObjectSelection.Instance.GetCurrentActivator().activables.Add(activableEditor);
-		activableEditor.activators.Add(ObjectSelection.Instance.GetCurrentActivator());
 		interactables.Add(activable.GetComponent<InteractableLister>());
 	}
 
-	public void RemoveActivableInteractionEditor(InteractableLister interactableLister)
+	public void RemoveActivableInteractionEditor(ActivableEditor activableEditor)
 	{
-		ObjectSelection.Instance.GetCurrentActivator().activables.Remove(interactableLister.activableEditor);
-		interactableLister.activableEditor.activators.Remove(ObjectSelection.Instance.GetCurrentActivator());
-		interactables.Remove(interactableLister);
-		Destroy(interactableLister.gameObject);
+		List<ActivableEditor> startActivables = ListCloner.CloneMonoBehaviourListReference(ObjectSelection.Instance.GetCurrentActivator().activables); //HERE
+		List<ActivatorEditor> startActivators = ListCloner.CloneMonoBehaviourListReference(activableEditor.activators); //HERE
+
+		List<ActivableEditor> endActivables = ListCloner.CloneMonoBehaviourListReference(startActivables); //HERE
+		List<ActivatorEditor> endActivators = ListCloner.CloneMonoBehaviourListReference(startActivators); //HERE
+		endActivables.Remove(activableEditor);
+		endActivators.Remove(ObjectSelection.Instance.GetCurrentActivator());
+
+		ActivatorCommand activatorCommand = new ActivatorCommand(
+			ObjectSelection.Instance.GetCurrentActivator().gameObject, ObjectSelection.Instance.GetCurrentActivator().transform.GetComponent<ModifiableObject>().objectId,
+			activableEditor.gameObject, activableEditor.transform.GetComponent<ModifiableObject>().objectId,
+			startActivables, startActivators, endActivables, endActivators);
+
+		HystoryCommand.Instance.ExecuteCommand(activatorCommand);
+
+		RemoveActivableUILister(activableEditor);
+
+		//ObjectSelection.Instance.GetCurrentActivator().activables.Remove(interactableLister.activableEditor);
+		//interactableLister.activableEditor.activators.Remove(ObjectSelection.Instance.GetCurrentActivator());
+	}
+	public void RemoveActivableUILister(ActivableEditor activableEditor)
+	{
+		foreach (var inter in interactables)
+		{
+			if(inter.activableEditor = activableEditor)
+			{
+				interactables.Remove(inter);
+				Destroy(inter.gameObject);
+				return;
+			}
+		}
 	}
 
 	public void HideAllCurrentActivableHighlight()
@@ -315,6 +392,10 @@ public class EditorHUDManager : MonoBehaviour
 		currentDispenserEditor = dispenserEditor;
 		typeDropdown.value = (int)dispenserEditor.materialType - 1;
 		numberDropdown.value = dispenserEditor.materialNumber;
+
+		_openInteractionEditor.Invoke();
+		SwitchGizmoButtonActiveState();
+		SwitchTypeButtonActiveState();
 	}
 
 	public void CloseDispenserEditor()
@@ -323,15 +404,19 @@ public class EditorHUDManager : MonoBehaviour
 
 		ObjectSelection.Instance.editorOpened = false;
 		currentDispenserEditor = null;
+
+		_closeInteractionEditor.Invoke();
+		SwitchGizmoButtonActiveState();
+		SwitchTypeButtonActiveState();
 	}
 
 	public void ChangeDispenserType(int type)
 	{
-		currentDispenserEditor.SetMaterial(type);
+		currentDispenserEditor.SetMaterialCommand(type);
 	}
 
 	public void ChangeDispenserNumber(int number)
 	{
-		currentDispenserEditor.SetNumber(number);
+		currentDispenserEditor.SetNumberCommand(number);
 	}
 }

@@ -8,7 +8,7 @@ public class SaveSystem : MonoBehaviour
 {
 	[SerializeField] Canvas editorCanvas;
 
-	[HideInInspector] public List<ModifiableObject> objectInScene = new List<ModifiableObject>();
+	public List<ModifiableObject> objectInScene = new List<ModifiableObject>();
 
 	[SerializeField] private Transform cameraHolder, cameraMain;
 

@@ -43,7 +43,7 @@ public class InteractableLister : MonoBehaviour
 		}
 		else
 		{
-			if (activatorEditor.gameObject.GetComponent<Outline>() != null)
+			if (activatorEditor != null && activatorEditor.gameObject.GetComponent<Outline>() != null)
 			{
 				activatorEditor.gameObject.GetComponent<Outline>().enabled = false;
 			}
@@ -97,7 +97,7 @@ public class InteractableLister : MonoBehaviour
 		{
 			if (activableEditor.gameObject.GetComponent<Outline>() != null)
 				activableEditor.gameObject.GetComponent<Outline>().enabled = false;
-			EditorHUDManager.Instance.RemoveActivableInteractionEditor(this);
+			EditorHUDManager.Instance.RemoveActivableInteractionEditor(this.activableEditor);
 		});
 	}
 

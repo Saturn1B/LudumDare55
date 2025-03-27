@@ -38,7 +38,7 @@ public class GizmoControl : MonoBehaviour
 	{
 		if (EditorHUDManager.Instance.isPaused) return;
 
-		if (Input.GetMouseButtonUp(0))
+		if (Input.GetMouseButtonUp(0) && mousePressed)
 		{
 			mousePressed = false;
 			currentAxis = null;
@@ -109,6 +109,8 @@ public class GizmoControl : MonoBehaviour
 				default:
 					break;
 			}
+
+			StartObjectModification();
 		}
 	}
 
@@ -145,6 +147,11 @@ public class GizmoControl : MonoBehaviour
 		}
 
 		return Axis.NONE;
+	}
+
+	protected virtual void StartObjectModification()
+	{
+
 	}
 
 	protected virtual void ObjectModification(Vector3 vectorDirection)

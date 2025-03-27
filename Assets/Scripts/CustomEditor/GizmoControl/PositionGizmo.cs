@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PositionGizmo : GizmoControl
 {
+	Vector3 startPosition;
+	[SerializeField] GameObject commandAffectedObject;
+
 	protected override void ObjectModification(Vector3 axis)
 	{
 		int vectorDir = 0;
@@ -34,5 +37,17 @@ public class PositionGizmo : GizmoControl
 
 			affectedObject.transform.position = tempPosition;
 		}
+	}
+
+	protected override void StartObjectModification()
+	{
+		startPosition = commandAffectedObject.transform.GetChild(0).transform.position;
+	}
+
+	protected override void EndObjectModification()
+	{
+		GameObject target = commandAffectedObject.transform.GetChild(0).gameObject;
+		MoveCommand moveCommand = new MoveCommand(target, target.GetComponent<ModifiableObject>().objectId, startPosition, target.transform.position);
+		HystoryCommand.Instance.ExecuteCommand(moveCommand);
 	}
 }
