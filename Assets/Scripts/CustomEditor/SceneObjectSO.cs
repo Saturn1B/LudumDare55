@@ -17,6 +17,7 @@ public class SceneObjectSO : ScriptableObject
 {
 	public string objectName;
 	public GameObject objectPrefab;
+	public GameObject workingObjectPrefab;
 	public Sprite objectSprite;
 	public SceneObjectType objectType;
 }
