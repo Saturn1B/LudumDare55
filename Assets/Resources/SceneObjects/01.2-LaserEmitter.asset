@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Laser Emitter
   objectPrefab: {fileID: 3789677907100511815, guid: 1cc58c3c6fbef52449ef6d64c6791b74, type: 3}
+  workingObjectPrefab: {fileID: 2923782301156268771, guid: b045b40a8665c234f8655dfe26cc110a, type: 3}
   objectSprite: {fileID: 21300000, guid: 076d0ff4ba2ddf24c80aa98a46563673, type: 3}
   objectType: 3

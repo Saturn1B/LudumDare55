@@ -13200,7 +13200,7 @@ MonoBehaviour:
   isStuckToWall: 0
   canTranslate: 1
   canScale: 1
-  canRotate: 0
+  canRotate: 1
   X: 0
   Y: 0
   Z: 0

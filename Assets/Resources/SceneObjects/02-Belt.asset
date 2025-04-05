@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Belt
   objectPrefab: {fileID: 1217213030359963627, guid: 84e344e152ed1a0478fd609780107ad6, type: 3}
+  workingObjectPrefab: {fileID: 2019869838691404896, guid: a6c6d25575ff16646bd55b57b62f42c1, type: 3}
   objectSprite: {fileID: 21300000, guid: 76db4ab4676833041ba8d28339b12a62, type: 3}
   objectType: 2

@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Sliding Door
   objectPrefab: {fileID: 535873700685041758, guid: 2b17a5d0532aa544294ceb3d99844063, type: 3}
+  workingObjectPrefab: {fileID: 7361955616547529410, guid: df7bdc2fbc41f5c4d87d6bf1479d3b09, type: 3}
   objectSprite: {fileID: 21300000, guid: b22a1c683b16c1d499dee7e9fb0815c6, type: 3}
   objectType: 2

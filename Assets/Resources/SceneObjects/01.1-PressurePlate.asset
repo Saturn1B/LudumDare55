@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Pressure Plate
   objectPrefab: {fileID: 632411165865690734, guid: c5ed0bb66c970314aa5eb0bb547f3545, type: 3}
+  workingObjectPrefab: {fileID: 6773800864810540547, guid: c4570f1af5b995e4590cd73b1f01abda, type: 3}
   objectSprite: {fileID: 21300000, guid: 6c20ab436b39124419662fc48c2ddbb8, type: 3}
   objectType: 1

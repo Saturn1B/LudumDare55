@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectName: Dispenser
   objectPrefab: {fileID: 5161630112465526153, guid: 43cd347f89429d0458881a4b0b47ba05, type: 3}
+  workingObjectPrefab: {fileID: 4980221321014952306, guid: f5c10187cc5331143b8ecf268d5f8dc4, type: 3}
   objectSprite: {fileID: 21300000, guid: 8894979910cfe1c4d976ae9393e480c5, type: 3}
   objectType: 3
