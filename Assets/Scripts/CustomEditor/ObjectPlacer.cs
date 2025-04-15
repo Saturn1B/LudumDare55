@@ -157,6 +157,8 @@ public class ObjectPlacer : MonoBehaviour
 
 		go.name = objectName;
 
+		go.GetComponent<ModifiableObject>().parentPrefab = objectPrefab;
+
 		if (go.GetComponent<ActivatorEditor>())
 		{
 			go.GetComponent<ActivatorEditor>().activatorName = objectName;
