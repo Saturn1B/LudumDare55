@@ -21,6 +21,13 @@ public class MaterialDispenser : MonoBehaviour
 		return dispenserMaterial;
 	}
 
+	public void SetupDispenser(Materials mat, int number)
+	{
+		dispenserMaterial = mat;
+		availableMaterial = number;
+		UpdateGraph();
+	}
+
 	public void AddMaterial(int value)
 	{
 		availableMaterial += value;

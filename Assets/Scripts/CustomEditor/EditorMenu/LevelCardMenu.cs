@@ -118,6 +118,6 @@ public class LevelCardMenu : MonoBehaviour
 	{
 		LevelDataTransfer.SceneDataToLoad = currentSceneData;
 		LevelDataTransfer.levelName = currentSceneData.levelName;
-		//SceneManager.LoadScene("EditorScene", LoadSceneMode.Single);
+		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
 	}
 }
