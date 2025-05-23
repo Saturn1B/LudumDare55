@@ -50,12 +50,19 @@ public class EditorHUDManager : MonoBehaviour
 	}
 	public void SaveLevel()
 	{
-		SaveSystem.Instance.Save();
+		SaveSystem.Instance.SaveOnDisk();
 		PauseGame();
 	}
 	public void MainMenu()
 	{
+		LevelDataTransfer.isEditing = false;
+		LevelDataTransfer.SceneDataToTest = null;
 		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+	}
+	public void TestLevel()
+	{
+		LevelDataTransfer.SceneDataToTest = SaveSystem.Instance.SaveSceneData();
+		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
 	}
 
 	[Space]

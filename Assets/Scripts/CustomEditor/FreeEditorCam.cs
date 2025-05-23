@@ -13,6 +13,12 @@ public class FreeEditorCam : MonoBehaviour
 
 	private bool isRightMouseButtonPressed;
 
+	private void Awake()
+	{
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
+	}
+
 	private void Update()
 	{
 		if (EditorHUDManager.Instance.isPaused) return;

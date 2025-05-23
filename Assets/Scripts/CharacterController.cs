@@ -44,9 +44,9 @@ public class CharacterController : MonoBehaviour
         RaycastHit hit;
         bool isGrounded = Physics.SphereCast(transform.position, 0.5f, Vector3.down, out hit, checkDistance, groundLayer);
 
-        HandleMouseLook();
+		HandleMouseLook();
 
-        if (isGrounded)
+		if (isGrounded)
         {
             Jump();
         }
@@ -115,6 +115,11 @@ public class CharacterController : MonoBehaviour
         transform.eulerAngles = new Vector3(0.0f, smoothedYaw, 0.0f);
         playerCamera.transform.localEulerAngles = new Vector3(smoothedPitch, 0.0f, 0.0f);
     }
+
+    public void SetYPlayerAngle(Vector3 newAngle)
+	{
+        yaw = newAngle.y;
+	}
 
     private float ClampAngle(float angle, float min, float max)
     {

@@ -3,23 +3,38 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class LevelLoader : MonoBehaviour
 {
 	[SerializeField] private GameObject[] permanentObjects;
+	[SerializeField] private TMP_Text escapeText;
 
-
-	// Start is called before the first frame update
 	void Start()
     {
-		Load(LevelDataTransfer.SceneDataToLoad);
-    }
+		if (LevelDataTransfer.isEditing)
+		{
+			escapeText.text = "Press <color=yellow>Escape</color> to go back to <color=yellow>Edit Mode</color>";
+			Load(LevelDataTransfer.SceneDataToTest);
+		}
+		else
+		{
+			escapeText.text = "Press <color=yellow>Escape</color> to go back to <color=yellow>Main Menu</color>";
+			Load(LevelDataTransfer.SceneDataToLoad);
+		}
+	}
 
-    // Update is called once per frame
-    void Update()
+	void Update()
     {
-
-    }
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			if (LevelDataTransfer.isEditing)
+				SceneManager.LoadScene("EditorScene", LoadSceneMode.Single);
+			else
+				SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
+		}
+	}
 
 	public void Load(SceneData selectedSceneData = null)
 	{
@@ -44,12 +59,16 @@ public class LevelLoader : MonoBehaviour
 		int j = 0;
 		foreach (var permanentData in sceneData.permanentObjectsInScene)
 		{
-			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null)
+			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null || permanentObjects[j].transform.GetComponent<CharacterController>() != null)
 				permanentObjects[j].transform.position = permanentData.position + Vector3.up;
 			else
 				permanentObjects[j].transform.position = permanentData.position;
 
-			permanentObjects[j].transform.eulerAngles = permanentData.rotation;
+			if (permanentObjects[j].transform.GetComponent<CharacterController>() != null)
+				permanentObjects[j].transform.GetComponent<CharacterController>().SetYPlayerAngle(permanentData.rotation);
+			else
+				permanentObjects[j].transform.eulerAngles = permanentData.rotation;
+
 			permanentObjects[j].transform.localScale = permanentData.scale;
 
 			j++;

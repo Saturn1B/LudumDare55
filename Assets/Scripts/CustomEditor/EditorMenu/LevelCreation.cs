@@ -24,6 +24,7 @@ public class LevelCreation : MonoBehaviour
 
 		LevelDataTransfer.SceneDataToLoad = null;
 		LevelDataTransfer.levelName = levelNameInput.text;
+		LevelDataTransfer.isEditing = true;
 		SceneManager.LoadScene("EditorScene", LoadSceneMode.Single);
 	}
 

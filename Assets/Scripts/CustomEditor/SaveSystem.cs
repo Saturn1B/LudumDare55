@@ -34,8 +34,12 @@ public class SaveSystem : MonoBehaviour
 
 	private void Start()
 	{
-		if (LevelDataTransfer.SceneDataToLoad != null)
+		if (LevelDataTransfer.SceneDataToTest != null)
+			Load(LevelDataTransfer.SceneDataToTest);
+		else if (LevelDataTransfer.SceneDataToLoad != null)
 			Load(LevelDataTransfer.SceneDataToLoad);
+		else
+			SaveOnDisk();
 	}
 
 	public static void GenerateSaveFilePath()
@@ -45,7 +49,7 @@ public class SaveSystem : MonoBehaviour
 	}
 
 	[ContextMenu("Save")]
-	public void Save()
+	public SceneData SaveSceneData()
 	{
 		SceneData sceneData = new SceneData();
 		sceneData.objectsInScene = new ModifiableObjectData[objectInScene.Count];
@@ -123,14 +127,21 @@ public class SaveSystem : MonoBehaviour
 		sceneData.levelName = saveFileName;
 		sceneData.levelId = saveFileId;
 
+		return sceneData;
+	}
+
+	public void SaveOnDisk()
+	{
+		SceneData sceneData = SaveSceneData();
+
 		string sceneDataString = JsonUtility.ToJson(sceneData);
 
-		string saveFileNameId = saveFileName + saveFileId;
+		string saveFileNameId = sceneData.levelName + sceneData.levelId;
 
 		if (!Directory.Exists(saveFilePath))
 			Directory.CreateDirectory(saveFilePath);
 
-		if(LevelDataTransfer.SceneDataToLoad != null)
+		if (LevelDataTransfer.SceneDataToLoad != null)
 		{
 			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".json");
 			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".png");

@@ -19,7 +19,7 @@ public class ShortcutManager : MonoBehaviour
 			//Save shortcut
 			if (Input.GetKeyDown(KeyCode.S))
 			{
-				SaveSystem.Instance.Save();
+				SaveSystem.Instance.SaveOnDisk();
 			}
 			//Duplicate shortcut
 			else if (Input.GetKeyDown(KeyCode.D))
