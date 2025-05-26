@@ -89,7 +89,10 @@ public class GizmoGestion : MonoBehaviour
 	{
 		if(currentModifiableObject != null)
 		{
-			currentModifiableObject.transform.SetParent(null);
+			if (currentModifiableObject.hasParent)
+			currentModifiableObject.transform.SetParent(currentModifiableObject.parentObject.transform);
+			else
+				currentModifiableObject.transform.SetParent(null);
 		}
 
 		currentModifiableObject = modifiableObject;
@@ -153,7 +156,10 @@ public class GizmoGestion : MonoBehaviour
 		Debug.Log("test");
 		if (currentModifiableObject)
 		{
-			currentModifiableObject.transform.SetParent(null);
+			if (currentModifiableObject.hasParent)
+				currentModifiableObject.transform.SetParent(currentModifiableObject.parentObject.transform);
+			else
+				currentModifiableObject.transform.SetParent(null);
 			currentModifiableObject = null;
 		}
 

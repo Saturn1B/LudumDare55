@@ -5,6 +5,14 @@ using UnityEditor;
 public class ModifiableObjectEditor : Editor
 {
 	protected static bool ShowOffsetSettings = false;
+	private SerializedProperty childObjectsProp;
+	private SerializedProperty parentObjectProp;
+
+	private void OnEnable()
+	{
+		childObjectsProp = serializedObject.FindProperty("childObjects");
+		parentObjectProp = serializedObject.FindProperty("parentObject");
+	}
 
 	public override void OnInspectorGUI()
 	{
@@ -41,6 +49,24 @@ public class ModifiableObjectEditor : Editor
 			}
 			EditorGUI.indentLevel--;
 		}
+
+		modifiableObject.hasChildObjects = EditorGUILayout.Toggle("Has Child Objects", modifiableObject.hasChildObjects);
+
+		if (modifiableObject.hasChildObjects)
+		{
+			EditorGUILayout.PropertyField(childObjectsProp, new GUIContent("Child Objects"), true);
+		}
+
+		serializedObject.ApplyModifiedProperties();
+
+		modifiableObject.hasParent = EditorGUILayout.Toggle("Has Parent", modifiableObject.hasParent);
+
+		if (modifiableObject.hasParent)
+		{
+			EditorGUILayout.PropertyField(parentObjectProp, new GUIContent("Parent Object"), true);
+		}
+
+		serializedObject.ApplyModifiedProperties();
 
 		// Apply changes made to the script
 		if (GUI.changed)

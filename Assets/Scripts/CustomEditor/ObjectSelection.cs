@@ -34,6 +34,16 @@ public class ObjectSelection : MonoBehaviour
         if (selected != null)
         {
             selected.gameObject.GetComponent<Outline>().enabled = false;
+
+            if (selected.GetComponent<ModifiableObject>().hasChildObjects)
+            {
+                ModifiableObject selectedModifiable = selected.GetComponent<ModifiableObject>();
+
+                foreach (ModifiableObject childObject in selectedModifiable.childObjects)
+                {
+                    childObject.gameObject.GetComponent<Outline>().enabled = false;
+                }
+            }
         }
 
         selected = null;
@@ -51,6 +61,17 @@ public class ObjectSelection : MonoBehaviour
         if (selected != null)
         {
             selected.gameObject.GetComponent<Outline>().enabled = false;
+
+            if (selected.GetComponent<ModifiableObject>().hasChildObjects)
+            {
+                ModifiableObject selectedModifiable = selected.GetComponent<ModifiableObject>();
+
+                foreach (ModifiableObject childObject in selectedModifiable.childObjects)
+                {
+                    childObject.gameObject.GetComponent<Outline>().enabled = false;
+                }
+            }
+
             GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
         }
 
@@ -65,6 +86,26 @@ public class ObjectSelection : MonoBehaviour
             outline.enabled = true;
             selected.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
             selected.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
+        }
+
+		if (selected.GetComponent<ModifiableObject>().hasChildObjects)
+		{
+            ModifiableObject selectedModifiable = selected.GetComponent<ModifiableObject>();
+
+			foreach (ModifiableObject childObject in selectedModifiable.childObjects)
+			{
+                if (childObject.gameObject.GetComponent<Outline>() != null)
+                {
+                    childObject.gameObject.GetComponent<Outline>().enabled = true;
+                }
+                else
+                {
+                    Outline outline = childObject.gameObject.AddComponent<Outline>();
+                    outline.enabled = true;
+                    childObject.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+                    childObject.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
+                }
+            }
         }
 
         GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());

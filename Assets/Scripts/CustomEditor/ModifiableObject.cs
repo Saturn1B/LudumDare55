@@ -15,6 +15,12 @@ public class ModifiableObject : MonoBehaviour
 
 	public GameObject parentPrefab;
 
+	public bool hasChildObjects;
+	public ModifiableObject[] childObjects;
+
+	public bool hasParent;
+	public ModifiableObject parentObject;
+
 	private void Awake()
 	{
 		objectId = GenerateUniqueID();

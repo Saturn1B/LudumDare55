@@ -57,16 +57,27 @@ public class SaveSystem : MonoBehaviour
 		int i = 0;
 		foreach (var modifiable in objectInScene)
 		{
-			ModifiableObjectData objectData = new ModifiableObjectData();
+			ModifiableObjectData objectData = SaveBaseModifiableObjectData(modifiable);
+			//ModifiableObjectData objectData = new ModifiableObjectData();
 
-			objectData.objectId = modifiable.objectId;
-			objectData.objectName = modifiable.gameObject.name;
+			//objectData.objectId = modifiable.objectId;
+			//objectData.objectName = modifiable.gameObject.name;
 
-			objectData.position = modifiable.transform.position;
-			objectData.rotation = modifiable.transform.eulerAngles;
-			objectData.scale = modifiable.transform.localScale;
+			//objectData.position = modifiable.transform.position;
+			//objectData.rotation = modifiable.transform.eulerAngles;
+			//objectData.scale = modifiable.transform.localScale;
 
-			objectData.canDelete = modifiable.GetComponent<Undeletable>() == null ? false : true;
+			//objectData.canDelete = modifiable.GetComponent<Undeletable>() == null ? false : true;
+
+			if (modifiable.hasChildObjects)
+			{
+				objectData.childObjects = new ModifiableObjectData[modifiable.childObjects.Length];
+
+				for (int k = 0; k < objectData.childObjects.Length; k++)
+				{
+					objectData.childObjects[k] = SaveBaseModifiableObjectData(modifiable.childObjects[k]);
+				}
+			}
 
 			if(modifiable.GetComponent<ActivatorEditor>() != null)
 			{
@@ -200,6 +211,18 @@ public class SaveSystem : MonoBehaviour
 				modifiable.OverrideID(objectData.objectId);
 				loadedObjects.Add(modifiable, modifiable.objectId);
 
+				if (objectData.childObjects != null && objectData.childObjects.Length > 0)
+				{
+					for (int i = 0; i < modifiable.childObjects.Length; i++)
+					{
+						modifiable.childObjects[i].transform.position = objectData.childObjects[i].position;
+						modifiable.childObjects[i].transform.eulerAngles = objectData.childObjects[i].rotation;
+						modifiable.childObjects[i].transform.localScale = objectData.childObjects[i].scale;
+						modifiable.childObjects[i].transform.name = objectData.objectName;
+						modifiable.childObjects[i].OverrideID(objectData.objectId);
+					}
+				}
+
 				if(modifiable.GetComponent<DispenserEditor>() != null)
 				{
 					DispenserEditor dispenser = modifiable.GetComponent<DispenserEditor>();
@@ -270,6 +293,22 @@ public class SaveSystem : MonoBehaviour
 
 		editorCanvas.enabled = true;
 	}
+
+	private ModifiableObjectData SaveBaseModifiableObjectData(ModifiableObject modifiable)
+	{
+		ModifiableObjectData objectData = new ModifiableObjectData();
+
+		objectData.objectId = modifiable.objectId;
+		objectData.objectName = modifiable.gameObject.name;
+
+		objectData.position = modifiable.transform.position;
+		objectData.rotation = modifiable.transform.eulerAngles;
+		objectData.scale = modifiable.transform.localScale;
+
+		objectData.canDelete = modifiable.GetComponent<Undeletable>() == null ? false : true;
+
+		return objectData;
+	}
 }
 
 [System.Serializable]
@@ -296,6 +335,7 @@ public class ModifiableObjectData
 	public List<string> activablesId = new List<string>();
 	public int materialType;
 	public int materialNumber;
+	public ModifiableObjectData[] childObjects;
 }
 
 [System.Serializable]

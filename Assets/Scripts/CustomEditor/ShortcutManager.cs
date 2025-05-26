@@ -26,6 +26,12 @@ public class ShortcutManager : MonoBehaviour
 			{
 				if(ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR || ObjectSelection.Instance.selected != null)
 				{
+					if (ObjectSelection.Instance.selected.GetComponent<Undeletable>())
+					{
+						DisplayMessage.Instance.ErrorMessage($"- {ObjectSelection.Instance.selected.name} - cannot be duplicated");
+						return;
+					}
+
 					Transform toDuplicate = ObjectSelection.Instance.selected;
 
 					ObjectSelection.Instance.DeselectObject();

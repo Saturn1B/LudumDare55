@@ -88,11 +88,24 @@ public class LevelLoader : MonoBehaviour
 
 			if (objectPrefabSO != null)
 			{
-				GameObject sceneObject = Instantiate(objectPrefabSO.workingObjectPrefab, objectData.position, Quaternion.identity); /*objectData.scale*/
+				GameObject sceneObject = Instantiate(objectPrefabSO.workingObjectPrefab, objectData.position, Quaternion.identity);
 				sceneObject.transform.eulerAngles = objectData.rotation;
 				sceneObject.transform.localScale = objectData.scale;
 
 				loadedObjects.Add(sceneObject, objectData);
+
+				if (sceneObject.GetComponent<MovingPlatform>() && objectData.childObjects.Length == 2)
+				{
+					MovingPlatform platform = sceneObject.GetComponent<MovingPlatform>();
+
+					platform.pointA.position = objectData.childObjects[0].position;
+					platform.pointA.eulerAngles = objectData.childObjects[0].rotation;
+					platform.pointA.localScale = objectData.childObjects[0].scale;
+
+					platform.pointB.position = objectData.childObjects[1].position;
+					platform.pointB.eulerAngles = objectData.childObjects[1].rotation;
+					platform.pointB.localScale = objectData.childObjects[1].scale;
+				}
 
 
 				if (sceneObject.GetComponent<MaterialDispenser>())

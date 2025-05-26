@@ -3442,6 +3442,10 @@ MonoBehaviour:
   Y: 1
   Z: 0
   parentPrefab: {fileID: 0}
+  hasChildObjects: 0
+  childObjects: []
+  hasParent: 0
+  parentObject: {fileID: 0}
 --- !u!4 &489377695
 Transform:
   m_ObjectHideFlags: 0
@@ -13668,6 +13672,10 @@ MonoBehaviour:
   Y: 0
   Z: 0
   parentPrefab: {fileID: 0}
+  hasChildObjects: 0
+  childObjects: []
+  hasParent: 0
+  parentObject: {fileID: 0}
 --- !u!23 &481577759367538037
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -14427,6 +14435,10 @@ MonoBehaviour:
   Y: 0
   Z: 0
   parentPrefab: {fileID: 0}
+  hasChildObjects: 0
+  childObjects: []
+  hasParent: 0
+  parentObject: {fileID: 0}
 --- !u!4 &4962294551335292614
 Transform:
   m_ObjectHideFlags: 0
@@ -14899,6 +14911,10 @@ MonoBehaviour:
   Y: 1
   Z: 0
   parentPrefab: {fileID: 0}
+  hasChildObjects: 0
+  childObjects: []
+  hasParent: 0
+  parentObject: {fileID: 0}
 --- !u!33 &8357789995491612091
 MeshFilter:
   m_ObjectHideFlags: 0
