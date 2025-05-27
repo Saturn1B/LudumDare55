@@ -345,7 +345,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 177248526356949941, guid: 3e862557adc4dad469b2b8521d7c8a3f, type: 3}
       propertyPath: nextScene
-      value: EndingScene
+      value: EditorEndingScene
       objectReference: {fileID: 0}
     - target: {fileID: 3422594407528011252, guid: 3e862557adc4dad469b2b8521d7c8a3f, type: 3}
       propertyPath: m_Name

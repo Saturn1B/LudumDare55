@@ -15,5 +15,5 @@ MonoBehaviour:
   objectName: Reset Button
   objectPrefab: {fileID: 9168176135802134674, guid: efbd51e58d397854b90efb93f5dfe5ed, type: 3}
   workingObjectPrefab: {fileID: 4958185246464188377, guid: 1c735f04fcc68ba4ca460c34f3ed346f, type: 3}
-  objectSprite: {fileID: 21300000, guid: 2101338cca061bd49bf4258fb13593db, type: 3}
+  objectSprite: {fileID: 21300000, guid: c69265899e731054fafe73a3f7a6cf6f, type: 3}
   objectType: 4

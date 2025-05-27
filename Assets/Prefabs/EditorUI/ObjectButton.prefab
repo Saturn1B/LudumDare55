@@ -211,8 +211,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 899b46935d1bfa046befe38bf52c68ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectPrefab: {fileID: 0}
   objectImage: {fileID: 4164321180015016267}
+  objectName: 
   outline: {fileID: 5602173074925611534}
+  id: 0
+  isNone: 0
+  isEditor: 0
+  isDelete: 0
 --- !u!1 &8417353516374398001
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,7 +254,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4783633820169156092
 CanvasRenderer:

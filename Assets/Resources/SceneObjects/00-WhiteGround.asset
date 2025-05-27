@@ -15,5 +15,5 @@ MonoBehaviour:
   objectName: White Ground
   objectPrefab: {fileID: 850536429210657331, guid: 874af0f2e544cc44b9747a55d316b7df, type: 3}
   workingObjectPrefab: {fileID: 850536429210657331, guid: babf29c2aad621843a80f052c55d1f29, type: 3}
-  objectSprite: {fileID: 21300000, guid: 5a452f910e0c7e84b836e32ab27eea6b, type: 3}
+  objectSprite: {fileID: 21300000, guid: 9c9dbe40df83c634a9797fe8720dd141, type: 3}
   objectType: 0
