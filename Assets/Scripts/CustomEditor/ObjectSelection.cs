@@ -84,7 +84,7 @@ public class ObjectSelection : MonoBehaviour
         {
             Outline outline = selected.gameObject.AddComponent<Outline>();
             outline.enabled = true;
-            selected.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+            selected.gameObject.GetComponent<Outline>().OutlineColor = Color.cyan;
             selected.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
         }
 
@@ -102,7 +102,7 @@ public class ObjectSelection : MonoBehaviour
                 {
                     Outline outline = childObject.gameObject.AddComponent<Outline>();
                     outline.enabled = true;
-                    childObject.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+                    childObject.gameObject.GetComponent<Outline>().OutlineColor = Color.cyan;
                     childObject.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
                 }
             }

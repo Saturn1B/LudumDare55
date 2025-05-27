@@ -251,6 +251,8 @@ public class EditorHUDManager : MonoBehaviour
 	private List<InteractableLister> interactables = new List<InteractableLister>();
 	[HideInInspector] public UnityEvent _openInteractionEditor;
 	[HideInInspector] public UnityEvent _closeInteractionEditor;
+	[SerializeField] private GameObject connectionLinePrefab;
+	private List<GameObject> connectionLines = new List<GameObject>();
 
 	public void OpenInteractionEditor(ActivatorEditor activatorEditor)
 	{
@@ -262,6 +264,9 @@ public class EditorHUDManager : MonoBehaviour
 			GameObject go = Instantiate(interactableLister, activableListPanel);
 			go.GetComponent<InteractableLister>().Setup(activable);
 			interactables.Add(go.GetComponent<InteractableLister>());
+
+			CreateConnectionLine(activatorEditor.transform.position, activable.transform.position);
+
 		}
 
 		_openInteractionEditor.Invoke();
@@ -278,11 +283,41 @@ public class EditorHUDManager : MonoBehaviour
 			GameObject go = Instantiate(interactableLister, activableListPanel);
 			go.GetComponent<InteractableLister>().Setup(activator);
 			interactables.Add(go.GetComponent<InteractableLister>());
+
+			CreateConnectionLine(activableEditor.transform.position, activator.transform.position);
 		}
 
 		_openInteractionEditor.Invoke();
 		SwitchGizmoButtonActiveState();
 		SwitchTypeButtonActiveState();
+	}
+
+	public void CreateConnectionLine(Vector3 startPos, Vector3 endPos)
+	{
+		GameObject cl = Instantiate(connectionLinePrefab);
+		connectionLines.Add(cl);
+		LineRenderer clRenderer = cl.GetComponent<LineRenderer>();
+		clRenderer.SetPosition(0, startPos);
+		clRenderer.SetPosition(1, endPos);
+	}
+
+	public void RemoveConnectionLineAt(Vector3 endPos)
+	{
+		GameObject clToRemove = null;
+		foreach (var cl in connectionLines)
+		{
+			if(cl.GetComponent<LineRenderer>().GetPosition(1) == endPos)
+			{
+				clToRemove = cl;
+				break;
+			}
+		}
+
+		if(clToRemove != null)
+		{
+			connectionLines.Remove(clToRemove);
+			Destroy(clToRemove);
+		}
 	}
 
 	public void CloseInteractionEditor()
@@ -295,6 +330,13 @@ public class EditorHUDManager : MonoBehaviour
 		}
 
 		interactables.Clear();
+
+		foreach (var cl in connectionLines)
+		{
+			Destroy(cl);
+		}
+
+		connectionLines.Clear();
 
 		editorPanel.SetActive(false);
 		activatorName.text = "";
@@ -332,6 +374,7 @@ public class EditorHUDManager : MonoBehaviour
 		HystoryCommand.Instance.ExecuteCommand(activatorCommand);
 
 		AddActivableUILister(activableEditor);
+		CreateConnectionLine(ObjectSelection.Instance.GetCurrentActivator().transform.position, activableEditor.transform.position);
 
 		//ObjectSelection.Instance.GetCurrentActivator().activables.Add(activableEditor);
 		//activableEditor.activators.Add(ObjectSelection.Instance.GetCurrentActivator());
@@ -361,6 +404,7 @@ public class EditorHUDManager : MonoBehaviour
 		HystoryCommand.Instance.ExecuteCommand(activatorCommand);
 
 		RemoveActivableUILister(activableEditor);
+		RemoveConnectionLineAt(activableEditor.transform.position);
 
 		//ObjectSelection.Instance.GetCurrentActivator().activables.Remove(interactableLister.activableEditor);
 		//interactableLister.activableEditor.activators.Remove(ObjectSelection.Instance.GetCurrentActivator());

@@ -65,7 +65,7 @@ public class InteractableLister : MonoBehaviour
 			{
 				Outline outline = activableEditor.gameObject.AddComponent<Outline>();
 				outline.enabled = true;
-				activableEditor.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+				activableEditor.gameObject.GetComponent<Outline>().OutlineColor = Color.cyan;
 				activableEditor.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
 			}
 		}
@@ -79,7 +79,7 @@ public class InteractableLister : MonoBehaviour
 			{
 				Outline outline = activatorEditor.gameObject.AddComponent<Outline>();
 				outline.enabled = true;
-				activatorEditor.gameObject.GetComponent<Outline>().OutlineColor = Color.magenta;
+				activatorEditor.gameObject.GetComponent<Outline>().OutlineColor = Color.cyan;
 				activatorEditor.gameObject.GetComponent<Outline>().OutlineWidth = 7.0f;
 			}
 		}
