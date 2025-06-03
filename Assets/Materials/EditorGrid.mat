@@ -67,6 +67,9 @@ Material:
     m_Floats:
     - PixelSnap: 0
     - _BoldEvery: 5
+    - _BoldLineEvery: 5
+    - _BoldLineOffset: 3
+    - _BoldLineWidth: 2
     - _BumpScale: 1
     - _CellSize: 1
     - _Cutoff: 0.5
@@ -78,6 +81,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _LineWidth: 1
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -89,9 +93,11 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BoldColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
+    - _BoldLineColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _ThinColor: {r: 0.6, g: 0.6, b: 0.6, a: 0.3}
+    - _ThinLineColor: {r: 0.6, g: 0.6, b: 0.6, a: 0.3}
   m_BuildTextureStacks: []
