@@ -48,10 +48,11 @@ public class EditorHUDManager : MonoBehaviour
 		isPaused = !isPaused;
 		menuPanel.SetActive(isPaused);
 	}
-	public void SaveLevel()
+	public void SaveLevel(bool unPause)
 	{
 		SaveSystem.Instance.SaveOnDisk();
-		PauseGame();
+		if(unPause)
+			PauseGame();
 	}
 	public void MainMenu()
 	{
@@ -63,6 +64,29 @@ public class EditorHUDManager : MonoBehaviour
 	{
 		LevelDataTransfer.SceneDataToTest = SaveSystem.Instance.SaveSceneData();
 		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
+	}
+
+	[Header("Tool Mode")]
+	[SerializeField] private GameObject grid;
+	private bool isGridOn = true;
+	[SerializeField] private Sprite gridOn, gridOff;
+	[SerializeField] private Image gridIcon;
+
+	public void ToggleGrid()
+	{
+		if (isGridOn)
+		{
+			isGridOn = false;
+			gridIcon.sprite = gridOff;
+		}
+		else
+		{
+			isGridOn = true;
+			gridIcon.sprite = gridOn;
+		}
+
+		grid.SetActive(isGridOn);
+
 	}
 
 	[Space]
@@ -252,11 +276,13 @@ public class EditorHUDManager : MonoBehaviour
 	[HideInInspector] public UnityEvent _openInteractionEditor;
 	[HideInInspector] public UnityEvent _closeInteractionEditor;
 	[SerializeField] private GameObject connectionLinePrefab;
+	[SerializeField] private GameObject quickMenu;
 	private List<GameObject> connectionLines = new List<GameObject>();
 
 	public void OpenInteractionEditor(ActivatorEditor activatorEditor)
 	{
 		editorPanel.SetActive(true);
+		quickMenu.SetActive(false);
 		activatorName.text = "> " + activatorEditor.activatorName;
 
 		foreach (var activable in activatorEditor.activables)
@@ -276,6 +302,7 @@ public class EditorHUDManager : MonoBehaviour
 	public void OpenInteractionEditor(ActivableEditor activableEditor)
 	{
 		editorPanel.SetActive(true);
+		quickMenu.SetActive(false);
 		activatorName.text = "> " + activableEditor.activableName;
 
 		foreach (var activator in activableEditor.activators)
@@ -339,6 +366,7 @@ public class EditorHUDManager : MonoBehaviour
 		connectionLines.Clear();
 
 		editorPanel.SetActive(false);
+		quickMenu.SetActive(true);
 		activatorName.text = "";
 		ObjectSelection.Instance.RemoveCurrentActivator();
 		ObjectSelection.Instance.editorOpened = false;
@@ -440,6 +468,7 @@ public class EditorHUDManager : MonoBehaviour
 	public void OpenDispenserEditor(DispenserEditor dispenserEditor)
 	{
 		dispenserPanel.SetActive(true);
+		quickMenu.SetActive(false);
 		currentDispenserEditor = dispenserEditor;
 		typeDropdown.value = (int)dispenserEditor.materialType - 1;
 		numberDropdown.value = dispenserEditor.materialNumber;
@@ -452,6 +481,7 @@ public class EditorHUDManager : MonoBehaviour
 	public void CloseDispenserEditor()
 	{
 		dispenserPanel.SetActive(false);
+		quickMenu.SetActive(true);
 
 		ObjectSelection.Instance.editorOpened = false;
 		currentDispenserEditor = null;

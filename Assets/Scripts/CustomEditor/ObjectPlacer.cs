@@ -76,56 +76,7 @@ public class ObjectPlacer : MonoBehaviour
 			{
 				if (isDelete)
 				{
-					if (!hit.transform.GetComponent<Undeletable>() && hit.transform.GetComponent<ModifiableObject>())
-					{
-						//if (hit.transform.GetComponent<ActivableEditor>())
-						//{
-						//	ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
-						//	currentActivable.RemoveFromActivator();
-						//}
-						//if (hit.transform.GetComponent<ActivatorEditor>())
-						//{
-						//	ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
-						//	currentActivator.RemoveFromActivable();
-						//}
-						//SaveSystem.Instance.objectInScene.Remove(hit.transform.GetComponent<ModifiableObject>());
-						//Destroy(hit.transform.gameObject);
-
-						DeleteCommand deleteCommand;
-
-						if (hit.transform.GetComponent<ActivableEditor>())
-						{
-							ActivableEditor currentActivable = hit.transform.GetComponent<ActivableEditor>();
-							ActivableSave activableSave = new ActivableSave(currentActivable.activators);
-							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
-								hit.transform.GetComponent<ModifiableObject>().parentPrefab, activableSave);
-						}
-						else if (hit.transform.GetComponent<ActivatorEditor>())
-						{
-							ActivatorEditor currentActivator = hit.transform.GetComponent<ActivatorEditor>();
-							ActivatorSave activatorSave = new ActivatorSave(currentActivator.activables);
-							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
-								hit.transform.GetComponent<ModifiableObject>().parentPrefab, activatorSave);
-						}
-						else if (hit.transform.GetComponent<DispenserEditor>())
-						{
-							DispenserEditor currentDispenser = hit.transform.GetComponent<DispenserEditor>();
-							DispenserSave dispenserSave = new DispenserSave(currentDispenser.materialType, currentDispenser.materialNumber);
-							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
-								hit.transform.GetComponent<ModifiableObject>().parentPrefab, dispenserSave);
-						}
-						else
-						{
-							deleteCommand = new DeleteCommand(hit.transform.gameObject, hit.transform.GetComponent<ModifiableObject>().objectId,
-								hit.transform.GetComponent<ModifiableObject>().parentPrefab);
-						}
-
-						HystoryCommand.Instance.ExecuteCommand(deleteCommand);
-					}
-					else
-					{
-						DisplayMessage.Instance.ErrorMessage($"- {hit.transform.name} - cannot be removed");
-					}
+					DeleteObject(hit.transform.gameObject);
 				}
 				else
 				{
@@ -169,5 +120,46 @@ public class ObjectPlacer : MonoBehaviour
 		}
 
 		return go.GetComponent<ModifiableObject>();
+	}
+
+	public void DeleteObject(GameObject toDelete)
+	{
+		if (!toDelete.transform.GetComponent<Undeletable>() && toDelete.transform.GetComponent<ModifiableObject>())
+		{
+			DeleteCommand deleteCommand;
+
+			if (toDelete.transform.GetComponent<ActivableEditor>())
+			{
+				ActivableEditor currentActivable = toDelete.transform.GetComponent<ActivableEditor>();
+				ActivableSave activableSave = new ActivableSave(currentActivable.activators);
+				deleteCommand = new DeleteCommand(toDelete.transform.gameObject, toDelete.transform.GetComponent<ModifiableObject>().objectId,
+					toDelete.transform.GetComponent<ModifiableObject>().parentPrefab, activableSave);
+			}
+			else if (toDelete.transform.GetComponent<ActivatorEditor>())
+			{
+				ActivatorEditor currentActivator = toDelete.transform.GetComponent<ActivatorEditor>();
+				ActivatorSave activatorSave = new ActivatorSave(currentActivator.activables);
+				deleteCommand = new DeleteCommand(toDelete.transform.gameObject, toDelete.transform.GetComponent<ModifiableObject>().objectId,
+					toDelete.transform.GetComponent<ModifiableObject>().parentPrefab, activatorSave);
+			}
+			else if (toDelete.transform.GetComponent<DispenserEditor>())
+			{
+				DispenserEditor currentDispenser = toDelete.transform.GetComponent<DispenserEditor>();
+				DispenserSave dispenserSave = new DispenserSave(currentDispenser.materialType, currentDispenser.materialNumber);
+				deleteCommand = new DeleteCommand(toDelete.transform.gameObject, toDelete.transform.GetComponent<ModifiableObject>().objectId,
+					toDelete.transform.GetComponent<ModifiableObject>().parentPrefab, dispenserSave);
+			}
+			else
+			{
+				deleteCommand = new DeleteCommand(toDelete.transform.gameObject, toDelete.transform.GetComponent<ModifiableObject>().objectId,
+					toDelete.transform.GetComponent<ModifiableObject>().parentPrefab);
+			}
+
+			HystoryCommand.Instance.ExecuteCommand(deleteCommand);
+		}
+		else
+		{
+			DisplayMessage.Instance.ErrorMessage($"- {toDelete.transform.name} - cannot be removed");
+		}
 	}
 }

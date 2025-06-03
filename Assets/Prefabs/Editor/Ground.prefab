@@ -140,3 +140,7 @@ MonoBehaviour:
   Y: 1
   Z: 1
   parentPrefab: {fileID: 0}
+  hasChildObjects: 0
+  childObjects: []
+  hasParent: 0
+  parentObject: {fileID: 0}

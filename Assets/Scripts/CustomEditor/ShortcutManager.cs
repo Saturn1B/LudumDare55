@@ -14,6 +14,18 @@ public class ShortcutManager : MonoBehaviour
 
 		if (EditorHUDManager.Instance.isPaused) return;
 
+		if (Input.GetKeyDown(KeyCode.Delete))
+		{
+			if (ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR || ObjectSelection.Instance.selected != null)
+			{
+				GameObject toDelete = ObjectSelection.Instance.selected.gameObject;
+
+				ObjectSelection.Instance.DeselectObject();
+
+				ObjectPlacer.Instance.DeleteObject(toDelete);
+			}
+		}
+
 		if (Input.GetKey(KeyCode.LeftControl))
 		{
 			//Save shortcut

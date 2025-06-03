@@ -29,9 +29,12 @@ public class GizmoControl : MonoBehaviour
 	public GameObject affectedObject;
 	private CurrentAxis currentAxis;
 
+	[SerializeField] Material[] idleMat, selectedMat;
+
 	protected virtual void Start()
 	{
 		editorCam = FindObjectOfType<FreeEditorCam>();
+		ResetGizmoMat();
 	}
 
 	private void Update()
@@ -42,6 +45,8 @@ public class GizmoControl : MonoBehaviour
 		{
 			mousePressed = false;
 			currentAxis = null;
+
+			ResetGizmoMat();
 
 			EndObjectModification();
 		}
@@ -80,6 +85,8 @@ public class GizmoControl : MonoBehaviour
 
 			if (GetHitAxis(hit) == Axis.NONE)
 			{
+				ResetGizmoMat();
+
 				Debug.Log("nope");
 
 				return;
@@ -131,19 +138,37 @@ public class GizmoControl : MonoBehaviour
 		foreach (Transform control in xControl)
 		{
 			if (hit.transform == control)
+			{
+				foreach (Transform controlMat in xControl)
+				{
+					controlMat.GetComponent<MeshRenderer>().material = selectedMat[0];
+				}
 				return Axis.X;
+			}
 		}
 
 		foreach (Transform control in yControl)
 		{
 			if (hit.transform == control)
+			{
+				foreach (Transform controlMat in yControl)
+				{
+					controlMat.GetComponent<MeshRenderer>().material = selectedMat[1];
+				}
 				return Axis.Y;
+			}
 		}
 
 		foreach (Transform control in zControl)
 		{
 			if (hit.transform == control)
+			{
+				foreach (Transform controlMat in zControl)
+				{
+					controlMat.GetComponent<MeshRenderer>().material = selectedMat[2];
+				}
 				return Axis.Z;
+			}
 		}
 
 		return Axis.NONE;
@@ -162,6 +187,22 @@ public class GizmoControl : MonoBehaviour
 	protected virtual void EndObjectModification()
 	{
 
+	}
+
+	private void ResetGizmoMat()
+	{
+		foreach (Transform controlMat in xControl)
+		{
+			controlMat.GetComponent<MeshRenderer>().material = idleMat[0];
+		}
+		foreach (Transform controlMat in yControl)
+		{
+			controlMat.GetComponent<MeshRenderer>().material = idleMat[1];
+		}
+		foreach (Transform controlMat in zControl)
+		{
+			controlMat.GetComponent<MeshRenderer>().material = idleMat[2];
+		}
 	}
 }
 

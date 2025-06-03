@@ -23,7 +23,7 @@ public class EditorGrid : MonoBehaviour
         {
             Vector3 camPos = targetCamera.transform.position;
             // Garder seulement les coordonnées X et Z, maintenir Y à 0
-            transform.position = new Vector3(camPos.x, 0, camPos.z);
+            transform.position = new Vector3(camPos.x, -.5f, camPos.z);
         }
     }
 
