@@ -71,6 +71,8 @@ public class EditorHUDManager : MonoBehaviour
 	private bool isGridOn = true;
 	[SerializeField] private Sprite gridOn, gridOff;
 	[SerializeField] private Image gridIcon;
+	[SerializeField] private Transform targetObject;
+	[SerializeField] private FreeEditorCam camObject;
 
 	public void ToggleGrid()
 	{
@@ -87,6 +89,22 @@ public class EditorHUDManager : MonoBehaviour
 
 		grid.SetActive(isGridOn);
 
+	}
+	public void Recenter()
+	{
+		Transform target = targetObject;
+
+		//Recenter on selected object if found one else recenter on spawn point
+		if(ObjectSelection.Instance.selected != null)
+		{
+			target = ObjectSelection.Instance.selected;
+		}
+
+		Transform camHolderObject = camObject.transform.parent;
+		Vector3 directionFromTarget = (camHolderObject.position - target.position).normalized;
+		camHolderObject.position = target.position + directionFromTarget * 10;
+
+		camObject.SetCamRotation(target);
 	}
 
 	[Space]

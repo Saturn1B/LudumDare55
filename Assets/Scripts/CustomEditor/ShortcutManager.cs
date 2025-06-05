@@ -32,6 +32,7 @@ public class ShortcutManager : MonoBehaviour
 			if (Input.GetKeyDown(KeyCode.S))
 			{
 				SaveSystem.Instance.SaveOnDisk();
+				DisplayMessage.Instance.NormalMessage($"Saved Level - {LevelDataTransfer.levelName}");
 			}
 			//Duplicate shortcut
 			else if (Input.GetKeyDown(KeyCode.D))
@@ -69,11 +70,13 @@ public class ShortcutManager : MonoBehaviour
 			else if (Input.GetKeyDown(KeyCode.Z))
 			{
 				HystoryCommand.Instance.Undo();
+				DisplayMessage.Instance.NormalMessage("Undo last action");
 			}
 			//Redo shortcut
 			else if (Input.GetKeyDown(KeyCode.Y))
 			{
 				HystoryCommand.Instance.Redo();
+				DisplayMessage.Instance.NormalMessage($"Redo last action");
 			}
 		}
 	}

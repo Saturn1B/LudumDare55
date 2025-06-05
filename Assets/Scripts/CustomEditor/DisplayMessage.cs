@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class DisplayMessage : MonoBehaviour
@@ -21,6 +22,7 @@ public class DisplayMessage : MonoBehaviour
 
 	private string customMessage;
 	[SerializeField] private TMP_Text textMessage;
+	[SerializeField] private Image textPanel;
 
 	public void NormalMessage(string message)
 	{
@@ -46,7 +48,8 @@ public class DisplayMessage : MonoBehaviour
 	private IEnumerator Display()
 	{
 		textMessage.text = customMessage;
-		textMessage.gameObject.SetActive(true);
+		textPanel.gameObject.SetActive(true);
+		textPanel.color = new Color(0, 0, 0, 0);
 		textMessage.color = new Color(1, 1, 1, 0);
 
 		float a = 0;
@@ -54,11 +57,13 @@ public class DisplayMessage : MonoBehaviour
 		while(a < 1)
 		{
 			a += .01f;
+			textPanel.color = new Color(0, 0, 0, a / 10);
 			textMessage.color = new Color(1, 1, 1, a);
 			yield return null;
 		}
 
 		a = 1;
+		textPanel.color = new Color(0, 0, 0, a / 10);
 		textMessage.color = new Color(1, 1, 1, a);
 
 		yield return new WaitForSecondsRealtime(4);
@@ -66,11 +71,13 @@ public class DisplayMessage : MonoBehaviour
 		while (a > 0)
 		{
 			a -= .01f;
+			textPanel.color = new Color(0, 0, 0, a / 10);
 			textMessage.color = new Color(1, 1, 1, a);
 			yield return null;
 		}
 
+		textPanel.color = new Color(0, 0, 0, 0);
 		textMessage.color = new Color(1, 1, 1, 0);
-		textMessage.gameObject.SetActive(false);
+		textPanel.gameObject.SetActive(false);
 	}
 }

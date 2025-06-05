@@ -49,6 +49,7 @@ public class GizmoControl : MonoBehaviour
 			ResetGizmoMat();
 
 			EndObjectModification();
+			FreeEditorCam.isModifyingObject = false;
 		}
 
 		if (mousePressed)
@@ -118,6 +119,7 @@ public class GizmoControl : MonoBehaviour
 			}
 
 			StartObjectModification();
+			FreeEditorCam.isModifyingObject = true;
 		}
 	}
 
