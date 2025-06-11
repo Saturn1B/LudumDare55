@@ -38,6 +38,7 @@ public class ObjectPlacer : MonoBehaviour
 	/*[HideInInspector]*/ public bool isDelete, isEditor;
 	[HideInInspector] public bool mouseOverSelecterUI;
 	[HideInInspector] public bool mouseOverDragUI;
+	[SerializeField] private GameObject ghostObject;
 
 	public void SetCurrentObject(GameObject currentObject, string objectName = "")
 	{
@@ -68,6 +69,41 @@ public class ObjectPlacer : MonoBehaviour
 		if (mouseOverSelecterUI == true) return;
 		if (mouseOverDragUI == true) return;
 
+		Ray testRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit testHit;
+		if (Physics.Raycast(testRay, out testHit, 100))
+		{
+			if(!ghostObject.activeSelf)
+				ghostObject.SetActive(true);
+			if (currentObjectPrefab.GetComponent<MeshFilter>())
+				ghostObject.GetComponent<MeshFilter>().mesh = currentObjectPrefab.GetComponent<MeshFilter>().sharedMesh;
+			else
+				ghostObject.GetComponent<MeshFilter>().mesh = null;
+			for (int i = 0; i < currentObjectPrefab.transform.childCount; i++)
+			{
+				if (currentObjectPrefab.transform.GetChild(i).GetComponent<MeshFilter>())
+				{
+					ghostObject.transform.GetChild(i).gameObject.SetActive(true);
+					ghostObject.transform.GetChild(i).GetComponent<MeshFilter>().mesh = currentObjectPrefab.transform.GetChild(i).GetComponent<MeshFilter>()?.sharedMesh;
+					ghostObject.transform.GetChild(i).localPosition = currentObjectPrefab.transform.GetChild(i).localPosition;
+					ghostObject.transform.GetChild(i).localRotation = currentObjectPrefab.transform.GetChild(i).localRotation;
+					ghostObject.transform.GetChild(i).localScale = currentObjectPrefab.transform.GetChild(i).localScale;
+				}
+			}
+			ghostObject.transform.position = SummonPointPrecal(testHit);
+		}
+		else
+		{
+			if (ghostObject.activeSelf)
+			{
+				ghostObject.SetActive(false);
+				foreach (Transform child in ghostObject.transform)
+				{
+					child.gameObject.SetActive(false);
+				}
+			}
+		}
+
 		if (Input.GetKeyDown(KeyCode.Mouse0))
 		{
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -84,6 +120,24 @@ public class ObjectPlacer : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	private Vector3 SummonPointPrecal(RaycastHit hit)
+	{
+		Vector3 objectSize = currentObjectPrefab.GetComponentInChildren<Renderer>().bounds.size;
+
+		Vector3 offset = objectSize * 0.1f;
+
+		Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
+		summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
+
+		if (currentObjectPrefab.GetComponent<ModifiableObject>() && !currentObjectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
+			summonPoint -= Vector3.up * .5f;
+
+		if (currentObjectPrefab.GetComponent<ModifiableObject>() && currentObjectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
+			summonPoint += Vector3.forward * .5f;
+
+		return summonPoint;
 	}
 
 	//Create object manually using command stack

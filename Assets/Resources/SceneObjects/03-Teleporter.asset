@@ -16,4 +16,4 @@ MonoBehaviour:
   objectPrefab: {fileID: 5383912226043811686, guid: 7f93b7b99c3de8f4695b86fcc5c097b1, type: 3}
   workingObjectPrefab: {fileID: 3422594407528011252, guid: 3e862557adc4dad469b2b8521d7c8a3f, type: 3}
   objectSprite: {fileID: 21300000, guid: a0651cfc4e01cd842a71661d3a5d9beb, type: 3}
-  objectType: 4
+  objectType: -1

@@ -66,6 +66,8 @@ public class EditorHUDManager : MonoBehaviour
 		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
 	}
 
+	[Space]
+
 	[Header("Tool Mode")]
 	[SerializeField] private GameObject grid;
 	private bool isGridOn = true;
