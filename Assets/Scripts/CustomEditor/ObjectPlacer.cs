@@ -44,6 +44,8 @@ public class ObjectPlacer : MonoBehaviour
 	{
 		currentObjectPrefab = currentObject;
 		currentObjectName = objectName;
+
+		ResetGhostObject();
 	}
 	public SelectionMode GetSelectionMode()
 	{
@@ -94,14 +96,7 @@ public class ObjectPlacer : MonoBehaviour
 		}
 		else
 		{
-			if (ghostObject.activeSelf)
-			{
-				ghostObject.SetActive(false);
-				foreach (Transform child in ghostObject.transform)
-				{
-					child.gameObject.SetActive(false);
-				}
-			}
+			ResetGhostObject();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -118,6 +113,18 @@ public class ObjectPlacer : MonoBehaviour
 				{
 					CreateObject(hit, currentObjectPrefab, currentObjectName);
 				}
+			}
+		}
+	}
+
+	private void ResetGhostObject()
+	{
+		if (ghostObject.activeSelf)
+		{
+			ghostObject.SetActive(false);
+			foreach (Transform child in ghostObject.transform)
+			{
+				child.gameObject.SetActive(false);
 			}
 		}
 	}
