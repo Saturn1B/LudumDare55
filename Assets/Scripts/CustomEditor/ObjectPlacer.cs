@@ -39,6 +39,7 @@ public class ObjectPlacer : MonoBehaviour
 	[HideInInspector] public bool mouseOverSelecterUI;
 	[HideInInspector] public bool mouseOverDragUI;
 	[SerializeField] private GameObject ghostObject;
+	[SerializeField] private LayerMask ghostLayer;
 
 	public void SetCurrentObject(GameObject currentObject, string objectName = "")
 	{
@@ -73,7 +74,7 @@ public class ObjectPlacer : MonoBehaviour
 
 		Ray testRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit testHit;
-		if (Physics.Raycast(testRay, out testHit, 100))
+		if (Physics.Raycast(testRay, out testHit, 100, ~ghostLayer))
 		{
 			if(!ghostObject.activeSelf)
 				ghostObject.SetActive(true);
@@ -87,6 +88,8 @@ public class ObjectPlacer : MonoBehaviour
 				{
 					ghostObject.transform.GetChild(i).gameObject.SetActive(true);
 					ghostObject.transform.GetChild(i).GetComponent<MeshFilter>().mesh = currentObjectPrefab.transform.GetChild(i).GetComponent<MeshFilter>()?.sharedMesh;
+					ghostObject.transform.GetComponent<BoxCollider>().center = currentObjectPrefab.transform.GetComponent<BoxCollider>().center;
+					ghostObject.transform.GetComponent<BoxCollider>().size = currentObjectPrefab.transform.GetComponent<BoxCollider>().size;
 					ghostObject.transform.GetChild(i).localPosition = currentObjectPrefab.transform.GetChild(i).localPosition;
 					ghostObject.transform.GetChild(i).localRotation = currentObjectPrefab.transform.GetChild(i).localRotation;
 					ghostObject.transform.GetChild(i).localScale = currentObjectPrefab.transform.GetChild(i).localScale;
@@ -111,7 +114,7 @@ public class ObjectPlacer : MonoBehaviour
 				}
 				else
 				{
-					CreateObject(hit, currentObjectPrefab, currentObjectName);
+					CreateObject(ghostObject.transform.position, currentObjectPrefab, currentObjectName);
 				}
 			}
 		}
@@ -131,7 +134,8 @@ public class ObjectPlacer : MonoBehaviour
 
 	private Vector3 SummonPointPrecal(RaycastHit hit)
 	{
-		Vector3 objectSize = currentObjectPrefab.GetComponentInChildren<Renderer>().bounds.size;
+		//Vector3 objectSize = currentObjectPrefab.GetComponentInChildren<Renderer>().bounds.size;
+		Vector3 objectSize = currentObjectPrefab.GetComponent<BoxCollider>().size;
 
 		Vector3 offset = objectSize * 0.1f;
 
@@ -144,15 +148,67 @@ public class ObjectPlacer : MonoBehaviour
 		if (currentObjectPrefab.GetComponent<ModifiableObject>() && currentObjectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
 			summonPoint += Vector3.forward * .5f;
 
+		Collider[] colliders = Physics.OverlapBox(summonPoint, objectSize / 2, Quaternion.identity);
+		float maxOverlapA = 0;
+		float maxOverlapB = 0;
+		foreach (Collider col in colliders)
+		{
+			if(col.gameObject != ghostObject)
+			{
+				float overlapPercentA = CalculateAABBOverlapPercentage(summonPoint, ghostObject.GetComponent<BoxCollider>().size, col.transform.position, col.bounds.size);
+				maxOverlapA = overlapPercentA > maxOverlapA ? overlapPercentA : maxOverlapA;
+				float overlapPercentB = CalculateAABBOverlapPercentage(col.transform.position, col.bounds.size, summonPoint, ghostObject.GetComponent<BoxCollider>().size);
+				maxOverlapB = overlapPercentB > maxOverlapB ? overlapPercentB : maxOverlapB;
+			}
+		}
+
+		if(maxOverlapA > 50 || maxOverlapB > 50)
+		{
+			summonPoint += Vector3.up;
+		}
+
 		return summonPoint;
 	}
 
+
+	private float CalculateAABBOverlapPercentage(Vector3 aCenter, Vector3 aSize, Vector3 bCenter, Vector3 bsize)
+	{
+		Bounds boundsA = new Bounds(aCenter, aSize);
+		Bounds boundsB = new Bounds(bCenter, bsize);
+
+		// Compute the overlap on each axis
+		float xOverlap = Mathf.Max(0, Mathf.Min(boundsA.max.x, boundsB.max.x) - Mathf.Max(boundsA.min.x, boundsB.min.x));
+		float yOverlap = Mathf.Max(0, Mathf.Min(boundsA.max.y, boundsB.max.y) - Mathf.Max(boundsA.min.y, boundsB.min.y));
+		float zOverlap = Mathf.Max(0, Mathf.Min(boundsA.max.z, boundsB.max.z) - Mathf.Max(boundsA.min.z, boundsB.min.z));
+
+
+		// If there's no overlap in any axis, volume is 0
+		if (xOverlap <= 0 || yOverlap <= 0 || zOverlap <= 0)
+			return 0f;
+
+		float overlapVolume = xOverlap * yOverlap * zOverlap;
+		float volumeA = boundsA.size.x * boundsA.size.y * boundsA.size.z;
+
+		if (volumeA <= 0f)
+			return 0f;
+
+		return (overlapVolume / volumeA) * 100f;
+	}
+
+	Bounds GetWorldBounds(BoxCollider col)
+	{
+		// Get the center and size in world space
+		Vector3 worldCenter = col.transform.TransformPoint(col.center);
+		Vector3 worldSize = Vector3.Scale(col.size, col.transform.lossyScale);
+		return new Bounds(worldCenter, worldSize);
+	}
+
 	//Create object manually using command stack
-	public void CreateObject(RaycastHit hit, GameObject objectPrefab, string objectName)
+	public void CreateObject(Vector3 summonPos, GameObject objectPrefab, string objectName)
 	{
 		Debug.Log(objectName + " " + currentObjectName);
 
-		CreateCommand createCommand = new CreateCommand(hit, objectPrefab, objectName, currentObjectName);
+		CreateCommand createCommand = new CreateCommand(summonPos, objectPrefab, objectName, currentObjectName);
 
 		HystoryCommand.Instance.ExecuteCommand(createCommand);
 	}

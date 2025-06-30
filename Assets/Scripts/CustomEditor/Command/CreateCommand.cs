@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CreateCommand : ICommand
 {
-	private RaycastHit hit;
+	private Vector3 summonPos;
 	private GameObject objectPrefab;
 	private string objectName;
 	private string currentObjectName;
@@ -12,9 +12,9 @@ public class CreateCommand : ICommand
 	private GameObject createdObject = null;
 	private string createdObjectId = null;
 
-	public CreateCommand(RaycastHit hit, GameObject objectPrefab, string objectName, string currentObjectName)
+	public CreateCommand(Vector3 summonPos, GameObject objectPrefab, string objectName, string currentObjectName)
 	{
-		this.hit = hit;
+		this.summonPos = summonPos;
 		this.objectPrefab = objectPrefab;
 		this.objectName = objectName;
 		this.currentObjectName = currentObjectName;
@@ -29,20 +29,7 @@ public class CreateCommand : ICommand
 			EditorHUDManager.Instance.CloseInteractionEditor();
 		}
 
-		Vector3 objectSize = objectPrefab.GetComponentInChildren<Renderer>().bounds.size;
-
-		Vector3 offset = objectSize * 0.1f;
-
-		Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
-		summonPoint = new Vector3(Mathf.RoundToInt(summonPoint.x), Mathf.RoundToInt(summonPoint.y), Mathf.RoundToInt(summonPoint.z));
-
-		if (objectPrefab.GetComponent<ModifiableObject>() && !objectPrefab.GetComponent<ModifiableObject>().isGroundOrWall)
-			summonPoint -= Vector3.up * .5f;
-
-		if (objectPrefab.GetComponent<ModifiableObject>() && objectPrefab.GetComponent<ModifiableObject>().isStuckToWall)
-			summonPoint += Vector3.forward * .5f;
-
-		GameObject go = GameObject.Instantiate(objectPrefab, summonPoint, Quaternion.identity);
+		GameObject go = GameObject.Instantiate(objectPrefab, summonPos, Quaternion.identity);
 
 		go.name = currentObjectName;
 
