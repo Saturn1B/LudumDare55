@@ -7,7 +7,7 @@ public class ObjectButton : MonoBehaviour
 {
 	[HideInInspector] public GameObject objectPrefab;
 	[SerializeField] private Image objectImage;
-	[SerializeField] private string objectName;
+	public string objectName;
 	[SerializeField] private GameObject outline;
 	[HideInInspector] public int id;
 
