@@ -289,6 +289,7 @@ public class EditorHUDManager : MonoBehaviour
 
 	[Header("Interaction Editor")]
 	[SerializeField] private GameObject editorPanel;
+	[SerializeField] private TMP_Text editorTitle;
 	[SerializeField] private TMP_Text activatorName;
 	[SerializeField] private GameObject interactableLister;
 	[SerializeField] private Transform activableListPanel;
@@ -299,11 +300,23 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private GameObject quickMenu;
 	private List<GameObject> connectionLines = new List<GameObject>();
 
+	[Header("Interaction Editor")]
+	[SerializeField] private TooltipsOption tooltipsOption;
+	[SerializeField] private string activatorSubtitle;
+	[SerializeField, TextArea(10, 10)] private string activatorExplanation;
+	[SerializeField] private string activableSubtitle;
+	[SerializeField, TextArea(10, 10)] private string activableExplanation;
+
+
 	public void OpenInteractionEditor(ActivatorEditor activatorEditor)
 	{
 		editorPanel.SetActive(true);
 		quickMenu.SetActive(false);
+		editorTitle.text = activatorSubtitle;
 		activatorName.text = "> " + activatorEditor.activatorName;
+
+		tooltipsOption.subtitle = activatorSubtitle;
+		tooltipsOption.explanation = activatorExplanation;
 
 		foreach (var activable in activatorEditor.activables)
 		{
@@ -323,7 +336,11 @@ public class EditorHUDManager : MonoBehaviour
 	{
 		editorPanel.SetActive(true);
 		quickMenu.SetActive(false);
+		editorTitle.text = activableSubtitle;
 		activatorName.text = "> " + activableEditor.activableName;
+
+		tooltipsOption.subtitle = activableSubtitle;
+		tooltipsOption.explanation = activableExplanation;
 
 		foreach (var activator in activableEditor.activators)
 		{
