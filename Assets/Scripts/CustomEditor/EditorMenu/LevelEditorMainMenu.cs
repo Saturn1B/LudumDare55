@@ -15,6 +15,9 @@ public class LevelEditorMainMenu : MonoBehaviour
 
 	[SerializeField] private GameObject createLevelPopup, deleteLevelPopup;
 
+	[SerializeField] private GameObject loadingWheelPrefab;
+	private GameObject loadingWheel;
+
 
 	private void Awake()
 	{
@@ -42,11 +45,20 @@ public class LevelEditorMainMenu : MonoBehaviour
 		onlineLevelsText.text = $"> {section2}";
 		onlineLevelsText.color = Color.white;
 
+		loadingWheel = Instantiate(loadingWheelPrefab, cardParent);
+
 		GameObject cc = Instantiate(levelCardPrefab, cardParent);
 		cc.GetComponent<LevelCardMenu>().SetCard(LevelCardType.CREATE, null, null, OpenCreateLevelPopup);
 
+		loadingWheel.transform.SetAsLastSibling();
+
 		if (!Directory.Exists(SaveSystem.saveFilePath)) return;
 
+		StartCoroutine(PopulateLevelsCoroutine());
+	}
+
+	private IEnumerator PopulateLevelsCoroutine()
+	{
 		string[] jsonLevelDataFiles = Directory.GetFiles(SaveSystem.saveFilePath, "*.json");
 
 		List<SceneData> levelsData = new List<SceneData>();
@@ -61,12 +73,18 @@ public class LevelEditorMainMenu : MonoBehaviour
 
 				GameObject go = Instantiate(levelCardPrefab, cardParent);
 				go.GetComponent<LevelCardMenu>().SetCard(LevelCardType.EDIT, levelData, OpenDeleteLevelPopup);
+
+				loadingWheel.transform.SetAsLastSibling();
 			}
 			catch (IOException ex)
 			{
 				Debug.LogError($"Failed to read file: {file}. Error: {ex.Message}");
 			}
+			yield return null;
 		}
+
+		Destroy(loadingWheel);
+		loadingWheel = null;
 	}
 
 	public void ActivateOnlineLevels()
