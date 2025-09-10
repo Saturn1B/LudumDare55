@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class ShortcutManager : MonoBehaviour
 {
+	public static bool pauseDisponible = true;
+
     // Update is called once per frame
     void Update()
     {
-		if (Input.GetKeyDown(KeyCode.Escape))
+		if (Input.GetKeyDown(KeyCode.Escape) && pauseDisponible)
 		{
 			EditorHUDManager.Instance.PauseGame();
 		}

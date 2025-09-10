@@ -300,7 +300,7 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private GameObject quickMenu;
 	private List<GameObject> connectionLines = new List<GameObject>();
 
-	[Header("Interaction Editor")]
+	[Header("Tootlips")]
 	[SerializeField] private TooltipsOption tooltipsOption;
 	[SerializeField] private string activatorSubtitle;
 	[SerializeField, TextArea(10, 10)] private string activatorExplanation;
