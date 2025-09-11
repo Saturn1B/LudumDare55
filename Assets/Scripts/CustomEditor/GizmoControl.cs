@@ -31,6 +31,8 @@ public class GizmoControl : MonoBehaviour
 
 	[SerializeField] Material[] idleMat, selectedMat;
 
+	protected bool scaleInPlace;
+
 	protected virtual void Start()
 	{
 		editorCam = FindObjectOfType<FreeEditorCam>();
@@ -40,6 +42,11 @@ public class GizmoControl : MonoBehaviour
 	private void Update()
 	{
 		if (EditorHUDManager.Instance.isPaused) return;
+
+		if (Input.GetKeyDown(KeyCode.LeftShift))
+			scaleInPlace = true;
+		else if (Input.GetKeyUp(KeyCode.LeftShift))
+			scaleInPlace = false;
 
 		if (Input.GetMouseButtonUp(0) && mousePressed)
 		{
@@ -56,7 +63,7 @@ public class GizmoControl : MonoBehaviour
 		{
 
 			Vector2 newDelta = new Vector2(-Mathf.RoundToInt(initMousePos.x - Input.mousePosition.x) / 100, -Mathf.RoundToInt(initMousePos.y - Input.mousePosition.y) / 100);
-			if (oldDelta != newDelta)
+			if (/*oldDelta != newDelta*/ newDelta.x == 1 || newDelta.x == -1 || newDelta.y == 1 || newDelta.y == -1)
 			{
 				mouseDelta = newDelta;
 				if (currentAxis != null)

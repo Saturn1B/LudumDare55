@@ -9,6 +9,7 @@ public class RotationGizmo : GizmoControl
 	private GameObject objectTransform;
 
 	Quaternion startRotation;
+	Vector3 startScale;
 
 	private void OnEnable()
 	{
@@ -58,32 +59,57 @@ public class RotationGizmo : GizmoControl
 			{
 				//Quaternion tempRotation = originaleRotation * Quaternion.AngleAxis(axis.x * usedMouseDelta * rotPower * camRotx, Vector3.right);
 				//objectTransform.transform.rotation = tempRotation;
-				objectTransform.transform.Rotate(Vector3.right, axis.x * usedMouseDelta * rotPower * camRotx, Space.World);
+				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+					objectTransform.transform.Rotate(Vector3.right, axis.x * usedMouseDelta * rotPower * camRotx, Space.World);
+				else
+				{
+					Debug.Log("TEST");
+					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.x, objectTransform.transform.localScale.z, objectTransform.transform.localScale.y);
+				}
 			}
 			if (allowYRot && axis.y == 1)
 			{
 				//Quaternion tempRotation = originaleRotation * Quaternion.Euler(0, axis.y * usedMouseDelta * -rotPower, 0);
 				//objectTransform.transform.rotation = tempRotation;
-				objectTransform.transform.Rotate(Vector3.up, axis.y * usedMouseDelta * -rotPower, Space.World);
+				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+					objectTransform.transform.Rotate(Vector3.up, axis.y * usedMouseDelta * -rotPower, Space.World);
+				else
+					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.z, objectTransform.transform.localScale.y, objectTransform.transform.localScale.x);
 			}
 			if (allowZRot && axis.z == 1)
 			{
 				//	Quaternion tempRotation = originaleRotation * Quaternion.AngleAxis(axis.z * usedMouseDelta * rotPower * camRotz, Vector3.forward);
 				//	objectTransform.transform.rotation = tempRotation;
-				objectTransform.transform.Rotate(Vector3.forward, axis.z * usedMouseDelta * rotPower * camRotz, Space.World);
+				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+					objectTransform.transform.Rotate(Vector3.forward, axis.z * usedMouseDelta * rotPower * camRotz, Space.World);
+				else
+					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.y, objectTransform.transform.localScale.x, objectTransform.transform.localScale.z);
 			}
 		}
 	}
 
 	protected override void StartObjectModification()
 	{
-		startRotation = affectedObject.transform.GetChild(0).transform.rotation;
+		if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+			startRotation = affectedObject.transform.GetChild(0).transform.rotation;
+		else
+			startScale = affectedObject.transform.GetChild(0).transform.localScale;
 	}
 
 	protected override void EndObjectModification()
 	{
 		GameObject target = affectedObject.transform.GetChild(0).gameObject;
-		RotateCommand rotateCommand = new RotateCommand(target, target.GetComponent<ModifiableObject>().objectId, startRotation, target.transform.rotation);
-		HystoryCommand.Instance.ExecuteCommand(rotateCommand);
+		if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+		{
+			RotateCommand rotateCommand = new RotateCommand(target, target.GetComponent<ModifiableObject>().objectId, startRotation, target.transform.rotation);
+			HystoryCommand.Instance.ExecuteCommand(rotateCommand);
+		}
+		else
+		{
+			ScaleCommand scaleCommand = new ScaleCommand(target, target.GetComponent<ModifiableObject>().objectId,
+				startScale, target.transform.localScale,
+				target.transform.position, target.transform.position);
+			HystoryCommand.Instance.ExecuteCommand(scaleCommand);
+		}
 	}
 }

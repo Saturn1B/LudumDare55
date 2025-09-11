@@ -48,11 +48,15 @@ public class ScaleGizmo : GizmoControl
 
 			objectTransform.transform.localScale = tempScale;
 			Vector3 newScale = objectTransform.transform.lossyScale;
-			objectTransform.transform.position += new Vector3((newScale.x / 2) - (originaleScale.x / 2), (newScale.y / 2) - (originaleScale.y / 2), (newScale.z / 2) - (originaleScale.z / 2)) * isInverted;
 
-			Vector3 tempPos = objectTransform.transform.localPosition;
-			gizmoControl.position = gizmoControl.position + tempPos;
-			objectTransform.transform.localPosition = Vector3.zero;
+			if(!scaleInPlace)
+			{
+				objectTransform.transform.position += new Vector3((newScale.x / 2) - (originaleScale.x / 2), (newScale.y / 2) - (originaleScale.y / 2), (newScale.z / 2) - (originaleScale.z / 2)) * isInverted;
+
+				Vector3 tempPos = objectTransform.transform.localPosition;
+				gizmoControl.position = gizmoControl.position + tempPos;
+				objectTransform.transform.localPosition = Vector3.zero;
+			}
 		}
 	}
 
