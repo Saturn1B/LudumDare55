@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DispenserTypeCommand : ICommand
+public class DispenserTypeCommand : ICommand<DispenserEditor>
 {
 	private GameObject target;
 	private string targetId;
@@ -17,7 +17,7 @@ public class DispenserTypeCommand : ICommand
 		this.afterMaterialType = afterMaterialType;
 	}
 
-	public void Execute(bool isRedo)
+	public DispenserEditor Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -30,7 +30,11 @@ public class DispenserTypeCommand : ICommand
 
 		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
 		targetDispenserEditor.SetMaterial((int)afterMaterialType, false);
+
+		return targetDispenserEditor;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

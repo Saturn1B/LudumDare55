@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class ActivatorCommand : ICommand
+public class ActivatorCommand : ICommand<GameObject>
 {
 	private GameObject activatorTarget;
 	private string activatorTargetId;
@@ -41,7 +41,7 @@ public class ActivatorCommand : ICommand
 		afterActivatorsId = SetIdList(afterActivators);
 	}
 
-	public void Execute(bool isRedo)
+	public GameObject Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -56,7 +56,11 @@ public class ActivatorCommand : ICommand
 
 		activatorTarget.GetComponent<ActivatorEditor>().activables = ListCloner.CloneMonoBehaviourListReference(afterActivables); //HERE
 		activableTarget.GetComponent<ActivableEditor>().activators = ListCloner.CloneMonoBehaviourListReference(afterActivators); //HERE
+
+		return activatorTarget;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

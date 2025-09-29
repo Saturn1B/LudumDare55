@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeleteCommand : ICommand
+public class DeleteCommand : ICommand<GameObject>
 {
 	private GameObject target;
 	private string targetId;
@@ -74,7 +74,7 @@ public class DeleteCommand : ICommand
 		objectScale = target.transform.localScale;
 	}
 
-	public void Execute(bool isRedo)
+	public GameObject Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -97,7 +97,11 @@ public class DeleteCommand : ICommand
 		}
 		SaveSystem.Instance.objectInScene.Remove(target.transform.GetComponent<ModifiableObject>());
 		GameObject.Destroy(target);
+
+		return prefabObject;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

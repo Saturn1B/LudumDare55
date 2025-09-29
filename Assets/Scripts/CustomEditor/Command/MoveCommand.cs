@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveCommand : ICommand
+public class MoveCommand : ICommand<GameObject>
 {
 	private GameObject target;
 	private string targetId;
@@ -17,7 +17,7 @@ public class MoveCommand : ICommand
 		this.afterPosition = afterPosition;
 	}
 
-	public void Execute(bool isRedo)
+	public GameObject Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -29,7 +29,11 @@ public class MoveCommand : ICommand
 		}
 
 		target.transform.position = afterPosition;
+
+		return target;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

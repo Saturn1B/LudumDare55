@@ -30,13 +30,13 @@ public class TooltipsDialog : MonoBehaviour
 		Debug.Log(transform.position);
 
 		StopAllCoroutines();
-		StartCoroutine(Fading(true, .02f, 1));
+		StartCoroutine(Fading(true, .03f, 1));
 	}
 
     public void HideTooltips()
 	{
 		StopAllCoroutines();
-		StartCoroutine(Fading(false, -.02f, 0));
+		StartCoroutine(Fading(false, -.03f, 0));
 	}
 
 	private IEnumerator Fading(bool activeState, float alphaStep, float alpha)

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RotateCommand : ICommand
+public class RotateCommand : ICommand<GameObject>
 {
 	private GameObject target;
 	private string targetId;
@@ -17,7 +17,7 @@ public class RotateCommand : ICommand
 		this.afterRotation = afterRotation;
 	}
 
-	public void Execute(bool isRedo)
+	public GameObject Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -29,7 +29,11 @@ public class RotateCommand : ICommand
 		}
 
 		target.transform.rotation = afterRotation;
+
+		return target;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

@@ -36,7 +36,7 @@ public class HoverButtonTooltips : MonoBehaviour, IPointerEnterHandler, IPointer
 
 	private IEnumerator DisplayTooltips()
 	{
-		yield return new WaitForSeconds(1f);
+		yield return new WaitForSeconds(.5f);
 
 		isTooltipsDisplayed = true;
 		if(objectButton != null)

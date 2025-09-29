@@ -6,8 +6,8 @@ public class HystoryCommand : MonoBehaviour
 {
 	public static HystoryCommand Instance { get; private set; }
 
-	private Stack<ICommand> undoStack = new Stack<ICommand>();
-	private Stack<ICommand> redoStack = new Stack<ICommand>();
+	private Stack<ICommandBase> undoStack = new Stack<ICommandBase>();
+	private Stack<ICommandBase> redoStack = new Stack<ICommandBase>();
 
 	private void Awake()
 	{
@@ -17,13 +17,15 @@ public class HystoryCommand : MonoBehaviour
 			Destroy(gameObject);
 	}
 
-	public void ExecuteCommand(ICommand command)
+	public TResult ExecuteCommand<TResult>(ICommand<TResult> command)
 	{
 		Debug.Log("Add command");
 
-		command.Execute(false);
+		TResult result = command.Execute(false);
 		undoStack.Push(command);
 		redoStack.Clear();
+
+		return result;
 	}
 
 	[ContextMenu("Undo")]
@@ -31,7 +33,7 @@ public class HystoryCommand : MonoBehaviour
 	{
 		if(undoStack.Count > 0)
 		{
-			ICommand command = undoStack.Pop();
+			ICommandBase command = undoStack.Pop();
 			command.Undo();
 			redoStack.Push(command);
 		}
@@ -42,17 +44,22 @@ public class HystoryCommand : MonoBehaviour
 	{
 		if(redoStack.Count > 0)
 		{
-			ICommand command = redoStack.Pop();
+			ICommandBase command = redoStack.Pop();
 			command.Execute(true);
 			undoStack.Push(command);
 		}
 	}
 }
 
-public interface ICommand
+public interface ICommandBase
 {
 	void Execute(bool isRedo);
 	void Undo();
+}
+
+public interface ICommand<TResult> : ICommandBase
+{
+	new TResult Execute(bool isRedo);
 }
 
 public static class ListCloner

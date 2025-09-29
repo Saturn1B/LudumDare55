@@ -68,7 +68,7 @@ public class ObjectPlacer : MonoBehaviour
 	{
 		if (EditorHUDManager.Instance.isPaused) return;
 
-		if (currentObjectPrefab == null && isDelete == false) return;
+		if (currentObjectPrefab == null) return;
 		if (mouseOverSelecterUI == true) return;
 		if (mouseOverDragUI == true) return;
 
@@ -114,7 +114,7 @@ public class ObjectPlacer : MonoBehaviour
 				}
 				else
 				{
-					CreateObject(ghostObject.transform.position, currentObjectPrefab, currentObjectName);
+					CreateObject(ghostObject.transform.position, Quaternion.identity, Vector3.one, currentObjectPrefab, currentObjectName);
 				}
 			}
 		}
@@ -204,13 +204,15 @@ public class ObjectPlacer : MonoBehaviour
 	}
 
 	//Create object manually using command stack
-	public void CreateObject(Vector3 summonPos, GameObject objectPrefab, string objectName)
+	public ModifiableObject CreateObject(Vector3 summonPos, Quaternion summonRot, Vector3 summonScale, GameObject objectPrefab, string objectName)
 	{
 		Debug.Log(objectName + " " + currentObjectName);
 
-		CreateCommand createCommand = new CreateCommand(summonPos, objectPrefab, objectName, currentObjectName);
+		CreateCommand createCommand = new CreateCommand(summonPos, summonRot, summonScale, objectPrefab, objectName, currentObjectName);
 
-		HystoryCommand.Instance.ExecuteCommand(createCommand);
+		GameObject go = HystoryCommand.Instance.ExecuteCommand(createCommand);
+
+		return go.GetComponent<ModifiableObject>();
 	}
 
 	//Create object at scene loading

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DispenserNumberCommand : ICommand
+public class DispenserNumberCommand : ICommand<DispenserEditor>
 {
 	private GameObject target;
 	private string targetId;
@@ -17,7 +17,7 @@ public class DispenserNumberCommand : ICommand
 		this.afterMaterialNumber = afterMaterialNumber;
 	}
 
-	public void Execute(bool isRedo)
+	public DispenserEditor Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -30,7 +30,11 @@ public class DispenserNumberCommand : ICommand
 
 		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
 		targetDispenserEditor.SetNumber(afterMaterialNumber);
+
+		return targetDispenserEditor;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{

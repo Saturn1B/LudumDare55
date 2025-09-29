@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScaleCommand : ICommand
+public class ScaleCommand : ICommand<GameObject>
 {
 	private GameObject target;
 	private string targetId;
@@ -21,7 +21,7 @@ public class ScaleCommand : ICommand
 		this.afterPosition = afterPosition;
 	}
 
-	public void Execute(bool isRedo)
+	public GameObject Execute(bool isRedo)
 	{
 		CheckTarget();
 
@@ -34,7 +34,11 @@ public class ScaleCommand : ICommand
 
 		target.transform.localScale = afterScale;
 		target.transform.position = afterPosition;
+
+		return target;
 	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
 
 	public void Undo()
 	{
