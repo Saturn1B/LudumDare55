@@ -6,7 +6,13 @@ public class LookAtCamera : MonoBehaviour
 {
     [SerializeField] private Transform cameraTarget;
 
-    void Update()
+	private void OnEnable()
+	{
+		if (cameraTarget == null)
+			cameraTarget = FindObjectOfType<FreeEditorCam>().transform;
+	}
+
+	void Update()
     {
         transform.LookAt(cameraTarget);
     }

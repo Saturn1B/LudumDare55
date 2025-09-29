@@ -175,8 +175,10 @@ public class ObjectSelection : MonoBehaviour
                         if (currentActivator)
 						{
                             if (currentActivable.activators.Count == 0)
+							{
                                 EditorHUDManager.Instance.AddActivableInteractionEditor(hit.transform.GetComponent<ActivableEditor>());
-							else
+                            }
+                            else
 							{
                                 if (currentActivable.activators[0] == currentActivator)
                                     DisplayMessage.Instance.WarningMessage($"Activable - {currentActivable.activableName} - already linked to this Activator");

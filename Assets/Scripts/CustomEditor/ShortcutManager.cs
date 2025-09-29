@@ -9,12 +9,61 @@ public class ShortcutManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if (Input.GetKeyDown(KeyCode.Escape) && pauseDisponible)
+		if (Input.GetKeyDown(KeyCode.Escape))
 		{
-			EditorHUDManager.Instance.PauseGame();
+			if (ObjectSelection.Instance.selected != null)
+				ObjectSelection.Instance.DeselectObject();
+			else if (ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.OBJECT)
+			{
+				ObjectPlacer.Instance.SetCurrentObject(null);
+				EditorHUDManager.Instance.SwitchGizmoMode(0);
+			}
+			else if (pauseDisponible)
+				EditorHUDManager.Instance.PauseGame();
 		}
 
 		if (EditorHUDManager.Instance.isPaused) return;
+
+		//Gizmo mode shortcut
+		//Translate shortcut
+		if (Input.GetKeyDown(KeyCode.W) && ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.NONE)
+		{
+			if (ObjectSelection.Instance.selected != null)
+			{
+				if (ObjectSelection.Instance.selected.GetComponent<ModifiableObject>().canTranslate)
+					EditorHUDManager.Instance.SwitchGizmoMode(0);
+			}
+			else
+			{
+				EditorHUDManager.Instance.SwitchGizmoMode(0);
+			}
+		}
+		//Scale shortcut
+		if (Input.GetKeyDown(KeyCode.R) && ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.NONE)
+		{
+			if (ObjectSelection.Instance.selected != null)
+			{
+				if (ObjectSelection.Instance.selected.GetComponent<ModifiableObject>().canScale)
+					EditorHUDManager.Instance.SwitchGizmoMode(1);
+			}
+			else
+			{
+				EditorHUDManager.Instance.SwitchGizmoMode(1);
+			}
+		}
+		//Rotate shortcut
+		if (Input.GetKeyDown(KeyCode.E) && ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.NONE)
+		{
+			if(ObjectSelection.Instance.selected != null)
+			{
+				if(ObjectSelection.Instance.selected.GetComponent<ModifiableObject>().canRotate)
+					EditorHUDManager.Instance.SwitchGizmoMode(2);
+			}
+			else
+			{
+				EditorHUDManager.Instance.SwitchGizmoMode(2);
+			}
+		}
 
 		if (Input.GetKeyDown(KeyCode.Delete))
 		{

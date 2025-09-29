@@ -97,7 +97,8 @@ public class InteractableLister : MonoBehaviour
 		{
 			if (activableEditor.gameObject.GetComponent<Outline>() != null)
 				activableEditor.gameObject.GetComponent<Outline>().enabled = false;
-			EditorHUDManager.Instance.RemoveActivableInteractionEditor(this.activableEditor);
+			EditorHUDManager.Instance.RemoveActivableInteractionEditor(this);
+			Destroy(this.gameObject);
 		});
 	}
 

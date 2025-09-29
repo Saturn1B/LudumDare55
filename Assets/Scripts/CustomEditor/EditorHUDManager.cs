@@ -451,41 +451,30 @@ public class EditorHUDManager : MonoBehaviour
 		interactables.Add(activable.GetComponent<InteractableLister>());
 	}
 
-	public void RemoveActivableInteractionEditor(ActivableEditor activableEditor)
+	public void RemoveActivableInteractionEditor(InteractableLister activableLister)
 	{
+		interactables.Remove(activableLister);
+		RemoveConnectionLineAt(activableLister.activableEditor.transform.position);
+
 		List<ActivableEditor> startActivables = ListCloner.CloneMonoBehaviourListReference(ObjectSelection.Instance.GetCurrentActivator().activables); //HERE
-		List<ActivatorEditor> startActivators = ListCloner.CloneMonoBehaviourListReference(activableEditor.activators); //HERE
+		List<ActivatorEditor> startActivators = ListCloner.CloneMonoBehaviourListReference(activableLister.activableEditor.activators); //HERE
 
 		List<ActivableEditor> endActivables = ListCloner.CloneMonoBehaviourListReference(startActivables); //HERE
 		List<ActivatorEditor> endActivators = ListCloner.CloneMonoBehaviourListReference(startActivators); //HERE
-		endActivables.Remove(activableEditor);
+		endActivables.Remove(activableLister.activableEditor);
 		endActivators.Remove(ObjectSelection.Instance.GetCurrentActivator());
 
 		ActivatorCommand activatorCommand = new ActivatorCommand(
 			ObjectSelection.Instance.GetCurrentActivator().gameObject, ObjectSelection.Instance.GetCurrentActivator().transform.GetComponent<ModifiableObject>().objectId,
-			activableEditor.gameObject, activableEditor.transform.GetComponent<ModifiableObject>().objectId,
+			activableLister.activableEditor.gameObject, activableLister.activableEditor.transform.GetComponent<ModifiableObject>().objectId,
 			startActivables, startActivators, endActivables, endActivators);
 
 		HystoryCommand.Instance.ExecuteCommand(activatorCommand);
 
-		RemoveActivableUILister(activableEditor);
-		RemoveConnectionLineAt(activableEditor.transform.position);
-
 		//ObjectSelection.Instance.GetCurrentActivator().activables.Remove(interactableLister.activableEditor);
 		//interactableLister.activableEditor.activators.Remove(ObjectSelection.Instance.GetCurrentActivator());
 	}
-	public void RemoveActivableUILister(ActivableEditor activableEditor)
-	{
-		foreach (var inter in interactables)
-		{
-			if(inter.activableEditor = activableEditor)
-			{
-				interactables.Remove(inter);
-				Destroy(inter.gameObject);
-				return;
-			}
-		}
-	}
+
 
 	public void HideAllCurrentActivableHighlight()
 	{

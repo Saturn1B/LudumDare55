@@ -2290,8 +2290,8 @@ RectTransform:
   - {fileID: 216331650}
   - {fileID: 273498137}
   - {fileID: 22569664}
-  - {fileID: 1432458751}
   - {fileID: 51381455}
+  - {fileID: 1432458751}
   m_Father: {fileID: 1351315848}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.6875, y: 0.9074074}
@@ -6691,171 +6691,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 635578615}
   m_CullTransparentMesh: 1
---- !u!43 &646297041
-Mesh:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: GridQuad
-  serializedVersion: 11
-  m_SubMeshes:
-  - serializedVersion: 2
-    firstByte: 0
-    indexCount: 6
-    topology: 0
-    baseVertex: 0
-    firstVertex: 0
-    vertexCount: 4
-    localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 100, y: 0, z: 100}
-  m_Shapes:
-    vertices: []
-    shapes: []
-    channels: []
-    fullWeights: []
-  m_BindPose: []
-  m_BoneNameHashes: 
-  m_RootBoneNameHash: 0
-  m_BonesAABB: []
-  m_VariableBoneCountWeights:
-    m_Data: 
-  m_MeshCompression: 0
-  m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexFormat: 0
-  m_IndexBuffer: 000001000200000002000300
-  m_VertexData:
-    serializedVersion: 3
-    m_VertexCount: 4
-    m_Channels:
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 12
-      format: 0
-      dimension: 3
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 24
-      format: 0
-      dimension: 2
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    - stream: 0
-      offset: 0
-      format: 0
-      dimension: 0
-    m_DataSize: 128
-    _typelessdata: 0000c8c2000000000000c8c200000000000080bf0000000000000000000000000000c842000000000000c8c200000000000080bf000000000000803f000000000000c842000000000000c84200000000000080bf000000000000803f0000803f0000c8c2000000000000c84200000000000080bf00000000000000000000803f
-  m_CompressedMesh:
-    m_Vertices:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UV:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Normals:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Tangents:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Weights:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_NormalSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_TangentSigns:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_FloatColors:
-      m_NumItems: 0
-      m_Range: 0
-      m_Start: 0
-      m_Data: 
-      m_BitSize: 0
-    m_BoneIndices:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_Triangles:
-      m_NumItems: 0
-      m_Data: 
-      m_BitSize: 0
-    m_UVInfo: 0
-  m_LocalAABB:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 100, y: 0, z: 100}
-  m_MeshUsageFlags: 0
-  m_CookingOptions: 30
-  m_BakedConvexCollisionMesh: 
-  m_BakedTriangleCollisionMesh: 
-  m_MeshMetrics[0]: 1
-  m_MeshMetrics[1]: 1
-  m_MeshOptimizationFlags: 1
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &648521090 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1482742044143230567, guid: 4aec4bfe2b8f5cf4499a551e0d0f44e2, type: 3}
@@ -8389,7 +8224,10 @@ MonoBehaviour:
       left/right/up/down\n\nScroll the wheel to go forward/backward"
     displayImage: {fileID: 21300000, guid: 36485049293682d4790ac68107b74f96, type: 3}
   - subtitle: '- SHORTCUT -'
-    mainText: 'Escape -> Pause the editor
+    mainText: 'Escape (with nothing selected) -> Pause the editor
+
+      Escape (with
+      an object selected) -> Deselect object
 
       Ctrl + S -> Save level
 
@@ -8400,6 +8238,19 @@ MonoBehaviour:
 
       Ctrl + Y ->
       Redo'
+    displayImage: {fileID: 21300000, guid: 686b480046cdc06448ff2a8d09b79ada, type: 3}
+  - subtitle: '- SHORTCUT -'
+    mainText: 'In Selection Mode :
+
+      W -> Switch to <color=yellow>Position Gizmo</color>
+
+      E
+      -> Switch to <color=yellow>Rotate Gizmo</color>
+
+      R -> Switch to <color=yellow>Scale
+      Gizmo</color>
+
+      Del -> Delete selected object'
     displayImage: {fileID: 21300000, guid: 686b480046cdc06448ff2a8d09b79ada, type: 3}
   - subtitle: '- MODES -'
     mainText: 'Selection mode :
@@ -8413,15 +8264,6 @@ MonoBehaviour:
       Allows you
       to select and open the interaction editor for interactable object on the scene'
     displayImage: {fileID: 21300000, guid: 4b6d323730c892341aaeb182a516ea8b, type: 3}
-  - subtitle: '- MODES -'
-    mainText: '<color=#D26464>Delete mode :</color>
-
-      Lets you delete object
-      by selecting them
-
-      (You can also delete object by selecting them in Selection
-      Mode and pressing the DEL key)'
-    displayImage: {fileID: 21300000, guid: 4b6d323730c892341aaeb182a516ea8b, type: 3}
   - subtitle: '- OBJECT -'
     mainText: Object can be placed on the scene and are separated in different categories.
     displayImage: {fileID: 21300000, guid: 034bd47d32c826243a62675fcabab822, type: 3}
@@ -8433,14 +8275,14 @@ MonoBehaviour:
       <color=yellow>Position Gizmo</color> lets you move the
       object
 
-      <color=yellow>Scale Gizmo</color> lets you scale some object
+      <color=yellow>Rotate Gizmo</color> lets you rotate some object
       (can be unavailable for some object)
 
-      Pressing Left Shift while scaling
-      scales in place
+      <color=yellow>Scale Gizmo</color>
+      lets you scale some object (can be unavailable for some object)
 
-      <color=yellow>Rotate Gizmo</color> lets you rotate some
-      object (can be unavailable for some object)'
+      Pressing
+      Left Shift while scaling scales in place'
     displayImage: {fileID: 21300000, guid: 93a192970c077b649a96a75e46c52b3d, type: 3}
   - subtitle: '- QUICK TOOLBAR -'
     mainText: The Quick Toolbar gives you usefull tool like recentering and refocusing
@@ -9867,7 +9709,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1088728846}
-  m_Mesh: {fileID: 646297041}
+  m_Mesh: {fileID: 1955949755}
 --- !u!4 &1088728850
 Transform:
   m_ObjectHideFlags: 0
@@ -18532,6 +18374,171 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35efcdc64cd5dd48ab5bde1a29df958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!43 &1955949755
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GridQuad
+  serializedVersion: 11
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 6
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 4
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 100, y: 0, z: 100}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 000001000200000002000300
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 4
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 24
+      format: 0
+      dimension: 2
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 128
+    _typelessdata: 0000c8c2000000000000c8c200000000000080bf0000000000000000000000000000c842000000000000c8c200000000000080bf000000000000803f000000000000c842000000000000c84200000000000080bf000000000000803f0000803f0000c8c2000000000000c84200000000000080bf00000000000000000000803f
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 100, y: 0, z: 100}
+  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1965290310
 GameObject:
   m_ObjectHideFlags: 0

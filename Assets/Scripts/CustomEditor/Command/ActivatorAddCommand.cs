@@ -57,6 +57,16 @@ public class ActivatorCommand : ICommand<GameObject>
 		activatorTarget.GetComponent<ActivatorEditor>().activables = ListCloner.CloneMonoBehaviourListReference(afterActivables); //HERE
 		activableTarget.GetComponent<ActivableEditor>().activators = ListCloner.CloneMonoBehaviourListReference(afterActivators); //HERE
 
+		if (activatorTarget.GetComponent<ActivatorEditor>().activables.Count > 0)
+			activatorTarget.GetComponent<ActivatorEditor>().SwitchWarningSignState(false);
+		else
+			activatorTarget.GetComponent<ActivatorEditor>().SwitchWarningSignState(true);
+
+		if (activableTarget.GetComponent<ActivableEditor>().activators.Count > 0)
+			activableTarget.GetComponent<ActivableEditor>().SwitchWarningSignState(false);
+		else
+			activableTarget.GetComponent<ActivableEditor>().SwitchWarningSignState(true);
+
 		return activatorTarget;
 	}
 
@@ -73,6 +83,16 @@ public class ActivatorCommand : ICommand<GameObject>
 
 		activatorTarget.GetComponent<ActivatorEditor>().activables = ListCloner.CloneMonoBehaviourListReference(beforeActivables); //HERE
 		activableTarget.GetComponent<ActivableEditor>().activators = ListCloner.CloneMonoBehaviourListReference(beforeActivators); //HERE
+
+		if (activatorTarget.GetComponent<ActivatorEditor>().activables.Count > 0)
+			activatorTarget.GetComponent<ActivatorEditor>().SwitchWarningSignState(false);
+		else
+			activatorTarget.GetComponent<ActivatorEditor>().SwitchWarningSignState(true);
+
+		if (activableTarget.GetComponent<ActivableEditor>().activators.Count > 0)
+			activableTarget.GetComponent<ActivableEditor>().SwitchWarningSignState(false);
+		else
+			activableTarget.GetComponent<ActivableEditor>().SwitchWarningSignState(true);
 	}
 
 	private void CheckTarget()

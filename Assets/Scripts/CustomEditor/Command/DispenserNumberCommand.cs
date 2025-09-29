@@ -31,6 +31,11 @@ public class DispenserNumberCommand : ICommand<DispenserEditor>
 		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
 		targetDispenserEditor.SetNumber(afterMaterialNumber);
 
+		if (afterMaterialNumber > 0)
+			targetDispenserEditor.SwitchWarningSignState(false);
+		else
+			targetDispenserEditor.SwitchWarningSignState(true);
+
 		return targetDispenserEditor;
 	}
 
@@ -46,6 +51,11 @@ public class DispenserNumberCommand : ICommand<DispenserEditor>
 
 		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
 		targetDispenserEditor.SetNumber(beforeMaterialNumber);
+
+		if (beforeMaterialNumber > 0)
+			targetDispenserEditor.SwitchWarningSignState(false);
+		else
+			targetDispenserEditor.SwitchWarningSignState(true);
 	}
 
 	private void CheckTarget()

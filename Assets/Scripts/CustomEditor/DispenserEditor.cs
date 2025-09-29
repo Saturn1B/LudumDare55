@@ -12,6 +12,8 @@ public class DispenserEditor : MonoBehaviour
 	public Materials materialType { get; private set; }
 	public int materialNumber { get; private set; }
 
+	[SerializeField] private GameObject warningSign;
+
 	private void Start()
 	{
 		if(materialType == Materials.EMPTY)
@@ -19,6 +21,11 @@ public class DispenserEditor : MonoBehaviour
 			SetMaterial(0);
 			SetNumber(0);
 		}
+
+		if (materialNumber > 0)
+			SwitchWarningSignState(false);
+		else
+			SwitchWarningSignState(true);
 	}
 
 	public void SetMaterial(int typeId, bool adder = true)
@@ -73,5 +80,10 @@ public class DispenserEditor : MonoBehaviour
 		DispenserNumberCommand dispenserNumberCommand = new DispenserNumberCommand(this.gameObject, this.GetComponent<ModifiableObject>().objectId, startMaterialNumber, endMaterialNumber);
 
 		HystoryCommand.Instance.ExecuteCommand(dispenserNumberCommand);
+	}
+
+	public void SwitchWarningSignState(bool warningState)
+	{
+		warningSign.SetActive(warningState);
 	}
 }
