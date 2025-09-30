@@ -171,6 +171,7 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private List<ObjectButton> objectButtons;
 	[SerializeField] private List<GameObject> typeSelectionButtons;
 	[SerializeField] private Color highColor, lowColor;
+	[SerializeField] private TooltipsCursor tooltipsCursor;
 	private bool isTypeButtonActive = true;
 
 	private void PopulateObjectSelecter()
@@ -257,6 +258,11 @@ public class EditorHUDManager : MonoBehaviour
 			else
 				sObject.ChangeSelectedState(false);
 		}
+
+		if (sButton.IsObjectOrMode())
+			tooltipsCursor.OpenTooltips(sButton.objectName);
+		else
+			tooltipsCursor.CloseTooltips();
 
 		if (id == 2)
 			ObjectPlacer.Instance.isDelete = true;

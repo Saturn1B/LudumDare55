@@ -25,6 +25,14 @@ public class ObjectButton : MonoBehaviour
 		EditorHUDManager.Instance._closeInteractionEditor.AddListener(SwitchButtonActiveState);
 	}
 
+	public bool IsObjectOrMode()
+	{
+		if (isNone || isEditor || isDelete)
+			return false;
+
+		return true;
+	}
+
 	public void ButtonSetter(string objectName, GameObject objectPrefab, Sprite objectSprite)
 	{
 		this.objectPrefab = objectPrefab;
