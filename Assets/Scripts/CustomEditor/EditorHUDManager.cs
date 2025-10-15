@@ -320,9 +320,12 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private string activableSubtitle;
 	[SerializeField, TextArea(10, 10)] private string activableExplanation;
 
+	[HideInInspector] public bool interactionEditorOpen;
 
 	public void OpenInteractionEditor(ActivatorEditor activatorEditor)
 	{
+		interactionEditorOpen = true;
+
 		editorPanel.SetActive(true);
 		quickMenu.SetActive(false);
 		editorTitle.text = activatorSubtitle;
@@ -347,6 +350,8 @@ public class EditorHUDManager : MonoBehaviour
 	}
 	public void OpenInteractionEditor(ActivableEditor activableEditor)
 	{
+		interactionEditorOpen = true;
+
 		editorPanel.SetActive(true);
 		quickMenu.SetActive(false);
 		editorTitle.text = activableSubtitle;
@@ -399,6 +404,8 @@ public class EditorHUDManager : MonoBehaviour
 
 	public void CloseInteractionEditor()
 	{
+		interactionEditorOpen = false;
+
 		HideAllCurrentActivableHighlight();
 
 		for (int i = activableListPanel.transform.childCount - 1; i >= 0; i--)
@@ -504,8 +511,12 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private TMP_Dropdown typeDropdown, numberDropdown;
 	private DispenserEditor currentDispenserEditor;
 
+	[HideInInspector] public bool dispenserEditorOpen;
+
 	public void OpenDispenserEditor(DispenserEditor dispenserEditor)
 	{
+		dispenserEditorOpen = true;
+
 		dispenserPanel.SetActive(true);
 		quickMenu.SetActive(false);
 		currentDispenserEditor = dispenserEditor;
@@ -519,6 +530,8 @@ public class EditorHUDManager : MonoBehaviour
 
 	public void CloseDispenserEditor()
 	{
+		dispenserEditorOpen = false;
+
 		dispenserPanel.SetActive(false);
 		quickMenu.SetActive(true);
 

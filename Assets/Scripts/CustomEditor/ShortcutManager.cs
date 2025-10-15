@@ -18,6 +18,10 @@ public class ShortcutManager : MonoBehaviour
 				ObjectPlacer.Instance.SetCurrentObject(null);
 				EditorHUDManager.Instance.SwitchGizmoMode(0);
 			}
+			else if (EditorHUDManager.Instance.interactionEditorOpen)
+				EditorHUDManager.Instance.CloseInteractionEditor();
+			else if (EditorHUDManager.Instance.dispenserEditorOpen)
+				EditorHUDManager.Instance.CloseDispenserEditor();
 			else if (pauseDisponible)
 				EditorHUDManager.Instance.PauseGame();
 		}
