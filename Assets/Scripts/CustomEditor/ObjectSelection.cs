@@ -46,7 +46,10 @@ public class ObjectSelection : MonoBehaviour
             }
         }
 
-        selected = null;
+        if(selected != null)
+            EditorHUDManager.Instance.CloseCursorTooltip();
+
+            selected = null;
         GizmoGestion.Instance.DeactivateGizmo();
         EditorHUDManager.Instance.GizmoSelectionButton(true, true, true);
     }
@@ -107,6 +110,11 @@ public class ObjectSelection : MonoBehaviour
                 }
             }
         }
+
+		if (selected.GetComponent<ModifiableObject>())
+		{
+            EditorHUDManager.Instance.OpenCursorTooltip(selected.GetComponent<ModifiableObject>().name);
+		}
 
         GizmoGestion.Instance.ActivateGizmo(selected.GetComponent<ModifiableObject>());
     }

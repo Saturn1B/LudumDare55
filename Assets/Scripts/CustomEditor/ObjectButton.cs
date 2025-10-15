@@ -51,15 +51,15 @@ public class ObjectButton : MonoBehaviour
 		}
 		else if (isDelete || isEditor)
 		{
+			ObjectSelection.Instance.DeselectObject();
 			ObjectPlacer.Instance.SetCurrentObject(null);
 			EditorHUDManager.Instance.SwitchGizmoMode();
-			ObjectSelection.Instance.DeselectObject();
 		}
 		else
 		{
+			ObjectSelection.Instance.DeselectObject();
 			ObjectPlacer.Instance.SetCurrentObject(objectPrefab, objectName);
 			EditorHUDManager.Instance.SwitchGizmoMode();
-			ObjectSelection.Instance.DeselectObject();
 		}
 
 		ObjectPlacer.Instance.isDelete = isDelete;

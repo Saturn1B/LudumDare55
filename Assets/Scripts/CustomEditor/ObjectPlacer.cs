@@ -40,11 +40,19 @@ public class ObjectPlacer : MonoBehaviour
 	[HideInInspector] public bool mouseOverDragUI;
 	[SerializeField] private GameObject ghostObject;
 	[SerializeField] private LayerMask ghostLayer;
+	private int scaleFactor = 1;
 
 	public void SetCurrentObject(GameObject currentObject, string objectName = "")
 	{
 		currentObjectPrefab = currentObject;
 		currentObjectName = objectName;
+
+		if (currentObjectPrefab != null)
+		{
+			EditorHUDManager.Instance.OpenCursorTooltip(currentObjectName, currentObjectPrefab.GetComponent<ModifiableObject>().canScale);
+		}
+		else
+			EditorHUDManager.Instance.CloseCursorTooltip();
 
 		ResetGhostObject();
 	}
@@ -95,11 +103,22 @@ public class ObjectPlacer : MonoBehaviour
 					ghostObject.transform.GetChild(i).localScale = currentObjectPrefab.transform.GetChild(i).localScale;
 				}
 			}
+
+			if (currentObjectPrefab.GetComponent<ModifiableObject>().canScale && Input.GetKey(KeyCode.LeftShift))
+			{
+				if (Input.GetAxis("Mouse ScrollWheel") > 0f && scaleFactor < 5)
+					scaleFactor++;
+				else if (Input.GetAxis("Mouse ScrollWheel") < 0f && scaleFactor > 1)
+					scaleFactor--;
+
+				ghostObject.transform.localScale = Vector3.one * scaleFactor;
+			}
+
 			ghostObject.transform.position = SummonPointPrecal(testHit);
 		}
 		else
 		{
-			ResetGhostObject();
+			ResetGhostObject(false);
 		}
 
 		if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -114,14 +133,20 @@ public class ObjectPlacer : MonoBehaviour
 				}
 				else
 				{
-					CreateObject(ghostObject.transform.position, Quaternion.identity, Vector3.one, currentObjectPrefab, currentObjectName);
+					CreateObject(ghostObject.transform.position, Quaternion.identity, Vector3.one * scaleFactor, currentObjectPrefab, currentObjectName);
 				}
 			}
 		}
 	}
 
-	private void ResetGhostObject()
+	private void ResetGhostObject(bool resetSize = true)
 	{
+		if (resetSize)
+		{
+			ghostObject.transform.localScale = Vector3.one;
+			scaleFactor = 1;
+		}
+
 		if (ghostObject.activeSelf)
 		{
 			ghostObject.SetActive(false);
@@ -166,6 +191,10 @@ public class ObjectPlacer : MonoBehaviour
 		{
 			summonPoint += Vector3.up;
 		}
+
+		float evenFactor = scaleFactor % 2 == 1 ? 0 : .5f;
+		summonPoint += Vector3.up * (((scaleFactor - 1) / 2));
+		summonPoint += Vector3.one * evenFactor;
 
 		return summonPoint;
 	}

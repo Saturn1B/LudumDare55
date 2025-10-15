@@ -162,6 +162,15 @@ public class EditorHUDManager : MonoBehaviour
 		rotationButton.interactable = isGizmoButtonActive;
 	}
 
+	public void OpenCursorTooltip(string objectName, bool canScale = false)
+	{
+		tooltipsCursor.OpenTooltips(objectName, canScale);
+	}
+	public void CloseCursorTooltip()
+	{
+		tooltipsCursor.CloseTooltips();
+	}
+
 	[Space]
 
 	[Header("Object Selecter")]
@@ -173,9 +182,12 @@ public class EditorHUDManager : MonoBehaviour
 	[SerializeField] private Color highColor, lowColor;
 	[SerializeField] private TooltipsCursor tooltipsCursor;
 	private bool isTypeButtonActive = true;
+	private int toolModeCount;
 
 	private void PopulateObjectSelecter()
 	{
+		toolModeCount = objectButtons.Count;
+
 		sceneObjectSOs = Resources.LoadAll("SceneObjects", typeof(SceneObjectSO));
 
 		foreach (var sObject in sceneObjectSOs)
@@ -200,7 +212,7 @@ public class EditorHUDManager : MonoBehaviour
 	public void PopulateObjectSelecter(int objectType)
 	{
 
-		for (int i = objectButtons.Count - 1; i >= 3; i--)
+		for (int i = objectButtons.Count - 1; i >= toolModeCount; i--)
 		{
 			ObjectButton toDelete = objectButtons[i];
 			objectButtons.RemoveAt(i);
@@ -258,11 +270,6 @@ public class EditorHUDManager : MonoBehaviour
 			else
 				sObject.ChangeSelectedState(false);
 		}
-
-		if (sButton.IsObjectOrMode())
-			tooltipsCursor.OpenTooltips(sButton.objectName);
-		else
-			tooltipsCursor.CloseTooltips();
 
 		if (id == 2)
 			ObjectPlacer.Instance.isDelete = true;
