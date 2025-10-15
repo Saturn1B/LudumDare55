@@ -47,6 +47,11 @@ public class EditorHUDManager : MonoBehaviour
 	{
 		isPaused = !isPaused;
 		menuPanel.SetActive(isPaused);
+		if (isPaused)
+		{
+			ObjectSelection.Instance.DeselectObject();
+			ObjectPlacer.Instance.SetCurrentObject(null);
+		}
 	}
 	public void SaveLevel(bool unPause)
 	{
