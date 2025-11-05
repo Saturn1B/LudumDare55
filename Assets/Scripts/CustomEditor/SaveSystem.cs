@@ -38,8 +38,8 @@ public class SaveSystem : MonoBehaviour
 			Load(LevelDataTransfer.SceneDataToTest);
 		else if (LevelDataTransfer.SceneDataToLoad != null)
 			Load(LevelDataTransfer.SceneDataToLoad);
-		//else
-		//	SaveOnDisk();
+		else
+			SaveOnDisk();
 	}
 
 	public static void GenerateSaveFilePath()

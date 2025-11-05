@@ -104,6 +104,8 @@ public class ShortcutManager : MonoBehaviour
 
 					ObjectSelection.Instance.DeselectObject();
 
+					ObjectPlacer.Instance.SetCurrentObjectName(toDuplicate.name);
+
 					ModifiableObject duplicate = ObjectPlacer.Instance.CreateObject(toDuplicate.position + Vector3.forward + Vector3.right, toDuplicate.transform.rotation, toDuplicate.transform.localScale, toDuplicate.gameObject, toDuplicate.name);
 
 					ObjectSelection.Instance.SelectObject(duplicate.transform);

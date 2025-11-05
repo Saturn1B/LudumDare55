@@ -14,7 +14,7 @@ public class GizmoControl : MonoBehaviour
 {
 	protected FreeEditorCam editorCam;
 
-	Vector2 initMousePos;
+	protected Vector2 initMousePos;
 	bool mousePressed;
 	Vector2 oldDelta;
 	protected Vector2 mouseDelta;

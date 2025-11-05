@@ -30,61 +30,125 @@ public class RotationGizmo : GizmoControl
 		else zControl[0].gameObject.SetActive(false);
 	}
 
+	//protected override void ObjectModification(Vector3 axis)
+	//{
+	//	int rotPower = 90;
+	//	int usedMouseDelta = 1;
+
+	//	if (mouseDelta.x == 1 || mouseDelta.y == 1)
+	//		usedMouseDelta = 1;
+	//	else if (mouseDelta.x == -1 || mouseDelta.y == -1)
+	//		usedMouseDelta = -1;
+	//	else
+	//		usedMouseDelta = 0;
+
+	//	int camRotx = 1;
+	//	int camRotz = 1;
+	//	if (editorCam.parentTransform.transform.eulerAngles.y < 270 && editorCam.parentTransform.transform.eulerAngles.y > 90)
+	//		camRotx = -1;
+	//	if (editorCam.parentTransform.transform.eulerAngles.y > 180)
+	//		camRotz = -1;
+
+	//	if (Input.GetMouseButton(0))
+	//	{
+	//		Quaternion originaleRotation = objectTransform.transform.rotation;
+
+	//		Debug.Log(axis);
+
+	//		if (allowXRot && axis.x == 1)
+	//		{
+	//			if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+	//				objectTransform.transform.Rotate(Vector3.right, axis.x * usedMouseDelta * rotPower * camRotx, Space.World);
+	//			else
+	//				objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.x, objectTransform.transform.localScale.z, objectTransform.transform.localScale.y);
+	//		}
+	//		if (allowYRot && axis.y == 1)
+	//		{
+	//			if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+	//				objectTransform.transform.Rotate(Vector3.up, axis.y * usedMouseDelta * -rotPower, Space.World);
+	//			else
+	//				objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.z, objectTransform.transform.localScale.y, objectTransform.transform.localScale.x);
+	//		}
+	//		if (allowZRot && axis.z == 1)
+	//		{
+	//			if (!objectTransform.GetComponent<ReCalcCubeTexture>())
+	//				objectTransform.transform.Rotate(Vector3.forward, axis.z * usedMouseDelta * rotPower * camRotz, Space.World);
+	//			else
+	//				objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.y, objectTransform.transform.localScale.x, objectTransform.transform.localScale.z);
+	//		}
+	//	}
+	//}
+
 	protected override void ObjectModification(Vector3 axis)
 	{
-		int rotPower = 90;
-		int usedMouseDelta = 1;
+		Camera cam = Camera.main;
+		if (!cam || objectTransform == null)
+			return;
 
-		if (mouseDelta.x == 1 || mouseDelta.y == 1)
-			usedMouseDelta = 1;
-		else if (mouseDelta.x == -1 || mouseDelta.y == -1)
-			usedMouseDelta = -1;
-		else
-			usedMouseDelta = 0;
+		// Convert local axis to world direction
+		Vector3 worldAxis = transform.TransformDirection(axis);
 
-		int camRotx = 1;
-		int camRotz = 1;
-		if (editorCam.parentTransform.transform.eulerAngles.y < 270 && editorCam.parentTransform.transform.eulerAngles.y > 90)
-			camRotx = -1;
-		if (editorCam.parentTransform.transform.eulerAngles.y > 180)
-			camRotz = -1;
+		// Determine screen-space direction of the rotation axis
+		Vector3 screenPos = cam.WorldToScreenPoint(objectTransform.transform.position);
+		Vector3 screenAxisEnd = cam.WorldToScreenPoint(objectTransform.transform.position + worldAxis);
+		Vector2 screenAxisDir = (screenAxisEnd - screenPos).normalized;
 
-		if (Input.GetMouseButton(0))
+		// --- Fix: use horizontal motion for Y rotation ---
+		if (axis == Vector3.up)
 		{
-			Quaternion originaleRotation = objectTransform.transform.rotation;
+			Vector3 camRight = cam.transform.right;
+			Vector3 screenCamRightEnd = cam.WorldToScreenPoint(objectTransform.transform.position + camRight);
+			screenAxisDir = (screenCamRightEnd - screenPos).normalized;
+		}
 
-			Debug.Log(axis);
+		// Get mouse delta since last step
+		Vector2 rawMouseDelta = (Vector2)Input.mousePosition - initMousePos;
+		float projectedDelta = Vector2.Dot(rawMouseDelta, screenAxisDir);
 
+		// Threshold and step settings
+		float pixelThreshold = 10f; // pixels of mouse move per rotation step
+		float snapAngle = 90f;      // degrees per step (set to 90 if you prefer)
+
+		if (Mathf.Abs(projectedDelta) >= pixelThreshold)
+		{
+			float direction = Mathf.Sign(projectedDelta);
+
+			// Rotate only on allowed axes
 			if (allowXRot && axis.x == 1)
 			{
-				//Quaternion tempRotation = originaleRotation * Quaternion.AngleAxis(axis.x * usedMouseDelta * rotPower * camRotx, Vector3.right);
-				//objectTransform.transform.rotation = tempRotation;
 				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
-					objectTransform.transform.Rotate(Vector3.right, axis.x * usedMouseDelta * rotPower * camRotx, Space.World);
+					objectTransform.transform.Rotate(worldAxis, -direction * snapAngle, Space.World);
 				else
-				{
-					Debug.Log("TEST");
-					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.x, objectTransform.transform.localScale.z, objectTransform.transform.localScale.y);
-				}
+					objectTransform.transform.localScale = new Vector3(
+						objectTransform.transform.localScale.x,
+						objectTransform.transform.localScale.z,
+						objectTransform.transform.localScale.y);
 			}
+
 			if (allowYRot && axis.y == 1)
 			{
-				//Quaternion tempRotation = originaleRotation * Quaternion.Euler(0, axis.y * usedMouseDelta * -rotPower, 0);
-				//objectTransform.transform.rotation = tempRotation;
 				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
-					objectTransform.transform.Rotate(Vector3.up, axis.y * usedMouseDelta * -rotPower, Space.World);
+					objectTransform.transform.Rotate(worldAxis, -direction * snapAngle, Space.World);
 				else
-					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.z, objectTransform.transform.localScale.y, objectTransform.transform.localScale.x);
+					objectTransform.transform.localScale = new Vector3(
+						objectTransform.transform.localScale.z,
+						objectTransform.transform.localScale.y,
+						objectTransform.transform.localScale.x);
 			}
+
 			if (allowZRot && axis.z == 1)
 			{
-				//	Quaternion tempRotation = originaleRotation * Quaternion.AngleAxis(axis.z * usedMouseDelta * rotPower * camRotz, Vector3.forward);
-				//	objectTransform.transform.rotation = tempRotation;
 				if (!objectTransform.GetComponent<ReCalcCubeTexture>())
-					objectTransform.transform.Rotate(Vector3.forward, axis.z * usedMouseDelta * rotPower * camRotz, Space.World);
+					objectTransform.transform.Rotate(worldAxis, -direction * snapAngle, Space.World);
 				else
-					objectTransform.transform.localScale = new Vector3(objectTransform.transform.localScale.y, objectTransform.transform.localScale.x, objectTransform.transform.localScale.z);
+					objectTransform.transform.localScale = new Vector3(
+						objectTransform.transform.localScale.y,
+						objectTransform.transform.localScale.x,
+						objectTransform.transform.localScale.z);
 			}
+
+			// Reset reference mouse position for next snap step
+			initMousePos = Input.mousePosition;
 		}
 	}
 

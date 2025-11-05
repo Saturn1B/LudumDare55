@@ -71,6 +71,7 @@ public class ObjectPlacer : MonoBehaviour
 
 		return _mode;
 	}
+	public void SetCurrentObjectName(string objectName) => currentObjectName = objectName;
 
 	private void Update()
 	{
