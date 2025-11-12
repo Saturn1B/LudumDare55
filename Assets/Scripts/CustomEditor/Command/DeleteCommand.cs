@@ -88,11 +88,21 @@ public class DeleteCommand : ICommand<GameObject>
 		if (target.transform.GetComponent<ActivableEditor>())
 		{
 			ActivableEditor currentActivable = target.transform.GetComponent<ActivableEditor>();
+			foreach (var activator in currentActivable.activators)
+			{
+				if(activator.activables.Count <= 1)
+					activator.SwitchWarningSignState(true);
+			}
 			currentActivable.RemoveFromActivator();
 		}
 		if (target.transform.GetComponent<ActivatorEditor>())
 		{
 			ActivatorEditor currentActivator = target.transform.GetComponent<ActivatorEditor>();
+			foreach (var activable in currentActivator.activables)
+			{
+				if (activable.activators.Count <= 1)
+					activable.SwitchWarningSignState(true);
+			}
 			currentActivator.RemoveFromActivable();
 		}
 		SaveSystem.Instance.objectInScene.Remove(target.transform.GetComponent<ModifiableObject>());
@@ -138,6 +148,10 @@ public class DeleteCommand : ICommand<GameObject>
 					}
 				}
 			}
+			foreach (var activable in currentActivatorEditor.activables)
+			{
+				activable.SwitchWarningSignState(false);
+			}
 		}
 		if (go.GetComponent<ActivableEditor>())
 		{
@@ -155,6 +169,10 @@ public class DeleteCommand : ICommand<GameObject>
 						break;
 					}
 				}
+			}
+			foreach (var activator in currentActivableEditor.activators)
+			{
+				activator.SwitchWarningSignState(false);
 			}
 		}
 		if (go.GetComponent<DispenserEditor>())
