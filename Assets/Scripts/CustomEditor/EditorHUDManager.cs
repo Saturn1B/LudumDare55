@@ -557,4 +557,12 @@ public class EditorHUDManager : MonoBehaviour
 	{
 		currentDispenserEditor.SetNumberCommand(number);
 	}
+
+	public bool IsEditorOpen()
+	{
+		if (editorPanel.activeSelf || dispenserPanel.activeSelf)
+			return true;
+
+		return false;
+	}
 }

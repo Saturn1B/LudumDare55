@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ScaleCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"{actionType} {target.name}";
+	private string actionType = "Scale";
+
 	private GameObject target;
 	private string targetId;
 	private Vector3 beforeScale;
@@ -11,7 +14,7 @@ public class ScaleCommand : ICommand<GameObject>
 	private Vector3 beforePosition;
 	private Vector3 afterPosition;
 
-	public ScaleCommand(GameObject target, string targetId, Vector3 beforeScale, Vector3 afterScale, Vector3 beforePosition, Vector3 afterPosition)
+	public ScaleCommand(GameObject target, string targetId, Vector3 beforeScale, Vector3 afterScale, Vector3 beforePosition, Vector3 afterPosition, bool isCubeRotated = false)
 	{
 		this.target = target;
 		this.targetId = targetId;
@@ -19,6 +22,8 @@ public class ScaleCommand : ICommand<GameObject>
 		this.afterScale = afterScale;
 		this.beforePosition = beforePosition;
 		this.afterPosition = afterPosition;
+
+		actionType = isCubeRotated ? "Rotate" : "Scale";
 	}
 
 	public GameObject Execute(bool isRedo)

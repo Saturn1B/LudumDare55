@@ -5,6 +5,9 @@ using System.Linq;
 
 public class ActivatorCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"{actionType[0]} {activableTarget.name} {actionType[1]} {activatorTarget.name}";
+	private string[] actionType = new string[2];
+
 	private GameObject activatorTarget;
 	private string activatorTargetId;
 
@@ -39,6 +42,19 @@ public class ActivatorCommand : ICommand<GameObject>
 		beforeActivatorsId = SetIdList(beforeActivators);
 		afterActivablesId = SetIdList(afterActivables);
 		afterActivatorsId = SetIdList(afterActivators);
+
+		if (beforeActivables.Count > afterActivables.Count)
+		{
+			actionType[0] = "Unlink";
+			actionType[1] = "from";
+		}
+		else
+		{
+			actionType[0] = "Link";
+			actionType[1] = "to";
+		}
+
+
 	}
 
 	public GameObject Execute(bool isRedo)

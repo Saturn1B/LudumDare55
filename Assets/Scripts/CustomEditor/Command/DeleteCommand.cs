@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DeleteCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"Delete {objectName}";
+
 	private GameObject target;
 	private string targetId;
 

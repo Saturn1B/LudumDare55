@@ -29,30 +29,35 @@ public class HystoryCommand : MonoBehaviour
 	}
 
 	[ContextMenu("Undo")]
-	public void Undo()
+	public string Undo()
 	{
 		if(undoStack.Count > 0)
 		{
 			ICommandBase command = undoStack.Pop();
 			command.Undo();
 			redoStack.Push(command);
+			return command.actionDescription;
 		}
+		return null;
 	}
 
 	[ContextMenu("Redo")]
-	public void Redo()
+	public string Redo()
 	{
 		if(redoStack.Count > 0)
 		{
 			ICommandBase command = redoStack.Pop();
 			command.Execute(true);
 			undoStack.Push(command);
+			return command.actionDescription;
 		}
+		return null;
 	}
 }
 
 public interface ICommandBase
 {
+	string actionDescription { get; }
 	void Execute(bool isRedo);
 	void Undo();
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CreateCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"Create {objectName}";
+
 	private Vector3 summonPos;
 	private Quaternion summonRot;
 	private Vector3 summonScale;

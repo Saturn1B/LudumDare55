@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DispenserNumberCommand : ICommand<DispenserEditor>
 {
+	public string actionDescription => $"Change dispenser number to {afterMaterialNumber.ToString()}";
+
 	private GameObject target;
 	private string targetId;
 	private int beforeMaterialNumber;

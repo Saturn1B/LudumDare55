@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DispenserTypeCommand : ICommand<DispenserEditor>
 {
+	public string actionDescription => $"Change dispenser type to {afterMaterialType.ToString()}";
+
 	private GameObject target;
 	private string targetId;
 	private Materials beforeMaterialType;

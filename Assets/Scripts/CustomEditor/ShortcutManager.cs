@@ -69,6 +69,24 @@ public class ShortcutManager : MonoBehaviour
 			}
 		}
 
+		if(Input.GetKeyDown(KeyCode.Tab))
+		{
+			if(ObjectPlacer.Instance.GetSelectionMode() != SelectionMode.NONE && !EditorHUDManager.Instance.IsEditorOpen())
+			{
+				ObjectSelection.Instance.DeselectObject();
+				EditorHUDManager.Instance.SwitchGizmoMode(0);
+				ObjectPlacer.Instance.isEditor = false;
+			}
+			else if(ObjectPlacer.Instance.GetSelectionMode() != SelectionMode.EDITOR)
+			{
+				ObjectSelection.Instance.DeselectObject();
+				ObjectPlacer.Instance.SetCurrentObject(null);
+				EditorHUDManager.Instance.SwitchCurrentObject(1);
+				EditorHUDManager.Instance.SwitchGizmoMode();
+				ObjectPlacer.Instance.isEditor = true;
+			}
+		}
+
 		if (Input.GetKeyDown(KeyCode.Delete))
 		{
 			if (ObjectPlacer.Instance.GetSelectionMode() == SelectionMode.EDITOR || ObjectSelection.Instance.selected != null)
@@ -126,14 +144,20 @@ public class ShortcutManager : MonoBehaviour
 			//Undo shortcut
 			else if (Input.GetKeyDown(KeyCode.Z))
 			{
-				HystoryCommand.Instance.Undo();
-				DisplayMessage.Instance.NormalMessage("Undo last action");
+				string msg = HystoryCommand.Instance.Undo();
+				if(msg != null)
+					DisplayMessage.Instance.NormalMessage($"Undo: {msg}");
+				else
+					DisplayMessage.Instance.NormalMessage("Nothing to undo");
 			}
 			//Redo shortcut
 			else if (Input.GetKeyDown(KeyCode.Y))
 			{
-				HystoryCommand.Instance.Redo();
-				DisplayMessage.Instance.NormalMessage($"Redo last action");
+				string msg = HystoryCommand.Instance.Redo();
+				if(msg != null)
+					DisplayMessage.Instance.NormalMessage($"Redo: {msg}");
+				else
+					DisplayMessage.Instance.NormalMessage("Nothing to redo");
 			}
 		}
 	}

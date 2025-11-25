@@ -172,7 +172,7 @@ public class RotationGizmo : GizmoControl
 		{
 			ScaleCommand scaleCommand = new ScaleCommand(target, target.GetComponent<ModifiableObject>().objectId,
 				startScale, target.transform.localScale,
-				target.transform.position, target.transform.position);
+				target.transform.position, target.transform.position, true);
 			HystoryCommand.Instance.ExecuteCommand(scaleCommand);
 		}
 	}

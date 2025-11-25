@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RotateCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"Rotate {target.name}";
+
 	private GameObject target;
 	private string targetId;
 	private Quaternion beforeRotation;

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MoveCommand : ICommand<GameObject>
 {
+	public string actionDescription => $"Move {target.name}";
+
 	private GameObject target;
 	private string targetId;
 	private Vector3 beforePosition;
