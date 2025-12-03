@@ -40,7 +40,8 @@ public class ObjectPlacer : MonoBehaviour
 	[HideInInspector] public bool mouseOverDragUI;
 	[SerializeField] private GameObject ghostObject;
 	[SerializeField] private LayerMask ghostLayer;
-	private int scaleFactor = 1;
+
+	Vector3 newScale = Vector3.one;
 
 	public void SetCurrentObject(GameObject currentObject, string objectName = "")
 	{
@@ -107,12 +108,38 @@ public class ObjectPlacer : MonoBehaviour
 
 			if (currentObjectPrefab.GetComponent<ModifiableObject>().canScale && Input.GetKey(KeyCode.LeftShift))
 			{
-				if (Input.GetAxis("Mouse ScrollWheel") > 0f && scaleFactor < 5)
-					scaleFactor++;
-				else if (Input.GetAxis("Mouse ScrollWheel") < 0f && scaleFactor > 1)
-					scaleFactor--;
+				if (Input.GetAxis("Mouse ScrollWheel") > 0f/* && scaleFactor < 5*/)
+				{
+					if (Input.GetKey(KeyCode.Z) && newScale.x < 10)
+						newScale.x++;
+					else if (Input.GetKey(KeyCode.X) && newScale.y < 10)
+						newScale.y++;
+					else if (Input.GetKey(KeyCode.C) && newScale.z < 10)
+						newScale.z++;
+					else if (newScale.x < 10 && newScale.y < 10 && newScale.z < 10)
+					{
+						newScale.x++;
+						newScale.y++;
+						newScale.z++;
+					}
+				}
+				else if (Input.GetAxis("Mouse ScrollWheel") < 0f/* && scaleFactor > 1*/)
+				{
+					if (Input.GetKey(KeyCode.Z) && newScale.x > 1)
+						newScale.x--;
+					else if (Input.GetKey(KeyCode.X) && newScale.y > 1)
+						newScale.y--;
+					else if (Input.GetKey(KeyCode.C) && newScale.z > 1)
+						newScale.z--;
+					else if (newScale.x > 1 && newScale.y > 1 && newScale.z > 1)
+					{
+						newScale.x--;
+						newScale.y--;
+						newScale.z--;
+					}
+				}
 
-				ghostObject.transform.localScale = Vector3.one * scaleFactor;
+				ghostObject.transform.localScale = newScale;
 			}
 
 			ghostObject.transform.position = SummonPointPrecal(testHit);
@@ -134,7 +161,7 @@ public class ObjectPlacer : MonoBehaviour
 				}
 				else
 				{
-					CreateObject(ghostObject.transform.position, Quaternion.identity, Vector3.one * scaleFactor, currentObjectPrefab, currentObjectName);
+					CreateObject(ghostObject.transform.position, Quaternion.identity, newScale, currentObjectPrefab, currentObjectName);
 				}
 			}
 		}
@@ -145,7 +172,7 @@ public class ObjectPlacer : MonoBehaviour
 		if (resetSize)
 		{
 			ghostObject.transform.localScale = Vector3.one;
-			scaleFactor = 1;
+			newScale = Vector3.one;
 		}
 
 		if (ghostObject.activeSelf)
@@ -193,9 +220,11 @@ public class ObjectPlacer : MonoBehaviour
 			summonPoint += Vector3.up;
 		}
 
-		float evenFactor = scaleFactor % 2 == 1 ? 0 : .5f;
-		summonPoint += Vector3.up * (((scaleFactor - 1) / 2));
-		summonPoint += Vector3.one * evenFactor;
+		float evenFactorX = newScale.x % 2 == 1 ? 0 : .5f;
+		float evenFactorZ = newScale.z % 2 == 1 ? 0 : .5f;
+		summonPoint += Vector3.up * (((newScale.y - 1) / 2));
+		summonPoint += Vector3.right * evenFactorX;
+		summonPoint += Vector3.forward * evenFactorZ;
 
 		return summonPoint;
 	}
