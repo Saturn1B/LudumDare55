@@ -40,7 +40,8 @@ public class TooltipsMenu : MonoBehaviour
 
 	public void OpenStartGuide()
 	{
-		PlayerPrefs.SetInt("guideDone", 1);
+		if(PlayerPrefs.HasKey("guideDone") && PlayerPrefs.GetInt("guideDone") == 1)
+			closeButton.SetActive(true);
 
 		if (EditorHUDManager.Instance.isPaused)
 			EditorHUDManager.Instance.PauseGame();
@@ -66,7 +67,7 @@ public class TooltipsMenu : MonoBehaviour
 
 		if(slideId < guideSlides.Length - 1)
 		{
-			closeButton.SetActive(false);
+			ToggleCloseButton(false);
 			if (slideId > 0)
 			{
 				previousButton.SetActive(true);
@@ -75,7 +76,7 @@ public class TooltipsMenu : MonoBehaviour
 		}
 		else
 		{
-			closeButton.SetActive(true);
+			ToggleCloseButton(true);
 		}
 
 		subtitleGuide.text = guideSlides[slideId].subtitle;
@@ -93,8 +94,19 @@ public class TooltipsMenu : MonoBehaviour
 
 	public void CloseGuide()
 	{
+		if (!PlayerPrefs.HasKey("guideDone"))
+			PlayerPrefs.SetInt("guideDone", 1);
+
 		guidePanel.SetActive(false);
 		ShortcutManager.pauseDisponible = true;
+	}
+
+	public void ToggleCloseButton(bool value)
+	{
+		if (PlayerPrefs.HasKey("guideDone") && PlayerPrefs.GetInt("guideDone") == 1)
+			return;
+
+		closeButton.SetActive(value);
 	}
 }
 
