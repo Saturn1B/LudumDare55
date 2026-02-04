@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
+using Firebase.Firestore;
+using Firebase.Extensions;
 
 public class SaveSystem : MonoBehaviour
 {
@@ -18,6 +20,8 @@ public class SaveSystem : MonoBehaviour
 
 	public static string saveFilePath;
 
+	private FirebaseFirestore firestore;
+
 	private void Awake()
 	{
 		if (Instance != null && Instance != this)
@@ -28,6 +32,8 @@ public class SaveSystem : MonoBehaviour
 		{
 			Instance = this;
 		}
+
+		firestore = FirebaseFirestore.DefaultInstance;
 
 		GenerateSaveFilePath();
 	}
@@ -144,6 +150,8 @@ public class SaveSystem : MonoBehaviour
 	public void SaveOnDisk()
 	{
 		SceneData sceneData = SaveSceneData();
+
+		firestore.Document($"save_data/0").SetAsync(sceneData);
 
 		string sceneDataString = JsonUtility.ToJson(sceneData);
 
@@ -311,7 +319,7 @@ public class SaveSystem : MonoBehaviour
 	}
 }
 
-[System.Serializable]
+[System.Serializable][FirestoreData]
 public class SceneData
 {
 	public string levelName;
@@ -322,7 +330,7 @@ public class SceneData
 	public PermanentObjectData[] permanentObjectsInScene;
 }
 
-[System.Serializable]
+[System.Serializable][FirestoreData]
 public class ModifiableObjectData
 {
 	public string objectId;
@@ -338,7 +346,7 @@ public class ModifiableObjectData
 	public ModifiableObjectData[] childObjects;
 }
 
-[System.Serializable]
+[System.Serializable][FirestoreData]
 public class PermanentObjectData
 {
 	public Vector3 position;
