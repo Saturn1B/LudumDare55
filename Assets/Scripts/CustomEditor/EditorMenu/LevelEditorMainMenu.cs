@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using TMPro;
+using Newtonsoft.Json;
 
 public class LevelEditorMainMenu : MonoBehaviour
 {
@@ -68,7 +69,7 @@ public class LevelEditorMainMenu : MonoBehaviour
 			try
 			{
 				string levelDataString = File.ReadAllText(file);
-				SceneData levelData = JsonUtility.FromJson<SceneData>(levelDataString);
+				SceneData levelData = JsonConvert.DeserializeObject<SceneData>(levelDataString);
 				levelsData.Add(levelData);
 
 				GameObject go = Instantiate(levelCardPrefab, cardParent);

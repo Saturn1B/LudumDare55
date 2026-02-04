@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using Firebase.Firestore;
 using Firebase.Extensions;
+using Newtonsoft.Json;
 
 public class SaveSystem : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class SaveSystem : MonoBehaviour
 
 	public static string saveFilePath;
 
-	private FirebaseFirestore firestore;
+	public string currentUploadId;
 
 	private void Awake()
 	{
@@ -32,8 +33,6 @@ public class SaveSystem : MonoBehaviour
 		{
 			Instance = this;
 		}
-
-		firestore = FirebaseFirestore.DefaultInstance;
 
 		GenerateSaveFilePath();
 	}
@@ -52,6 +51,15 @@ public class SaveSystem : MonoBehaviour
 	{
 		if (string.IsNullOrEmpty(saveFilePath))
 			saveFilePath = Application.persistentDataPath + "/EditorLevelsData/";
+	}
+
+	[ContextMenu("Upload")]
+	public void UploadData()
+	{
+		SceneData sceneData = SaveSceneData();
+
+		FindObjectOfType<FirestoreManager>().UploadLevel(sceneData);
+		SaveOnDisk(sceneData);
 	}
 
 	[ContextMenu("Save")]
@@ -85,7 +93,12 @@ public class SaveSystem : MonoBehaviour
 				}
 			}
 
-			if(modifiable.GetComponent<ActivatorEditor>() != null)
+			if (objectData.activablesId == null)
+				objectData.activablesId = new List<string>();
+			if (objectData.activatorsId == null)
+				objectData.activatorsId = new List<string>();
+
+			if (modifiable.GetComponent<ActivatorEditor>() != null)
 			{
 				ActivatorEditor activator = modifiable.GetComponent<ActivatorEditor>();
 				foreach (var item in activator.activables)
@@ -144,16 +157,25 @@ public class SaveSystem : MonoBehaviour
 		sceneData.levelName = saveFileName;
 		sceneData.levelId = saveFileId;
 
+		sceneData.uploadId = currentUploadId;
+
 		return sceneData;
 	}
 
-	public void SaveOnDisk()
+	public void SaveOnDisk(SceneData customSceneData = null)
 	{
-		SceneData sceneData = SaveSceneData();
+		SceneData sceneData;
 
-		firestore.Document($"save_data/0").SetAsync(sceneData);
+		if (customSceneData != null)
+			sceneData = customSceneData;
+		else
+			sceneData = SaveSceneData();
 
-		string sceneDataString = JsonUtility.ToJson(sceneData);
+		string sceneDataString = JsonConvert.SerializeObject(sceneData, Formatting.Indented, new JsonSerializerSettings
+		{
+			ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+			Converters = new JsonConverter[] { new Vector3Converter() }
+		});
 
 		string saveFileNameId = sceneData.levelName + sceneData.levelId;
 
@@ -180,7 +202,7 @@ public class SaveSystem : MonoBehaviour
 			if (!File.Exists(saveFilePath + "SceneData.json")) return;
 
 			string sceneDataString = File.ReadAllText(saveFilePath + "SceneData.json");
-			sceneData = JsonUtility.FromJson<SceneData>(sceneDataString);
+			sceneData = JsonConvert.DeserializeObject<SceneData>(sceneDataString);
 		}
 		else
 		{
@@ -262,6 +284,8 @@ public class SaveSystem : MonoBehaviour
 		cameraHolder.position = sceneData.camPosition;
 		cameraHolder.eulerAngles = new Vector3(0, sceneData.camRotation.y, 0);
 		cameraMain.localEulerAngles = new Vector3(sceneData.camRotation.x, 0, 0);
+
+		currentUploadId = sceneData.uploadId;
 	}
 
 	ModifiableObjectData GetObjectDataById(string objectId, SceneData sceneData)
@@ -322,34 +346,138 @@ public class SaveSystem : MonoBehaviour
 [System.Serializable][FirestoreData]
 public class SceneData
 {
-	public string levelName;
-	public string levelId;
-	public Vector3 camPosition;
-	public Vector3 camRotation;
-	public ModifiableObjectData[] objectsInScene;
-	public PermanentObjectData[] permanentObjectsInScene;
+	[FirestoreProperty]
+	public string levelName { get; set; }
+	[FirestoreProperty]
+	public string levelId { get; set; }
+	public Vector3 camPosition { get; set; }
+	[JsonIgnore][FirestoreProperty("camPosition")]
+	private float[] camPositionSerialized
+	{
+		get => new float[] { camPosition.x, camPosition.y, camPosition.z };
+		set => camPosition = new Vector3(value[0], value[1], value[2]);
+	}
+	public Vector3 camRotation { get; set; }
+	[JsonIgnore][FirestoreProperty("camRotation")]
+	private float[] camRotationSerialized
+	{
+		get => new float[] { camRotation.x, camRotation.y, camRotation.z };
+		set => camRotation = new Vector3(value[0], value[1], value[2]);
+	}
+	[FirestoreProperty]
+	public ModifiableObjectData[] objectsInScene { get; set; }
+	[FirestoreProperty]
+	public PermanentObjectData[] permanentObjectsInScene { get; set; }
+	[FirestoreProperty]
+	public string uploadId { get; set; }
 }
 
 [System.Serializable][FirestoreData]
 public class ModifiableObjectData
 {
-	public string objectId;
-	public string objectName;
-	public Vector3 position;
-	public Vector3 rotation;
-	public Vector3 scale;
-	public bool canDelete;
-	public List<string> activatorsId = new List<string>();
-	public List<string> activablesId = new List<string>();
-	public int materialType;
-	public int materialNumber;
-	public ModifiableObjectData[] childObjects;
+	[FirestoreProperty]
+	public string objectId { get; set; }
+	[FirestoreProperty]
+	public string objectName { get; set; }
+	public Vector3 position { get; set; }
+	[JsonIgnore][FirestoreProperty("position")]
+	private float[] positionSerialized
+	{
+		get => new float[] { position.x, position.y, position.z };
+		set => position = new Vector3(value[0], value[1], value[2]);
+	}
+	public Vector3 rotation { get; set; }
+	[JsonIgnore][FirestoreProperty("rotation")]
+	private float[] rotationSerialized
+	{
+		get => new float[] { rotation.x, rotation.y, rotation.z };
+		set => rotation = new Vector3(value[0], value[1], value[2]);
+	}
+	public Vector3 scale { get; set; }
+	[JsonIgnore][FirestoreProperty("scale")]
+	private float[] scaleSerialized
+	{
+		get => new float[] { scale.x, scale.y, scale.z };
+		set => scale = new Vector3(value[0], value[1], value[2]);
+	}
+	[FirestoreProperty]
+	public bool canDelete { get; set; }
+	[FirestoreProperty]
+	public List<string> activatorsId { get; set; }
+	[FirestoreProperty]
+	public List<string> activablesId { get; set; }
+	[FirestoreProperty]
+	public int materialType { get; set; }
+	[FirestoreProperty]
+	public int materialNumber { get; set; }
+	[FirestoreProperty]
+	public ModifiableObjectData[] childObjects { get; set; }
 }
 
 [System.Serializable][FirestoreData]
 public class PermanentObjectData
 {
-	public Vector3 position;
-	public Vector3 rotation;
-	public Vector3 scale;
+	public Vector3 position { get; set; }
+	[JsonIgnore][FirestoreProperty("position")]
+	private float[] positionSerialized
+	{
+		get => new float[] { position.x, position.y, position.z };
+		set => position = new Vector3(value[0], value[1], value[2]);
+	}
+	public Vector3 rotation { get; set; }
+	[JsonIgnore][FirestoreProperty("rotation")]
+	private float[] rotationSerialized
+	{
+		get => new float[] { rotation.x, rotation.y, rotation.z };
+		set => rotation = new Vector3(value[0], value[1], value[2]);
+	}
+	public Vector3 scale { get; set; }
+	[JsonIgnore][FirestoreProperty("scale")]
+	private float[] scaleSerialized
+	{
+		get => new float[] { scale.x, scale.y, scale.z };
+		set => scale = new Vector3(value[0], value[1], value[2]);
+	}
+}
+
+public class Vector3Converter : JsonConverter<Vector3>
+{
+	public override void WriteJson(JsonWriter writer, Vector3 value, JsonSerializer serializer)
+	{
+		writer.WriteStartObject();
+		writer.WritePropertyName("x");
+		writer.WriteValue(value.x);
+		writer.WritePropertyName("y");
+		writer.WriteValue(value.y);
+		writer.WritePropertyName("z");
+		writer.WriteValue(value.z);
+		writer.WriteEndObject();
+	}
+
+	public override Vector3 ReadJson(JsonReader reader, System.Type objectType, Vector3 existingValue, bool hasExistingValue, JsonSerializer serializer)
+	{
+		float x = 0, y = 0, z = 0;
+
+		while (reader.Read())
+		{
+			if (reader.TokenType == JsonToken.PropertyName)
+			{
+				string propertyName = (string)reader.Value;
+				if (!reader.Read()) continue;
+
+				switch (propertyName)
+				{
+					case "x": x = (float)(double)reader.Value; break;
+					case "y": y = (float)(double)reader.Value; break;
+					case "z": z = (float)(double)reader.Value; break;
+				}
+			}
+			else if (reader.TokenType == JsonToken.EndObject)
+			{
+				break;
+			}
+		}
+
+		return new Vector3(x, y, z);
+	}
 }
