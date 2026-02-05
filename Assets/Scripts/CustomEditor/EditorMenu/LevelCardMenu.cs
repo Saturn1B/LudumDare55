@@ -14,11 +14,16 @@ public enum LevelCardType
 
 public class LevelCardMenu : MonoBehaviour
 {
-	[SerializeField] private GameObject topSection, bottomSection, createSection;
+	[SerializeField] private GameObject topSection, bottomSection, createSection, onlineBottomSection;
 	[SerializeField] private TMP_Text titleText;
 	[SerializeField] private Image levelImage;
 	[SerializeField] private RectTransform levelImageMask;
-	[SerializeField] private UnityEngine.UI.Button createLevelButton, deleteLevelButton;
+	[SerializeField] private UnityEngine.UI.Button createLevelButton, deleteLevelButton, likeButton;
+	[SerializeField] private Image likeImage;
+	[SerializeField] private Sprite emptyHeart, fillHeart;
+	[SerializeField] private TMP_Text likeCount;
+
+	bool isLevelLiked;
 
 	private SceneData currentSceneData;
 
@@ -29,12 +34,14 @@ public class LevelCardMenu : MonoBehaviour
 			case LevelCardType.CREATE:
 				topSection.SetActive(false);
 				bottomSection.SetActive(false);
+				onlineBottomSection.SetActive(false);
 				createSection.SetActive(true);
 				createLevelButton.onClick.AddListener(() => { createCallback?.Invoke(); });
 				break;
 			case LevelCardType.EDIT:
 				topSection.SetActive(true);
 				bottomSection.SetActive(true);
+				onlineBottomSection.SetActive(false);
 				createSection.SetActive(false);
 				titleText.text = sceneData.levelName;
 
@@ -56,6 +63,24 @@ public class LevelCardMenu : MonoBehaviour
 		}
 
 		currentSceneData = sceneData;
+	}
+	public async void SetOnlineCard(LevelData levelData)
+	{
+		topSection.SetActive(true);
+		bottomSection.SetActive(false);
+		onlineBottomSection.SetActive(true);
+		createSection.SetActive(false);
+		titleText.text = levelData.sceneData.levelName;
+
+		if (levelData != null)
+			likeButton.onClick.AddListener(() => { ToggleLikeLevelButton(levelData); });
+
+			currentSceneData = levelData.sceneData;
+		likeCount.text = levelData.likesCount.ToString();
+
+		isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
+		if(isLevelLiked)
+			likeImage.sprite = fillHeart;
 	}
 
 	Sprite LoadPNG(string filePath)
@@ -121,5 +146,24 @@ public class LevelCardMenu : MonoBehaviour
 		LevelDataTransfer.levelName = currentSceneData.levelName;
 		LevelDataTransfer.isEditing = false;
 		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
+	}
+
+	public async void ToggleLikeLevelButton(LevelData levelData)
+	{
+		await FirestoreManager.Instance.ToggleLikeLevel(levelData.uploadId);
+
+		isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
+
+		int likes = await FirestoreManager.Instance.GetLikeCount(levelData.uploadId);
+		likeCount.text = likes.ToString();
+
+		if (!isLevelLiked)
+		{
+			likeImage.sprite = emptyHeart;
+		}
+		else
+		{
+			likeImage.sprite = fillHeart;
+		}
 	}
 }

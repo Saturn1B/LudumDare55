@@ -88,7 +88,7 @@ public class LevelEditorMainMenu : MonoBehaviour
 		loadingWheel = null;
 	}
 
-	public void ActivateOnlineLevels()
+	public async void ActivateOnlineLevels()
 	{
 		ClearLevelContainer();
 
@@ -98,6 +98,14 @@ public class LevelEditorMainMenu : MonoBehaviour
 		myLevelsText.color = Color.white;
 		onlineLevelsText.text = $"-> {section2}";
 		onlineLevelsText.color = highlightButtonColor;
+
+		List<LevelData> levelsData = await FirestoreManager.Instance.GetAllLevels();
+
+		foreach (LevelData level in levelsData)
+		{
+			GameObject go = Instantiate(levelCardPrefab, cardParent);
+			go.GetComponent<LevelCardMenu>().SetOnlineCard(level);
+		}
 	}
 
 	private void ClearLevelContainer()
