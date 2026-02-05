@@ -73,3 +73,4 @@ crashlytics-build.properties
 
 #Firebase
 google-services.json
+google-services-desktop.json
