@@ -17,6 +17,8 @@ public class SaveSystem : MonoBehaviour
 
 	[SerializeField] private Undeletable[] permanentObjects;
 
+	[SerializeField] private Camera captureCamera;
+
 	public static SaveSystem Instance { get; private set; }
 
 	public static string saveFilePath;
@@ -54,11 +56,13 @@ public class SaveSystem : MonoBehaviour
 	}
 
 	[ContextMenu("Upload")]
-	public void UploadData()
+	public async void UploadData()
 	{
 		SceneData sceneData = SaveSceneData();
 
-		FindObjectOfType<FirestoreManager>().UploadLevel(sceneData);
+		Texture2D thumbnail = Capture();
+
+		await FindObjectOfType<FirestoreManager>().UploadLevel(sceneData, thumbnail);
 		SaveOnDisk(sceneData);
 	}
 
@@ -324,6 +328,27 @@ public class SaveSystem : MonoBehaviour
 		ScreenCapture.CaptureScreenshot(saveFilePath + $"{saveFileNameId}.png");
 
 		editorCanvas.enabled = true;
+	}
+
+	private Texture2D Capture()
+	{
+		RenderTexture rt = new RenderTexture(Screen.height, Screen.width, 24);
+		Texture2D texture = new Texture2D(Screen.height, Screen.width, TextureFormat.RGB24, false);
+
+		captureCamera.targetTexture = rt;
+		RenderTexture.active = rt;
+
+		captureCamera.Render();
+
+		texture.ReadPixels(new Rect(0, 0, Screen.height, Screen.width), 0, 0);
+		texture.Apply();
+
+		captureCamera.targetTexture = null;
+		RenderTexture.active = null;
+
+		Destroy(rt);
+
+		return texture;
 	}
 
 	private ModifiableObjectData SaveBaseModifiableObjectData(ModifiableObject modifiable)

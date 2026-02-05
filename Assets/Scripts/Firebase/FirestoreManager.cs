@@ -5,6 +5,8 @@ using Firebase.Firestore;
 using Firebase.Extensions;
 using Firebase.Auth;
 using System.Threading.Tasks;
+using UnityEngine.Networking;
+using System.Text;
 using Newtonsoft.Json;
 
 public class FirestoreManager : MonoBehaviour
@@ -12,6 +14,9 @@ public class FirestoreManager : MonoBehaviour
 	public static FirestoreManager Instance { get; private set; }
 
 	private FirebaseFirestore firestore;
+
+	private const string CLOUD_NAME = "dbl7f0vfr";
+	private const string UPLOAD_PRESET = "Matlab_level_thumbnails";
 
 	private void Awake()
 	{
@@ -27,15 +32,15 @@ public class FirestoreManager : MonoBehaviour
 		firestore = FirebaseFirestore.DefaultInstance;
 	}
 
-	public async Task UploadLevel(SceneData sceneData)
+	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail = null)
 	{
 		if (string.IsNullOrEmpty(sceneData.uploadId))
-			await FirstUpload(sceneData);
+			await FirstUpload(sceneData, thumbnail);
 		else
-			await UpdateUpload(sceneData);
+			await UpdateUpload(sceneData, thumbnail);
 	}
 
-	private async Task FirstUpload(SceneData sceneData)
+	private async Task FirstUpload(SceneData sceneData, Texture2D thumbnail = null)
 	{
 		string userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
 
@@ -44,6 +49,12 @@ public class FirestoreManager : MonoBehaviour
 		string uploadId = levelRef.Id;
 
 		sceneData.uploadId = uploadId;
+
+		string thumbnailUrl = null;
+		if (thumbnail != null)
+		{
+			thumbnailUrl = await UploadThumbnailAsync(thumbnail, uploadId);
+		}
 
 		LevelData levelData = new LevelData
 		{
@@ -54,7 +65,7 @@ public class FirestoreManager : MonoBehaviour
 			createdAt = Timestamp.GetCurrentTimestamp(),
 			updatedAt = Timestamp.GetCurrentTimestamp(),
 			likesCount = 0,
-			thumbnailPath = $"thumbnails/{uploadId}.png",
+			thumbnailPath = thumbnailUrl,
 			sceneData = sceneData
 		};
 
@@ -73,15 +84,25 @@ public class FirestoreManager : MonoBehaviour
 		});
 	}
 
-	private async Task UpdateUpload(SceneData sceneData)
+	private async Task UpdateUpload(SceneData sceneData, Texture2D thumbnail = null)
 	{
 		DocumentReference levelRef = firestore.Collection("levels").Document(sceneData.uploadId);
 
-		await levelRef.UpdateAsync(new Dictionary<string, object>
+		Dictionary<string, object> updates = new Dictionary<string, object>
 		{
 			{"sceneData", sceneData },
 			{"updatedAt", Timestamp.GetCurrentTimestamp() }
-		});
+		};
+
+
+		if (thumbnail != null)
+		{
+			string thumbnailUrl = await UploadThumbnailAsync(thumbnail, sceneData.uploadId);
+
+			updates["thumbnailPath"] = thumbnailUrl;
+		}
+
+		await levelRef.UpdateAsync(updates);
 	}
 
 	public async Task<List<LevelData>> GetAllLevels()
@@ -178,6 +199,58 @@ public class FirestoreManager : MonoBehaviour
 		DocumentSnapshot snapshot = await firestore.Collection("levels").Document(uploadId).GetSnapshotAsync();
 
 		return snapshot.GetValue<int>("likesCount");
+	}
+
+	public IEnumerator UploadThumbnail(Texture2D texture, string uploadId, System.Action<string> onSuccess, System.Action<string> onError)
+	{
+		byte[] imageBytes = texture.EncodeToPNG();
+
+		WWWForm form = new WWWForm();
+		form.AddBinaryData("file", imageBytes, $"{uploadId}.png", "image/png");
+		form.AddField("upload_preset", UPLOAD_PRESET);
+		form.AddField("public_id", uploadId);
+		form.AddField("folder", "level_thumbnails");
+
+		string url = $"https://api.cloudinary.com/v1_1/{CLOUD_NAME}/image/upload";
+
+		using (UnityWebRequest request = UnityWebRequest.Post(url, form))
+		{
+			yield return request.SendWebRequest();
+
+			if(request.result != UnityWebRequest.Result.Success)
+			{
+				onError?.Invoke(request.error);
+			}
+			else
+			{
+				string json = request.downloadHandler.text;
+				string secureUrl = ExtractSecureUrl(json);
+
+				onSuccess?.Invoke(secureUrl);
+			}
+		}
+	}
+
+	private string ExtractSecureUrl(string json)
+	{
+		const string key = "\"secure_url\":\"";
+		int start = json.IndexOf(key) + key.Length;
+		int end = json.IndexOf("\"", start);
+		return json.Substring(start, end - start);
+	}
+
+	private Task<string> UploadThumbnailAsync(Texture2D thumbnail, string uploadId)
+	{
+		var tcs = new TaskCompletionSource<string>();
+
+		StartCoroutine(UploadThumbnail(
+			thumbnail,
+			uploadId,
+			url => tcs.SetResult(url),
+			error => tcs.SetException(new System.Exception(error))
+		));
+
+		return tcs.Task;
 	}
 }
 
