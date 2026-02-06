@@ -79,8 +79,17 @@ public class LevelCardMenu : MonoBehaviour
 		likeCount.text = levelData.likesCount.ToString();
 
 		isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
-		if(isLevelLiked)
+		if (isLevelLiked)
 			likeImage.sprite = fillHeart;
+
+		Texture2D thumbnailTex = await FirestoreManager.Instance.LoadTextureAsync(levelData.thumbnailPath);
+		if(thumbnailTex != null)
+		{
+			Sprite sprite = Sprite.Create(thumbnailTex, new Rect(0, 0, thumbnailTex.width, thumbnailTex.height), Vector2.zero,1);
+
+			SpriteFitter(sprite , levelImage, levelImageMask);
+			levelImage.color = Color.white;
+		}
 	}
 
 	Sprite LoadPNG(string filePath)

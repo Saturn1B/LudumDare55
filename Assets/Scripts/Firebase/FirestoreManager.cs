@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,10 +51,10 @@ public class FirestoreManager : MonoBehaviour
 
 		sceneData.uploadId = uploadId;
 
-		string thumbnailUrl = null;
+		ThumbnailUploadResult thumbnailResult = null;
 		if (thumbnail != null)
 		{
-			thumbnailUrl = await UploadThumbnailAsync(thumbnail, uploadId);
+			thumbnailResult = await UploadThumbnailAsync(thumbnail, uploadId);
 		}
 
 		LevelData levelData = new LevelData
@@ -65,7 +66,8 @@ public class FirestoreManager : MonoBehaviour
 			createdAt = Timestamp.GetCurrentTimestamp(),
 			updatedAt = Timestamp.GetCurrentTimestamp(),
 			likesCount = 0,
-			thumbnailPath = thumbnailUrl,
+			thumbnailPath = thumbnailResult.secure_url,
+			thumbnailPublicId = thumbnailResult.public_id,
 			sceneData = sceneData
 		};
 
@@ -97,9 +99,10 @@ public class FirestoreManager : MonoBehaviour
 
 		if (thumbnail != null)
 		{
-			string thumbnailUrl = await UploadThumbnailAsync(thumbnail, sceneData.uploadId);
+			ThumbnailUploadResult thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId);
 
-			updates["thumbnailPath"] = thumbnailUrl;
+			updates["thumbnailPath"] = thumbnailResult.secure_url;
+			updates["thumbnailPublicId"] = thumbnailResult.public_id;
 		}
 
 		await levelRef.UpdateAsync(updates);
@@ -201,36 +204,6 @@ public class FirestoreManager : MonoBehaviour
 		return snapshot.GetValue<int>("likesCount");
 	}
 
-	public IEnumerator UploadThumbnail(Texture2D texture, string uploadId, System.Action<string> onSuccess, System.Action<string> onError)
-	{
-		byte[] imageBytes = texture.EncodeToPNG();
-
-		WWWForm form = new WWWForm();
-		form.AddBinaryData("file", imageBytes, $"{uploadId}.png", "image/png");
-		form.AddField("upload_preset", UPLOAD_PRESET);
-		form.AddField("public_id", uploadId);
-		form.AddField("folder", "level_thumbnails");
-
-		string url = $"https://api.cloudinary.com/v1_1/{CLOUD_NAME}/image/upload";
-
-		using (UnityWebRequest request = UnityWebRequest.Post(url, form))
-		{
-			yield return request.SendWebRequest();
-
-			if(request.result != UnityWebRequest.Result.Success)
-			{
-				onError?.Invoke(request.error);
-			}
-			else
-			{
-				string json = request.downloadHandler.text;
-				string secureUrl = ExtractSecureUrl(json);
-
-				onSuccess?.Invoke(secureUrl);
-			}
-		}
-	}
-
 	private string ExtractSecureUrl(string json)
 	{
 		const string key = "\"secure_url\":\"";
@@ -239,19 +212,64 @@ public class FirestoreManager : MonoBehaviour
 		return json.Substring(start, end - start);
 	}
 
-	private Task<string> UploadThumbnailAsync(Texture2D thumbnail, string uploadId)
+	private async Task<ThumbnailUploadResult> UploadThumbnailAsync(Texture2D texture, string uploadId)
 	{
-		var tcs = new TaskCompletionSource<string>();
+		string publicId = $"level_thumbnails/{uploadId}_{DateTime.UtcNow.Ticks}";
 
-		StartCoroutine(UploadThumbnail(
-			thumbnail,
-			uploadId,
-			url => tcs.SetResult(url),
-			error => tcs.SetException(new System.Exception(error))
-		));
+		byte[] imageBytes = texture.EncodeToPNG();
 
-		return tcs.Task;
+		WWWForm form = new WWWForm();
+		form.AddBinaryData("file", imageBytes, $"thumbnail.png", "image/png");
+		form.AddField("upload_preset", UPLOAD_PRESET);
+		form.AddField("public_id", publicId);
+
+		string url = $"https://api.cloudinary.com/v1_1/{CLOUD_NAME}/image/upload";
+
+		using (UnityWebRequest request = UnityWebRequest.Post(url, form))
+		{
+			var op = request.SendWebRequest();
+
+			while (!op.isDone)
+				await Task.Yield();
+
+			if (request.result != UnityWebRequest.Result.Success)
+				throw new Exception(request.error);
+
+			string json = request.downloadHandler.text;
+
+			ThumbnailUploadResult response = JsonUtility.FromJson<ThumbnailUploadResult>(json);
+
+			return response;
+		};
 	}
+
+	public async Task<Texture2D> LoadTextureAsync(string imageUrl)
+	{
+		if (string.IsNullOrEmpty(imageUrl))
+			return null;
+
+		using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl))
+		{
+			var op = request.SendWebRequest();
+
+			while (!op.isDone)
+				await Task.Yield();
+
+			if(request.result != UnityWebRequest.Result.Success)
+			{
+				Debug.LogError($"Failed to load thumbnail: {request.error}");
+				return null;
+			}
+
+			return DownloadHandlerTexture.GetContent(request);
+		}
+	}
+}
+
+public class ThumbnailUploadResult
+{
+	public string public_id;
+	public string secure_url;
 }
 
 [System.Serializable][FirestoreData]
@@ -276,6 +294,8 @@ public class LevelData
 
 	[FirestoreProperty]
 	public string thumbnailPath { get; set; }
+	[FirestoreProperty]
+	public string thumbnailPublicId { get; set; }
 
 	[FirestoreProperty]
 	public SceneData sceneData { get; set; }
