@@ -63,6 +63,9 @@ public class SaveSystem : MonoBehaviour
 		Texture2D thumbnail = Capture();
 
 		await FindObjectOfType<FirestoreManager>().UploadLevel(sceneData, thumbnail);
+
+		currentUploadId = sceneData.uploadId;
+
 		SaveOnDisk(sceneData);
 	}
 
@@ -190,8 +193,9 @@ public class SaveSystem : MonoBehaviour
 		{
 			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".json");
 			File.Delete(SaveSystem.saveFilePath + LevelDataTransfer.SceneDataToLoad.levelName + LevelDataTransfer.SceneDataToLoad.levelId + ".png");
-			LevelDataTransfer.SceneDataToLoad = sceneData;
 		}
+
+		LevelDataTransfer.SceneDataToLoad = sceneData;
 
 		System.IO.File.WriteAllText(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
 		StartCoroutine(CaptureScreen(saveFileNameId));
