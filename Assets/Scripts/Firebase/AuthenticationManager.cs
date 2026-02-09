@@ -37,6 +37,8 @@ public class AuthenticationManager : MonoBehaviour
 
 		var result = await auth.SignInAnonymouslyAsync();
 		Debug.Log($"Signed in anonymously: {result.User.UserId}");
+
+		await FirestoreManager.Instance.CleanupInvalidLevels();
 	}
 
 	private async Task CreateUser()

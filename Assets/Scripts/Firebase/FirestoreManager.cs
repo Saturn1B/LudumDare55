@@ -10,6 +10,13 @@ using UnityEngine.Networking;
 using System.Text;
 using Newtonsoft.Json;
 
+public enum LevelSortType
+{
+	LIKED = 0,
+	NEWEST = 1,
+	UPDATED = 2
+}
+
 public class FirestoreManager : MonoBehaviour
 {
 	public static FirestoreManager Instance { get; private set; }
@@ -108,9 +115,26 @@ public class FirestoreManager : MonoBehaviour
 		await levelRef.UpdateAsync(updates);
 	}
 
-	public async Task<List<LevelData>> GetAllLevels()
+	public async Task<List<LevelData>> GetAllLevels(LevelSortType sortType)
 	{
-		QuerySnapshot snapshot = await firestore.Collection("levels").GetSnapshotAsync();
+		await CleanupInvalidLevels();
+
+		Query query = firestore.Collection("levels");
+
+		switch (sortType)
+		{
+			case LevelSortType.LIKED:
+				query = query.OrderByDescending("likesCount");
+				break;
+			case LevelSortType.NEWEST:
+				query = query.OrderByDescending("createdAt");
+				break;
+			case LevelSortType.UPDATED:
+				query = query.OrderByDescending("updatedAt");
+				break;
+		}
+
+		QuerySnapshot snapshot = await query.GetSnapshotAsync();
 
 		List<LevelData> levels = new List<LevelData>();
 
@@ -262,6 +286,63 @@ public class FirestoreManager : MonoBehaviour
 			}
 
 			return DownloadHandlerTexture.GetContent(request);
+		}
+	}
+
+	public async Task DeleteLevel(string uploadId)
+	{
+		string currentUserId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+
+		DocumentReference levelRef = firestore.Collection("levels").Document(uploadId);
+
+		DocumentSnapshot levelSnap = await levelRef.GetSnapshotAsync();
+
+		if (!levelSnap.Exists)
+			throw new Exception("Level does not exist");
+
+		string authorId = levelSnap.GetValue<string>("authorId");
+
+		if (authorId != currentUserId)
+			throw new Exception("User is not the author of this level");
+
+		QuerySnapshot likesSnapshot = await levelRef.Collection("likes").GetSnapshotAsync();
+
+		WriteBatch batch = firestore.StartBatch();
+
+		DocumentReference authorRef = firestore.Collection("users").Document(authorId);
+
+		batch.Update(authorRef, new Dictionary<string, object>
+		{
+			{"uploadedLevelsCount", FieldValue.Increment(-1) }
+		});
+
+		batch.Delete(levelRef);
+
+		await batch.CommitAsync();
+	}
+
+	public async Task CleanupInvalidLevels()
+	{
+		string userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+
+		DocumentReference userRef = firestore.Collection("users").Document(userId);
+
+		CollectionReference likedLevelsRef = userRef.Collection("likedLevels");
+
+		QuerySnapshot likedLevels = await likedLevelsRef.GetSnapshotAsync();
+
+		foreach (DocumentSnapshot likedDoc in likedLevels.Documents)
+		{
+			string levelId = likedDoc.Id;
+
+			DocumentSnapshot levelSnap = await firestore.Collection("levels").Document(levelId).GetSnapshotAsync();
+
+			if (!levelSnap.Exists)
+			{
+				await likedDoc.Reference.DeleteAsync();
+
+				await userRef.UpdateAsync("likedLevelsCount", FieldValue.Increment(-1));
+			}
 		}
 	}
 }

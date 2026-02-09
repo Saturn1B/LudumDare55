@@ -14,13 +14,18 @@ public class LevelDeletion : MonoBehaviour
 	{
 		toDeleteSceneData = sceneData;
 		toDeleteCard = levelCard;
-		toDeleteText.text = $"Are you sure you want to delete this level : <color=#FFD700>{toDeleteSceneData.levelName}</color>";
+		toDeleteText.text = $"Are you sure you want to delete this level : <color=#FFD700>{toDeleteSceneData.levelName}</color>.\nYou will loose all the level data !";
+
 	}
 
-	public void DeleteLevel()
+	public async void DeleteLevel()
 	{
+		if (!string.IsNullOrEmpty(toDeleteSceneData.uploadId))
+			await FirestoreManager.Instance.DeleteLevel(toDeleteSceneData.uploadId);
+
 		File.Delete(SaveSystem.saveFilePath + toDeleteSceneData.levelName + toDeleteSceneData.levelId + ".json");
 		File.Delete(SaveSystem.saveFilePath + toDeleteSceneData.levelName + toDeleteSceneData.levelId + ".png");
+
 		Destroy(toDeleteCard);
 		ClosePanel();
 	}

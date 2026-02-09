@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using TMPro;
 using Newtonsoft.Json;
+using UnityEngine.UI;
 
 public class LevelEditorMainMenu : MonoBehaviour
 {
@@ -18,6 +19,11 @@ public class LevelEditorMainMenu : MonoBehaviour
 
 	[SerializeField] private GameObject loadingWheelPrefab;
 	private GameObject loadingWheel;
+
+	[SerializeField] private GameObject sortByPanel;
+	private LevelSortType levelSortType = LevelSortType.LIKED;
+	[SerializeField] private Image[] sortButtons;
+	[SerializeField] private Color selected, unselected;
 
 
 	private void Awake()
@@ -99,7 +105,7 @@ public class LevelEditorMainMenu : MonoBehaviour
 		onlineLevelsText.text = $"-> {section2}";
 		onlineLevelsText.color = highlightButtonColor;
 
-		List<LevelData> levelsData = await FirestoreManager.Instance.GetAllLevels();
+		List<LevelData> levelsData = await FirestoreManager.Instance.GetAllLevels(levelSortType);
 
 		foreach (LevelData level in levelsData)
 		{
@@ -121,5 +127,25 @@ public class LevelEditorMainMenu : MonoBehaviour
 	{
 		deleteLevelPopup.SetActive(true);
 		deleteLevelPopup.GetComponent<LevelDeletion>().Setup(sceneData, levelCard);
+	}
+
+	public void ToggleSortBy(bool value)
+	{
+		sortByPanel.SetActive(value);
+	}
+
+	public void SetLevelSortType(int sortType)
+	{
+		levelSortType = (LevelSortType)sortType;
+
+		for (int i = 0; i < sortButtons.Length; i++)
+		{
+			if (i == sortType)
+				sortButtons[i].color = selected;
+			else
+				sortButtons[i].color = unselected;
+		}
+
+		ActivateOnlineLevels();
 	}
 }
