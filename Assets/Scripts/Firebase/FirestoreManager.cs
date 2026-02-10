@@ -75,7 +75,8 @@ public class FirestoreManager : MonoBehaviour
 			likesCount = 0,
 			thumbnailPath = thumbnailResult.secure_url,
 			thumbnailPublicId = thumbnailResult.public_id,
-			sceneData = sceneData
+			sceneData = sceneData,
+			isDeleted = false
 		};
 
 		DocumentReference userRef = firestore.Collection("users").Document(userId);
@@ -96,6 +97,10 @@ public class FirestoreManager : MonoBehaviour
 	private async Task UpdateUpload(SceneData sceneData, Texture2D thumbnail = null)
 	{
 		DocumentReference levelRef = firestore.Collection("levels").Document(sceneData.uploadId);
+
+		DocumentSnapshot snap = await levelRef.GetSnapshotAsync();
+		if (!snap.Exists || snap.GetValue<bool>("isDeleted"))
+			throw new Exception("Cannot update a deleted level");
 
 		Dictionary<string, object> updates = new Dictionary<string, object>
 		{
@@ -119,7 +124,7 @@ public class FirestoreManager : MonoBehaviour
 	{
 		await CleanupInvalidLevels();
 
-		Query query = firestore.Collection("levels");
+		Query query = firestore.Collection("levels").WhereEqualTo("isDeleted", false);
 
 		switch (sortType)
 		{
@@ -167,6 +172,10 @@ public class FirestoreManager : MonoBehaviour
 
 		DocumentReference levelRef = firestore.Collection("levels").Document(uploadId);
 
+		DocumentSnapshot levelSnap = await levelRef.GetSnapshotAsync();
+		if (!levelSnap.Exists || levelSnap.GetValue<bool>("isDeleted"))
+			return;
+
 		DocumentReference levelLikeRef = levelRef.Collection("likes").Document(userId);
 
 		DocumentReference userRef = firestore.Collection("users").Document(userId);
@@ -184,39 +193,16 @@ public class FirestoreManager : MonoBehaviour
 			{
 				transaction.Delete(levelLikeRef);
 				transaction.Delete(userLikedLevelRef);
-
-				transaction.Update(levelRef, new Dictionary<string, object>
-				{
-					{"likesCount", FieldValue.Increment(-1) }
-				});
-
-				transaction.Update(userRef, new Dictionary<string, object>
-				{
-					{"likedLevelsCount", FieldValue.Increment(-1) }
-				});
+				transaction.Update(levelRef, "likesCount", FieldValue.Increment(-1));
+				transaction.Update(userRef, "likedLevelsCount", FieldValue.Increment(-1));
 			}
 			//Like
 			else
 			{
-				transaction.Set(levelLikeRef, new Dictionary<string, object>
-				{
-					{"likedAt", Timestamp.GetCurrentTimestamp() }
-				});
-
-				transaction.Set(userLikedLevelRef, new Dictionary<string, object>
-				{
-					{"likedAt", Timestamp.GetCurrentTimestamp() }
-				});
-
-				transaction.Update(levelRef, new Dictionary<string, object>
-				{
-					{"likesCount", FieldValue.Increment(1) }
-				});
-
-				transaction.Update(userRef, new Dictionary<string, object>
-				{
-					{"likedLevelsCount", FieldValue.Increment(1) }
-				});
+				transaction.Set(levelLikeRef, new {likedAt = Timestamp.GetCurrentTimestamp() });
+				transaction.Set(userLikedLevelRef, new {likedAt = Timestamp.GetCurrentTimestamp() });
+				transaction.Update(levelRef, "likesCount", FieldValue.Increment(1));
+				transaction.Update(userRef, "likedLevelsCount", FieldValue.Increment(1));
 			}
 		});
 	}
@@ -226,14 +212,6 @@ public class FirestoreManager : MonoBehaviour
 		DocumentSnapshot snapshot = await firestore.Collection("levels").Document(uploadId).GetSnapshotAsync();
 
 		return snapshot.GetValue<int>("likesCount");
-	}
-
-	private string ExtractSecureUrl(string json)
-	{
-		const string key = "\"secure_url\":\"";
-		int start = json.IndexOf(key) + key.Length;
-		int end = json.IndexOf("\"", start);
-		return json.Substring(start, end - start);
 	}
 
 	private async Task<ThumbnailUploadResult> UploadThumbnailAsync(Texture2D texture, string uploadId)
@@ -305,18 +283,17 @@ public class FirestoreManager : MonoBehaviour
 		if (authorId != currentUserId)
 			throw new Exception("User is not the author of this level");
 
-		QuerySnapshot likesSnapshot = await levelRef.Collection("likes").GetSnapshotAsync();
-
 		WriteBatch batch = firestore.StartBatch();
 
-		DocumentReference authorRef = firestore.Collection("users").Document(authorId);
-
-		batch.Update(authorRef, new Dictionary<string, object>
+		batch.Update(levelRef, new Dictionary<string, object>
 		{
-			{"uploadedLevelsCount", FieldValue.Increment(-1) }
+			{"isDeleted", true },
+			{"deletedAt", Timestamp.GetCurrentTimestamp() }
 		});
 
-		batch.Delete(levelRef);
+		DocumentReference userRef = firestore.Collection("users").Document(currentUserId);
+
+		batch.Update(userRef, "uploadedLevelsCount", FieldValue.Increment(-1));
 
 		await batch.CommitAsync();
 	}
@@ -327,22 +304,26 @@ public class FirestoreManager : MonoBehaviour
 
 		DocumentReference userRef = firestore.Collection("users").Document(userId);
 
-		CollectionReference likedLevelsRef = userRef.Collection("likedLevels");
+		QuerySnapshot likedLevels = await userRef.Collection("likedLevels").GetSnapshotAsync();
 
-		QuerySnapshot likedLevels = await likedLevelsRef.GetSnapshotAsync();
+		WriteBatch batch = firestore.StartBatch();
+		int removedCount = 0;
 
-		foreach (DocumentSnapshot likedDoc in likedLevels.Documents)
+		foreach (DocumentSnapshot doc in likedLevels.Documents)
 		{
-			string levelId = likedDoc.Id;
+			DocumentSnapshot levelSnap = await firestore.Collection("levels").Document(doc.Id).GetSnapshotAsync();
 
-			DocumentSnapshot levelSnap = await firestore.Collection("levels").Document(levelId).GetSnapshotAsync();
-
-			if (!levelSnap.Exists)
+			if (!levelSnap.Exists || levelSnap.GetValue<bool>("isDeleted"))
 			{
-				await likedDoc.Reference.DeleteAsync();
-
-				await userRef.UpdateAsync("likedLevelsCount", FieldValue.Increment(-1));
+				batch.Delete(doc.Reference);
+				removedCount++;
 			}
+		}
+
+		if(removedCount > 0)
+		{
+			batch.Update(userRef, "likedLevelsCount", FieldValue.Increment(-removedCount));
+			await batch.CommitAsync();
 		}
 	}
 }
@@ -380,6 +361,11 @@ public class LevelData
 
 	[FirestoreProperty]
 	public SceneData sceneData { get; set; }
+
+	[FirestoreProperty]
+	public bool isDeleted { get; set; }
+	[FirestoreProperty]
+	public Timestamp deletedAt { get; set; }
 }
 
 [System.Serializable][FirestoreData]
