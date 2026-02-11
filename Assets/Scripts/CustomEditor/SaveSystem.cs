@@ -6,6 +6,8 @@ using UnityEngine;
 using Firebase.Firestore;
 using Firebase.Extensions;
 using Newtonsoft.Json;
+using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class SaveSystem : MonoBehaviour
 {
@@ -19,11 +21,15 @@ public class SaveSystem : MonoBehaviour
 
 	[SerializeField] private Camera captureCamera;
 
+	[SerializeField] private Image uploadButtonFillImage;
+
 	public static SaveSystem Instance { get; private set; }
 
 	public static string saveFilePath;
 
 	public string currentUploadId;
+
+	public bool isUploading;
 
 	private void Awake()
 	{
@@ -58,15 +64,40 @@ public class SaveSystem : MonoBehaviour
 	[ContextMenu("Upload")]
 	public async void UploadData()
 	{
-		SceneData sceneData = SaveSceneData();
+		if (isUploading) return;
 
-		Texture2D thumbnail = Capture();
+		isUploading = true;
+		uploadButtonFillImage.fillAmount = 0f;
 
-		await FindObjectOfType<FirestoreManager>().UploadLevel(sceneData, thumbnail);
+		try
+		{
+			SceneData sceneData = SaveSceneData();
+			uploadButtonFillImage.fillAmount = 0.1f;
 
-		currentUploadId = sceneData.uploadId;
+			Texture2D thumbnail = Capture();
 
-		SaveOnDisk(sceneData);
+			await FirestoreManager.Instance.UploadLevel(sceneData, thumbnail, progress =>
+			{
+				uploadButtonFillImage.fillAmount = Mathf.Lerp(.1f, .8f, progress);
+			});
+
+			currentUploadId = sceneData.uploadId;
+
+			await SaveOnDisk(sceneData, diskProgress =>
+			{
+				uploadButtonFillImage.fillAmount = Mathf.Lerp(.8f, 1f, diskProgress);
+			});
+
+			uploadButtonFillImage.fillAmount = 1f;
+		}
+		catch (Exception e)
+		{
+			Debug.LogError(e);
+		}
+		finally
+		{
+			isUploading = false;
+		}
 	}
 
 	[ContextMenu("Save")]
@@ -169,8 +200,10 @@ public class SaveSystem : MonoBehaviour
 		return sceneData;
 	}
 
-	public void SaveOnDisk(SceneData customSceneData = null)
+	public async Task SaveOnDisk(SceneData customSceneData = null, Action<float> onProgress = null)
 	{
+		onProgress?.Invoke(0f);
+
 		SceneData sceneData;
 
 		if (customSceneData != null)
@@ -197,8 +230,16 @@ public class SaveSystem : MonoBehaviour
 
 		LevelDataTransfer.SceneDataToLoad = sceneData;
 
-		System.IO.File.WriteAllText(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
-		StartCoroutine(CaptureScreen(saveFileNameId));
+		await System.IO.File.WriteAllTextAsync(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
+
+		onProgress?.Invoke(.5f);
+
+		//StartCoroutine(CaptureScreen(saveFileNameId));
+		Texture2D screenshot = Capture();
+		byte[] pngBytes = screenshot.EncodeToPNG();
+		await File.WriteAllBytesAsync(saveFilePath + $"{saveFileNameId}.png", pngBytes);
+
+		onProgress?.Invoke(1f);
 	}
 
 	public void Load(SceneData selectedSceneData = null)
@@ -322,29 +363,17 @@ public class SaveSystem : MonoBehaviour
 		return null;
 	}
 
-	private IEnumerator CaptureScreen(string saveFileNameId)
-	{
-		yield return null;
-		editorCanvas.enabled = false;
-
-		yield return new WaitForEndOfFrame();
-
-		ScreenCapture.CaptureScreenshot(saveFilePath + $"{saveFileNameId}.png");
-
-		editorCanvas.enabled = true;
-	}
-
 	private Texture2D Capture()
 	{
-		RenderTexture rt = new RenderTexture(Screen.height, Screen.width, 24);
-		Texture2D texture = new Texture2D(Screen.height, Screen.width, TextureFormat.RGB24, false);
+		RenderTexture rt = new RenderTexture(Screen.width, Screen.height, 24);
+		Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
 
 		captureCamera.targetTexture = rt;
 		RenderTexture.active = rt;
 
 		captureCamera.Render();
 
-		texture.ReadPixels(new Rect(0, 0, Screen.height, Screen.width), 0, 0);
+		texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 		texture.Apply();
 
 		captureCamera.targetTexture = null;

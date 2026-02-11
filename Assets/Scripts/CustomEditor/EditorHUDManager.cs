@@ -45,6 +45,8 @@ public class EditorHUDManager : MonoBehaviour
 
 	public void PauseGame()
 	{
+		if (isUploading("resume")) return;
+
 		isPaused = !isPaused;
 		menuPanel.SetActive(isPaused);
 		if (isPaused)
@@ -53,22 +55,44 @@ public class EditorHUDManager : MonoBehaviour
 			ObjectPlacer.Instance.SetCurrentObject(null);
 		}
 	}
-	public void SaveLevel(bool unPause)
+	public async void SaveLevel(bool unPause)
 	{
-		SaveSystem.Instance.SaveOnDisk();
+		if (isUploading("save")) return;
+
+		await SaveSystem.Instance.SaveOnDisk();
 		if(unPause)
 			PauseGame();
 	}
+	public void UploadLevel()
+	{
+		SaveSystem.Instance.UploadData();
+	}
 	public void MainMenu()
 	{
+		if (isUploading("leave")) return;
+
 		LevelDataTransfer.isEditing = false;
 		LevelDataTransfer.SceneDataToTest = null;
 		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
 	}
 	public void TestLevel()
 	{
+		if (isUploading("test level")) return;
+
 		LevelDataTransfer.SceneDataToTest = SaveSystem.Instance.SaveSceneData();
 		SceneManager.LoadScene("PlayScene", LoadSceneMode.Single);
+	}
+
+	private bool isUploading(string action)
+	{
+		bool value = SaveSystem.Instance.isUploading;
+
+		if (value)
+		{
+			DisplayMessage.Instance.ErrorMessage($"Cannot {action} while uploading level online");
+		}
+
+		return value;
 	}
 
 	[Space]

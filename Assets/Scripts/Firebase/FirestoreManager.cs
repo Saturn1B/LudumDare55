@@ -26,7 +26,7 @@ public class FirestoreManager : MonoBehaviour
 	private const string CLOUD_NAME = "dbl7f0vfr";
 	private const string UPLOAD_PRESET = "Matlab_level_thumbnails";
 
-	private void Awake()
+	private async void Awake()
 	{
 		if (Instance != null && Instance != this)
 		{
@@ -37,18 +37,21 @@ public class FirestoreManager : MonoBehaviour
 		Instance = this;
 		DontDestroyOnLoad(gameObject);
 
+		while (!FirebaseInitializer.isReady)
+			await Task.Yield();
+
 		firestore = FirebaseFirestore.DefaultInstance;
 	}
 
-	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail = null)
+	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail, Action<float> onProgress)
 	{
 		if (string.IsNullOrEmpty(sceneData.uploadId))
-			await FirstUpload(sceneData, thumbnail);
+			await FirstUpload(sceneData, thumbnail, onProgress);
 		else
-			await UpdateUpload(sceneData, thumbnail);
+			await UpdateUpload(sceneData, thumbnail, onProgress);
 	}
 
-	private async Task FirstUpload(SceneData sceneData, Texture2D thumbnail = null)
+	private async Task FirstUpload(SceneData sceneData, Texture2D thumbnail, Action<float> onProgress)
 	{
 		string userId = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
 
@@ -61,7 +64,7 @@ public class FirestoreManager : MonoBehaviour
 		ThumbnailUploadResult thumbnailResult = null;
 		if (thumbnail != null)
 		{
-			thumbnailResult = await UploadThumbnailAsync(thumbnail, uploadId);
+			thumbnailResult = await UploadThumbnailAsync(thumbnail, uploadId, onProgress);
 		}
 
 		LevelData levelData = new LevelData
@@ -94,7 +97,7 @@ public class FirestoreManager : MonoBehaviour
 		});
 	}
 
-	private async Task UpdateUpload(SceneData sceneData, Texture2D thumbnail = null)
+	private async Task UpdateUpload(SceneData sceneData, Texture2D thumbnail, Action<float> onProgress)
 	{
 		DocumentReference levelRef = firestore.Collection("levels").Document(sceneData.uploadId);
 
@@ -111,7 +114,7 @@ public class FirestoreManager : MonoBehaviour
 
 		if (thumbnail != null)
 		{
-			ThumbnailUploadResult thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId);
+			ThumbnailUploadResult thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId, onProgress);
 
 			updates["thumbnailPath"] = thumbnailResult.secure_url;
 			updates["thumbnailPublicId"] = thumbnailResult.public_id;
@@ -214,7 +217,7 @@ public class FirestoreManager : MonoBehaviour
 		return snapshot.GetValue<int>("likesCount");
 	}
 
-	private async Task<ThumbnailUploadResult> UploadThumbnailAsync(Texture2D texture, string uploadId)
+	private async Task<ThumbnailUploadResult> UploadThumbnailAsync(Texture2D texture, string uploadId, Action<float> onProgress = null)
 	{
 		string publicId = $"level_thumbnails/{uploadId}_{DateTime.UtcNow.Ticks}";
 
@@ -232,7 +235,12 @@ public class FirestoreManager : MonoBehaviour
 			var op = request.SendWebRequest();
 
 			while (!op.isDone)
+			{
+				onProgress?.Invoke(request.uploadProgress);
 				await Task.Yield();
+			}
+
+			onProgress?.Invoke(1f);
 
 			if (request.result != UnityWebRequest.Result.Success)
 				throw new Exception(request.error);

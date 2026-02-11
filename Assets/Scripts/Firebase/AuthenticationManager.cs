@@ -13,12 +13,9 @@ public class AuthenticationManager : MonoBehaviour
 	private async void Awake()
 	{
 		DontDestroyOnLoad(gameObject);
-		var status = await FirebaseApp.CheckAndFixDependenciesAsync();
-		if(status != DependencyStatus.Available)
-		{
-			Debug.LogError($"Firebase error: {status}");
-			return;
-		}
+
+		while (!FirebaseInitializer.isReady)
+			await Task.Yield();
 
 		auth = FirebaseAuth.DefaultInstance;
 
