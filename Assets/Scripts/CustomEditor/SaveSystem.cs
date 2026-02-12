@@ -64,40 +64,14 @@ public class SaveSystem : MonoBehaviour
 	[ContextMenu("Upload")]
 	public async void UploadData()
 	{
-		if (isUploading) return;
+		SceneData sceneData = SaveSceneData();
+		Texture2D thumbnail = Capture();
 
-		isUploading = true;
-		uploadButtonFillImage.fillAmount = 0f;
+		await LevelRestService.Instance.UploadLevel(sceneData);
 
-		try
-		{
-			SceneData sceneData = SaveSceneData();
-			uploadButtonFillImage.fillAmount = 0.1f;
+		currentUploadId = sceneData.uploadId;
 
-			Texture2D thumbnail = Capture();
-
-			await FirestoreManager.Instance.UploadLevel(sceneData, thumbnail, progress =>
-			{
-				uploadButtonFillImage.fillAmount = Mathf.Lerp(.1f, .8f, progress);
-			});
-
-			currentUploadId = sceneData.uploadId;
-
-			await SaveOnDisk(sceneData, diskProgress =>
-			{
-				uploadButtonFillImage.fillAmount = Mathf.Lerp(.8f, 1f, diskProgress);
-			});
-
-			uploadButtonFillImage.fillAmount = 1f;
-		}
-		catch (Exception e)
-		{
-			Debug.LogError(e);
-		}
-		finally
-		{
-			isUploading = false;
-		}
+		SaveOnDisk(sceneData);
 	}
 
 	[ContextMenu("Save")]
@@ -110,16 +84,6 @@ public class SaveSystem : MonoBehaviour
 		foreach (var modifiable in objectInScene)
 		{
 			ModifiableObjectData objectData = SaveBaseModifiableObjectData(modifiable);
-			//ModifiableObjectData objectData = new ModifiableObjectData();
-
-			//objectData.objectId = modifiable.objectId;
-			//objectData.objectName = modifiable.gameObject.name;
-
-			//objectData.position = modifiable.transform.position;
-			//objectData.rotation = modifiable.transform.eulerAngles;
-			//objectData.scale = modifiable.transform.localScale;
-
-			//objectData.canDelete = modifiable.GetComponent<Undeletable>() == null ? false : true;
 
 			if (modifiable.hasChildObjects)
 			{
@@ -200,10 +164,8 @@ public class SaveSystem : MonoBehaviour
 		return sceneData;
 	}
 
-	public async Task SaveOnDisk(SceneData customSceneData = null, Action<float> onProgress = null)
+	public void SaveOnDisk(SceneData customSceneData = null)
 	{
-		onProgress?.Invoke(0f);
-
 		SceneData sceneData;
 
 		if (customSceneData != null)
@@ -211,11 +173,7 @@ public class SaveSystem : MonoBehaviour
 		else
 			sceneData = SaveSceneData();
 
-		string sceneDataString = JsonConvert.SerializeObject(sceneData, Formatting.Indented, new JsonSerializerSettings
-		{
-			ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-			Converters = new JsonConverter[] { new Vector3Converter() }
-		});
+		string sceneDataString = JsonUtility.ToJson(sceneData, true);
 
 		string saveFileNameId = sceneData.levelName + sceneData.levelId;
 
@@ -230,16 +188,11 @@ public class SaveSystem : MonoBehaviour
 
 		LevelDataTransfer.SceneDataToLoad = sceneData;
 
-		await System.IO.File.WriteAllTextAsync(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
+		File.WriteAllTextAsync(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
 
-		onProgress?.Invoke(.5f);
-
-		//StartCoroutine(CaptureScreen(saveFileNameId));
 		Texture2D screenshot = Capture();
 		byte[] pngBytes = screenshot.EncodeToPNG();
-		await File.WriteAllBytesAsync(saveFilePath + $"{saveFileNameId}.png", pngBytes);
-
-		onProgress?.Invoke(1f);
+		File.WriteAllBytesAsync(saveFilePath + $"{saveFileNameId}.png", pngBytes);
 	}
 
 	public void Load(SceneData selectedSceneData = null)
@@ -251,7 +204,7 @@ public class SaveSystem : MonoBehaviour
 			if (!File.Exists(saveFilePath + "SceneData.json")) return;
 
 			string sceneDataString = File.ReadAllText(saveFilePath + "SceneData.json");
-			sceneData = JsonConvert.DeserializeObject<SceneData>(sceneDataString);
+			sceneData = JsonUtility.FromJson<SceneData>(sceneDataString);
 		}
 		else
 		{
@@ -401,141 +354,38 @@ public class SaveSystem : MonoBehaviour
 	}
 }
 
-[System.Serializable][FirestoreData]
+[System.Serializable]
 public class SceneData
 {
-	[FirestoreProperty]
-	public string levelName { get; set; }
-	[FirestoreProperty]
-	public string levelId { get; set; }
-	public Vector3 camPosition { get; set; }
-	[JsonIgnore][FirestoreProperty("camPosition")]
-	private float[] camPositionSerialized
-	{
-		get => new float[] { camPosition.x, camPosition.y, camPosition.z };
-		set => camPosition = new Vector3(value[0], value[1], value[2]);
-	}
-	public Vector3 camRotation { get; set; }
-	[JsonIgnore][FirestoreProperty("camRotation")]
-	private float[] camRotationSerialized
-	{
-		get => new float[] { camRotation.x, camRotation.y, camRotation.z };
-		set => camRotation = new Vector3(value[0], value[1], value[2]);
-	}
-	[FirestoreProperty]
-	public ModifiableObjectData[] objectsInScene { get; set; }
-	[FirestoreProperty]
-	public PermanentObjectData[] permanentObjectsInScene { get; set; }
-	[FirestoreProperty]
-	public string uploadId { get; set; }
+	public string levelName;
+	public string levelId;
+	public Vector3 camPosition;
+	public Vector3 camRotation;
+	public ModifiableObjectData[] objectsInScene;
+	public PermanentObjectData[] permanentObjectsInScene;
+	public string uploadId;
 }
 
-[System.Serializable][FirestoreData]
+[System.Serializable]
 public class ModifiableObjectData
 {
-	[FirestoreProperty]
-	public string objectId { get; set; }
-	[FirestoreProperty]
-	public string objectName { get; set; }
-	public Vector3 position { get; set; }
-	[JsonIgnore][FirestoreProperty("position")]
-	private float[] positionSerialized
-	{
-		get => new float[] { position.x, position.y, position.z };
-		set => position = new Vector3(value[0], value[1], value[2]);
-	}
-	public Vector3 rotation { get; set; }
-	[JsonIgnore][FirestoreProperty("rotation")]
-	private float[] rotationSerialized
-	{
-		get => new float[] { rotation.x, rotation.y, rotation.z };
-		set => rotation = new Vector3(value[0], value[1], value[2]);
-	}
-	public Vector3 scale { get; set; }
-	[JsonIgnore][FirestoreProperty("scale")]
-	private float[] scaleSerialized
-	{
-		get => new float[] { scale.x, scale.y, scale.z };
-		set => scale = new Vector3(value[0], value[1], value[2]);
-	}
-	[FirestoreProperty]
-	public bool canDelete { get; set; }
-	[FirestoreProperty]
-	public List<string> activatorsId { get; set; }
-	[FirestoreProperty]
-	public List<string> activablesId { get; set; }
-	[FirestoreProperty]
-	public int materialType { get; set; }
-	[FirestoreProperty]
-	public int materialNumber { get; set; }
-	[FirestoreProperty]
-	public ModifiableObjectData[] childObjects { get; set; }
+	public string objectId;
+	public string objectName;
+	public Vector3 position;
+	public Vector3 rotation;
+	public Vector3 scale;
+	public bool canDelete;
+	public List<string> activatorsId = new List<string>();
+	public List<string> activablesId = new List<string>();
+	public int materialType;
+	public int materialNumber;
+	public ModifiableObjectData[] childObjects;
 }
 
-[System.Serializable][FirestoreData]
+[System.Serializable]
 public class PermanentObjectData
 {
-	public Vector3 position { get; set; }
-	[JsonIgnore][FirestoreProperty("position")]
-	private float[] positionSerialized
-	{
-		get => new float[] { position.x, position.y, position.z };
-		set => position = new Vector3(value[0], value[1], value[2]);
-	}
-	public Vector3 rotation { get; set; }
-	[JsonIgnore][FirestoreProperty("rotation")]
-	private float[] rotationSerialized
-	{
-		get => new float[] { rotation.x, rotation.y, rotation.z };
-		set => rotation = new Vector3(value[0], value[1], value[2]);
-	}
-	public Vector3 scale { get; set; }
-	[JsonIgnore][FirestoreProperty("scale")]
-	private float[] scaleSerialized
-	{
-		get => new float[] { scale.x, scale.y, scale.z };
-		set => scale = new Vector3(value[0], value[1], value[2]);
-	}
-}
-
-public class Vector3Converter : JsonConverter<Vector3>
-{
-	public override void WriteJson(JsonWriter writer, Vector3 value, JsonSerializer serializer)
-	{
-		writer.WriteStartObject();
-		writer.WritePropertyName("x");
-		writer.WriteValue(value.x);
-		writer.WritePropertyName("y");
-		writer.WriteValue(value.y);
-		writer.WritePropertyName("z");
-		writer.WriteValue(value.z);
-		writer.WriteEndObject();
-	}
-
-	public override Vector3 ReadJson(JsonReader reader, System.Type objectType, Vector3 existingValue, bool hasExistingValue, JsonSerializer serializer)
-	{
-		float x = 0, y = 0, z = 0;
-
-		while (reader.Read())
-		{
-			if (reader.TokenType == JsonToken.PropertyName)
-			{
-				string propertyName = (string)reader.Value;
-				if (!reader.Read()) continue;
-
-				switch (propertyName)
-				{
-					case "x": x = (float)(double)reader.Value; break;
-					case "y": y = (float)(double)reader.Value; break;
-					case "z": z = (float)(double)reader.Value; break;
-				}
-			}
-			else if (reader.TokenType == JsonToken.EndObject)
-			{
-				break;
-			}
-		}
-
-		return new Vector3(x, y, z);
-	}
+	public Vector3 position;
+	public Vector3 rotation;
+	public Vector3 scale;
 }

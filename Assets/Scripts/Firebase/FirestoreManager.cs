@@ -73,8 +73,8 @@ public class FirestoreManager : MonoBehaviour
 			levelName = sceneData.levelName,
 			authorId = userId,
 			authorName = null,
-			createdAt = Timestamp.GetCurrentTimestamp(),
-			updatedAt = Timestamp.GetCurrentTimestamp(),
+			//createdAt = Timestamp.GetCurrentTimestamp(),
+			//updatedAt = Timestamp.GetCurrentTimestamp(),
 			likesCount = 0,
 			thumbnailPath = thumbnailResult.secure_url,
 			thumbnailPublicId = thumbnailResult.public_id,
@@ -340,55 +340,4 @@ public class ThumbnailUploadResult
 {
 	public string public_id;
 	public string secure_url;
-}
-
-[System.Serializable][FirestoreData]
-public class LevelData
-{
-	[FirestoreProperty]
-	public string uploadId { get; set; }
-	[FirestoreProperty]
-	public string levelName { get; set; }
-	[FirestoreProperty]
-	public string authorId { get; set; }
-	[FirestoreProperty]
-	public string authorName { get; set; }
-
-	[FirestoreProperty]
-	public Timestamp createdAt { get; set; }
-	[FirestoreProperty]
-	public Timestamp updatedAt { get; set; }
-
-	[FirestoreProperty]
-	public int likesCount { get; set; }
-
-	[FirestoreProperty]
-	public string thumbnailPath { get; set; }
-	[FirestoreProperty]
-	public string thumbnailPublicId { get; set; }
-
-	[FirestoreProperty]
-	public SceneData sceneData { get; set; }
-
-	[FirestoreProperty]
-	public bool isDeleted { get; set; }
-	[FirestoreProperty]
-	public Timestamp deletedAt { get; set; }
-}
-
-[System.Serializable][FirestoreData]
-public class User
-{
-	[FirestoreProperty]
-	public string userId { get; set; }
-	[FirestoreProperty]
-	public string userName { get; set; }
-
-	[FirestoreProperty]
-	public Timestamp createdAt { get; set; }
-
-	[FirestoreProperty]
-	public int uploadedLevelsCount { get; set; }
-	[FirestoreProperty]
-	public int likedLevelsCount { get; set; }
 }

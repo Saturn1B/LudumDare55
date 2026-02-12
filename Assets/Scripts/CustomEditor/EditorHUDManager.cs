@@ -59,7 +59,7 @@ public class EditorHUDManager : MonoBehaviour
 	{
 		if (isUploading("save")) return;
 
-		await SaveSystem.Instance.SaveOnDisk();
+		SaveSystem.Instance.SaveOnDisk();
 		if(unPause)
 			PauseGame();
 	}
