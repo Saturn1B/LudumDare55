@@ -105,7 +105,7 @@ public class LevelEditorMainMenu : MonoBehaviour
 		onlineLevelsText.text = $"-> {section2}";
 		onlineLevelsText.color = highlightButtonColor;
 
-		List<LevelData> levelsData = await FirestoreManager.Instance.GetAllLevels(levelSortType);
+		List<LevelData> levelsData = await LevelRestService.Instance.GetAllLevels();
 
 		foreach (LevelData level in levelsData)
 		{

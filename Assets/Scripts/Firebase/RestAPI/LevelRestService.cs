@@ -5,13 +5,15 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Networking;
+using Newtonsoft.Json.Linq;
 
 public class LevelRestService : MonoBehaviour
 {
 	public static LevelRestService Instance;
 
-	private string projectId = "matlab-c258c";
-	private string baseUrl;
+	private const string CLOUD_NAME = "dbl7f0vfr";
+	private const string UPLOAD_PRESET = "Matlab_level_thumbnails";
 
 	private void Awake()
 	{
@@ -23,19 +25,11 @@ public class LevelRestService : MonoBehaviour
 
 		Instance = this;
 		DontDestroyOnLoad(gameObject);
-
-		baseUrl = $"https://firestore.googleapis.com/v1/projects/{projectId}/databases/(default)/documents";
 	}
 
-	private Dictionary<string, string> AuthHeader(string token)
-	{
-		return new Dictionary<string, string>
-		{
-			{ "Authorization", "Bearer " + token }
-		};
-	}
+	// UPLOAD LEVEL
 
-	public async Task UploadLevel(SceneData sceneData)
+	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail = null, Action<float> onProgress = null)
 	{
 		var user = FirebaseAuth.DefaultInstance.CurrentUser;
 		if (user == null)
@@ -46,164 +40,203 @@ public class LevelRestService : MonoBehaviour
 
 		string token = await user.TokenAsync(true);
 
-		if (string.IsNullOrEmpty(sceneData.uploadId))
+		bool isNew = string.IsNullOrEmpty(sceneData.uploadId);
+
+		if (isNew)
 			sceneData.uploadId = Guid.NewGuid().ToString();
 
-		string uploadId = sceneData.uploadId;
+		string documentUrl = FirestoreRestConfig.GetDocumentUrl("levels", sceneData.uploadId);
 
-		string postUrl = $"{baseUrl}/levels?documentId={uploadId}";
+		ThumbnailUploadResult thumbnailResult = null;
 
-		var body = new
+		if(thumbnail != null)
 		{
-			fields = new
+			thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId, onProgress);
+		}
+
+		if (isNew)
+		{
+			var levelData = ConstructLevelData(sceneData, user.UserId, thumbnailResult);
+			var firestoreFields = FirestoreSerializer.SerializeRoot(levelData);
+
+			await RestClient.Patch(new RequestHelper
 			{
-				uploadId = new { stringValue = uploadId },
-				levelName = new { stringValue = sceneData.levelName ?? "" },
-				authorId = new { stringValue = user.UserId },
-				authorName = new { stringValue = "" },
-				createdAt = new { timestampValue = DateTime.UtcNow.ToString("o") },
-				updatedAt = new { timestampValue = DateTime.UtcNow.ToString("o") },
-				likesCount = new { integerValue = "0" },
-				thumbnailPath = new { stringValue = "" },
-				thumbnailPublicId = new { stringValue = "" },
-				isDeleted = new { booleanValue = false },
-				sceneData = SceneDataToFirestore(sceneData)
-			}
-		};
-
-		await RestClient.Post(new RequestHelper
+				Uri = documentUrl,
+				Headers = FirestoreRestConfig.GetAuthHeader(token),
+				BodyString = JsonConvert.SerializeObject(new { fields = firestoreFields }),
+				ContentType = "application/json"
+			}).AsTask();
+		}
+		else
 		{
-			Uri = postUrl,
-			Headers = AuthHeader(token),
-			BodyString = JsonConvert.SerializeObject(body),
-			ContentType = "application/json"
+			var fields = new Dictionary<string, object>
+			{
+				{"sceneData", FirestoreSerializer.SerializeField(sceneData) },
+				{"updatedAt", new {timestampValue = DateTime.UtcNow.ToString("o")} }
+			};
+
+			var updateMaskFields = new List<string> { "sceneData", "updatedAt" };
+
+			if (thumbnailResult != null)
+			{
+				fields["thumbnailPath"] = new Dictionary<string, object>
+				{
+					{ "stringValue", thumbnailResult.secure_url }
+				};
+
+				fields["thumbnailPublicId"] = new Dictionary<string, object>
+				{
+					{ "stringValue", thumbnailResult.public_id }
+				};
+
+				updateMaskFields.Add("thumbnailPath");
+				updateMaskFields.Add("thumbnailPublicId");
+			}
+
+			string updateMaskQuery = string.Join("&updateMask.fieldPaths=", updateMaskFields);
+
+			await RestClient.Patch(new RequestHelper
+			{
+				Uri = documentUrl + $"?updateMask.fieldPaths={updateMaskQuery}",
+				Headers = FirestoreRestConfig.GetAuthHeader(token),
+				BodyString = JsonConvert.SerializeObject(new { fields } ),
+				ContentType = "application/json"
+			}).AsTask();
+		}
+	}
+
+	// FETCH LEVEL
+
+	public async Task<List<LevelData>> GetAllLevels()
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return null;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		string url = FirestoreRestConfig.GetDocumentUrl("levels");
+
+		var response = await RestClient.Get(new RequestHelper
+		{
+			Uri = url,
+			Headers = FirestoreRestConfig.GetAuthHeader(token)
 		}).AsTask();
 
-		Debug.Log("Level uploaded succesfully");
+		JObject json = JObject.Parse(response.Text);
+
+		if (!json.ContainsKey("documents"))
+			return new List<LevelData>();
+
+		var documents = (JArray)json["documents"];
+
+		List<LevelData> levels = new List<LevelData>();
+
+		foreach (var doc in documents)
+		{
+			LevelData level = FirestoreDeserializer.DeserializeDocument<LevelData>((JObject)doc);
+
+			if (!level.isDeleted)
+				levels.Add(level);
+		}
+
+		return levels;
+	}
+
+	// CLOUDINARY FUNCTION
+
+	private async Task<ThumbnailUploadResult> UploadThumbnailAsync(Texture2D texture, string uploadId, Action<float> onProgress = null)
+	{
+		string publicId = $"level_thumbnails/{uploadId}_{DateTime.UtcNow.Ticks}";
+
+		byte[] imageBytes = texture.EncodeToPNG();
+
+		WWWForm form = new WWWForm();
+		form.AddBinaryData("file", imageBytes, $"thumbnail.png", "image/png");
+		form.AddField("upload_preset", UPLOAD_PRESET);
+		form.AddField("public_id", publicId);
+
+		string url = $"https://api.cloudinary.com/v1_1/{CLOUD_NAME}/image/upload";
+
+		using (UnityWebRequest request = UnityWebRequest.Post(url, form))
+		{
+			var op = request.SendWebRequest();
+
+			while (!op.isDone)
+			{
+				onProgress?.Invoke(request.uploadProgress);
+				await Task.Yield();
+			}
+
+			onProgress?.Invoke(1f);
+
+			if (request.result != UnityWebRequest.Result.Success)
+				throw new Exception(request.error);
+
+			string json = request.downloadHandler.text;
+
+			ThumbnailUploadResult response = JsonUtility.FromJson<ThumbnailUploadResult>(json);
+
+			return response;
+		};
+	}
+
+	public async Task<Texture2D> LoadTextureAsync(string imageUrl)
+	{
+		if (string.IsNullOrEmpty(imageUrl))
+			return null;
+
+		using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl))
+		{
+			var op = request.SendWebRequest();
+
+			while (!op.isDone)
+				await Task.Yield();
+
+			if (request.result != UnityWebRequest.Result.Success)
+			{
+				Debug.LogError($"Failed to load thumbnail: {request.error}");
+				return null;
+			}
+
+			return DownloadHandlerTexture.GetContent(request);
+		}
 	}
 
 	// HELPER FUNCTION
 
-	private object Vector3ToFirestore(Vector3 v)
+	private LevelData ConstructLevelData(SceneData sceneData, string userId, ThumbnailUploadResult thumbnailResult)
 	{
-		return new
+		return new LevelData
 		{
-			mapValue = new
-			{
-				fields = new
-				{
-					x = new { doubleValue = v.x },
-					y = new { doubleValue = v.y },
-					z = new { doubleValue = v.z },
-				}
-			}
+			uploadId = sceneData.uploadId,
+			levelName = sceneData.levelName,
+			authorId = userId,
+			authorName = "", // you can fetch from user document later
+
+			createdAt = DateTime.UtcNow.ToString("o"),
+			updatedAt = DateTime.UtcNow.ToString("o"),
+
+			likesCount = 0,
+
+			thumbnailPath = thumbnailResult?.secure_url ?? "",
+			thumbnailPublicId = thumbnailResult?.public_id ?? "",
+
+			sceneData = sceneData,
+
+			isDeleted = false,
+			deletedAt = null
 		};
 	}
+}
 
-	private object SceneDataToFirestore(SceneData data)
-	{
-		return new
-		{
-			mapValue = new
-			{
-				fields = new
-				{
-					levelName = new { stringValue = data.levelName ?? "" },
-					levelId = new { stringValue = data.levelId ?? "" },
-					uploadId = new { stringValue = data.uploadId ?? "" },
-					camPosition = Vector3ToFirestore(data.camPosition),
-					camRotation = Vector3ToFirestore(data.camRotation),
-					objectsInScene = ModifiableArrayToFirestore(data.objectsInScene),
-					permanentObjectsInScene = PermanentArrayToFirestore(data.permanentObjectsInScene)
-				}
-			}
-		};
-	}
-
-	private object ModifiableArrayToFirestore(ModifiableObjectData[] array)
-	{
-		if (array == null || array.Length == 0)
-		{
-			return new { arrayValue = new { values = new object[] { } } };
-		}
-
-		var values = new List<object>();
-
-		foreach (var obj in array)
-		{
-			values.Add(ModifiableObjectToFirestore(obj));
-		}
-
-		return new { arrayValue = new { values } };
-	}
-
-	private object ModifiableObjectToFirestore(ModifiableObjectData obj)
-	{
-		return new
-		{
-			mapValue = new
-			{
-				fields = new
-				{
-					objectId = new { stringValue = obj.objectId ?? "" },
-					objectName = new { stringValue = obj.objectName ?? "" },
-					position = Vector3ToFirestore(obj.position),
-					rotation = Vector3ToFirestore(obj.rotation),
-					scale = Vector3ToFirestore(obj.scale),
-					canDelete = new { booleanValue = obj.canDelete },
-					materialType = new { integerValue = obj.materialType.ToString() },
-					materialNumber = new { integerValue = obj.materialNumber.ToString() },
-					activatorsId = StringListToFirestore(obj.activatorsId),
-					activablesId = StringListToFirestore(obj.activablesId),
-					childObjects = ModifiableArrayToFirestore(obj.childObjects)
-				}
-			}
-		};
-	}
-
-
-	private object StringListToFirestore(List<string> list)
-	{
-		if (list == null || list.Count == 0)
-			return new { arrayValue = new { values = new object[] { } } };
-
-		var values = new List<object>();
-
-		foreach (var s in list)
-		{
-			values.Add(new { stringValue = s });
-		}
-
-		return new { arrayValue = new { values } };
-	}
-
-	private object PermanentArrayToFirestore(PermanentObjectData[] array)
-	{
-		if (array == null || array.Length == 0)
-		{
-			return new { arrayValue = new { values = new object[] { } } };
-		}
-
-		var values = new List<object>();
-
-		foreach (var obj in array)
-		{
-			values.Add(new
-			{
-				mapValue = new
-				{
-					fields = new
-					{
-						position = Vector3ToFirestore(obj.position),
-						rotation = Vector3ToFirestore(obj.rotation),
-						scale = Vector3ToFirestore(obj.scale)
-					}
-				}
-			});
-		}
-
-		return new { arrayValue = new { values } };
-	}
+public class ThumbnailUploadResult
+{
+	public string public_id;
+	public string secure_url;
 }
 
 [Serializable]

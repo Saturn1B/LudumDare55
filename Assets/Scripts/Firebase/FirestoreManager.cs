@@ -335,9 +335,3 @@ public class FirestoreManager : MonoBehaviour
 		}
 	}
 }
-
-public class ThumbnailUploadResult
-{
-	public string public_id;
-	public string secure_url;
-}

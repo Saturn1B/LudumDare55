@@ -9,9 +9,6 @@ public class UserRestService : MonoBehaviour
 {
 	public static UserRestService Instance;
 
-	private string projectId = "matlab-c258c";
-	private string baseUrl;
-
 	private void Awake()
 	{
 		if(Instance != null && Instance != this)
@@ -22,16 +19,6 @@ public class UserRestService : MonoBehaviour
 
 		Instance = this;
 		DontDestroyOnLoad(gameObject);
-
-		baseUrl = $"https://firestore.googleapis.com/v1/projects/{projectId}/databases/(default)/documents";
-	}
-
-	private Dictionary<string, string> AuthHeader(string token)
-	{
-		return new Dictionary<string, string>
-		{
-			{"Authorization", "Bearer " + token }
-		};
 	}
 
 	public async Task CreateUserIfNeeded()
@@ -46,14 +33,14 @@ public class UserRestService : MonoBehaviour
 		string token = await user.TokenAsync(true);
 		string userId = user.UserId;
 
-		string getUrl = $"{baseUrl}/users/{userId}";
+		string getUrl = FirestoreRestConfig.GetDocumentUrl("users") + $"{userId}";
 
 		try
 		{
 			await RestClient.Get(new RequestHelper
 			{
 				Uri = getUrl,
-				Headers = AuthHeader(token)
+				Headers = FirestoreRestConfig.GetAuthHeader(token)
 			}).AsTask();
 
 			Debug.Log("User already exists");
@@ -76,12 +63,12 @@ public class UserRestService : MonoBehaviour
 			}
 		};
 
-		string postUrl = $"{baseUrl}/users?documentId={userId}";
+		string postUrl = FirestoreRestConfig.GetDocumentUrl("users") + $"?documentId={userId}";
 
 		await RestClient.Post(new RequestHelper
 		{
 			Uri = postUrl,
-			Headers = AuthHeader(token),
+			Headers = FirestoreRestConfig.GetAuthHeader(token),
 			BodyString = JsonConvert.SerializeObject(body),
 			ContentType = "application/json"
 		}).AsTask();

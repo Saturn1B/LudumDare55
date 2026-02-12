@@ -122,7 +122,8 @@ public class LevelLoader : MonoBehaviour
 		foreach (var lo in loadedObjects)
 		{
 			ModifiableObjectData currentDataSearched = lo.Value;
-			if (currentDataSearched.activablesId.Count > 0)
+
+			if (currentDataSearched.activablesId != null && currentDataSearched.activablesId.Count > 0)
 			{
 				lo.Key.GetComponent<Activator>().linkedActivable.Clear();
 				for (int i = 0; i < currentDataSearched.activablesId.Count; i++)

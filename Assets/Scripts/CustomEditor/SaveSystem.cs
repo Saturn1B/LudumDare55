@@ -67,7 +67,7 @@ public class SaveSystem : MonoBehaviour
 		SceneData sceneData = SaveSceneData();
 		Texture2D thumbnail = Capture();
 
-		await LevelRestService.Instance.UploadLevel(sceneData);
+		await LevelRestService.Instance.UploadLevel(sceneData, thumbnail);
 
 		currentUploadId = sceneData.uploadId;
 

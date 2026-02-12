@@ -75,14 +75,14 @@ public class LevelCardMenu : MonoBehaviour
 		if (levelData != null)
 			likeButton.onClick.AddListener(() => { ToggleLikeLevelButton(levelData); });
 
-			currentSceneData = levelData.sceneData;
+		currentSceneData = levelData.sceneData;
 		likeCount.text = levelData.likesCount.ToString();
 
-		isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
-		if (isLevelLiked)
-			likeImage.sprite = fillHeart;
+		//isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
+		//if (isLevelLiked)
+		//	likeImage.sprite = fillHeart;
 
-		Texture2D thumbnailTex = await FirestoreManager.Instance.LoadTextureAsync(levelData.thumbnailPath);
+		Texture2D thumbnailTex = await LevelRestService.Instance.LoadTextureAsync(levelData.thumbnailPath);
 		if(thumbnailTex != null)
 		{
 			Sprite sprite = Sprite.Create(thumbnailTex, new Rect(0, 0, thumbnailTex.width, thumbnailTex.height), Vector2.zero,1);
