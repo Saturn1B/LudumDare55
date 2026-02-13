@@ -78,9 +78,9 @@ public class LevelCardMenu : MonoBehaviour
 		currentSceneData = levelData.sceneData;
 		likeCount.text = levelData.likesCount.ToString();
 
-		//isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
-		//if (isLevelLiked)
-		//	likeImage.sprite = fillHeart;
+		isLevelLiked = await LevelRestService.Instance.HasCurrentUserLiked(levelData.uploadId);
+		if (isLevelLiked)
+			likeImage.sprite = fillHeart;
 
 		Texture2D thumbnailTex = await LevelRestService.Instance.LoadTextureAsync(levelData.thumbnailPath);
 		if(thumbnailTex != null)
@@ -159,12 +159,9 @@ public class LevelCardMenu : MonoBehaviour
 
 	public async void ToggleLikeLevelButton(LevelData levelData)
 	{
-		await FirestoreManager.Instance.ToggleLikeLevel(levelData.uploadId);
+		await LevelRestService.Instance.ToggleLike(levelData.uploadId);
 
-		isLevelLiked = await FirestoreManager.Instance.HasUserLiked(levelData.uploadId);
-
-		int likes = await FirestoreManager.Instance.GetLikeCount(levelData.uploadId);
-		likeCount.text = likes.ToString();
+		isLevelLiked = !isLevelLiked;
 
 		if (!isLevelLiked)
 		{
@@ -174,5 +171,8 @@ public class LevelCardMenu : MonoBehaviour
 		{
 			likeImage.sprite = fillHeart;
 		}
+
+		int likes = await LevelRestService.Instance.GetIntField("levels", levelData.uploadId, "likesCount");
+		likeCount.text = likes.ToString();
 	}
 }

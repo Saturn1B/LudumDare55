@@ -29,8 +29,10 @@ public class LevelRestService : MonoBehaviour
 
 	// UPLOAD LEVEL
 
-	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail = null, Action<float> onProgress = null)
+	public async Task UploadLevel(SceneData sceneData, Texture2D thumbnail, Action<float> onProgress = null)
 	{
+		onProgress?.Invoke(0f);
+
 		var user = FirebaseAuth.DefaultInstance.CurrentUser;
 		if (user == null)
 		{
@@ -49,15 +51,26 @@ public class LevelRestService : MonoBehaviour
 
 		ThumbnailUploadResult thumbnailResult = null;
 
-		if(thumbnail != null)
-		{
-			thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId, onProgress);
-		}
+		if (thumbnail != null)
+			thumbnailResult = await UploadThumbnailAsync(thumbnail, sceneData.uploadId, p => onProgress?.Invoke(p * .6f));
+		else
+			onProgress?.Invoke(.6f);
+
+		onProgress?.Invoke(.65f);
 
 		if (isNew)
 		{
 			var levelData = ConstructLevelData(sceneData, user.UserId, thumbnailResult);
 			var firestoreFields = FirestoreSerializer.SerializeRoot(levelData);
+
+			firestoreFields["createdAt"] = new Dictionary<string, object>
+			{
+				{"timestampValue", DateTime.UtcNow.ToString("o") }
+			};
+			firestoreFields["updatedAt"] = new Dictionary<string, object>
+			{
+				{"timestampValue", DateTime.UtcNow.ToString("o") }
+			};
 
 			await RestClient.Patch(new RequestHelper
 			{
@@ -66,6 +79,11 @@ public class LevelRestService : MonoBehaviour
 				BodyString = JsonConvert.SerializeObject(new { fields = firestoreFields }),
 				ContentType = "application/json"
 			}).AsTask();
+
+			onProgress?.Invoke(.85f);
+
+			await IncrementFields("users", user.UserId, "uploadedLevelsCount", 1);
+			onProgress?.Invoke(.95f);
 		}
 		else
 		{
@@ -102,7 +120,11 @@ public class LevelRestService : MonoBehaviour
 				BodyString = JsonConvert.SerializeObject(new { fields } ),
 				ContentType = "application/json"
 			}).AsTask();
+
+			onProgress?.Invoke(.95f);
 		}
+
+		onProgress?.Invoke(1f);
 	}
 
 	// FETCH LEVEL
@@ -144,6 +166,107 @@ public class LevelRestService : MonoBehaviour
 		}
 
 		return levels;
+	}
+
+	//LIKE LEVEL
+
+	public async Task ToggleLike(string levelId)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		string likeDocId = $"{user.UserId}_{levelId}";
+		string likeDocUrl = FirestoreRestConfig.GetDocumentUrl("likes", likeDocId);
+
+		bool alreadyLiked = await LikeExists(likeDocUrl, token);
+
+		if (alreadyLiked)
+		{
+			await Unlike(levelId, likeDocUrl, token, user.UserId);
+			Debug.Log("Unliked");
+		}
+		else
+		{
+			await Like(levelId, likeDocUrl, token, user.UserId);
+			Debug.Log("Liked");
+		}
+	}
+
+	private async Task<bool> LikeExists(string likeDocUrl, string token)
+	{
+		try
+		{
+			await RestClient.Get(new RequestHelper
+			{
+				Uri = likeDocUrl,
+				Headers = FirestoreRestConfig.GetAuthHeader(token)
+			}).AsTask();
+
+			return true;
+		}
+		catch
+		{
+			return false;
+		}
+	}
+
+	private async Task Like(string levelId, string likeDocUrl, string token, string userId)
+	{
+		var likeData = new
+		{
+			fields = new Dictionary<string, object>
+			{
+				{"userId", new Dictionary<string, object>{{"stringValue", userId}} },
+				{"levelId", new Dictionary<string, object>{{"stringValue", levelId}} },
+				{"createdAt", new Dictionary<string, object>{{"timestampValue", DateTime.UtcNow.ToString("o")}} }
+			}
+		};
+
+		await RestClient.Patch(new RequestHelper
+		{
+			Uri = likeDocUrl,
+			Headers = FirestoreRestConfig.GetAuthHeader(token),
+			BodyString = JsonConvert.SerializeObject(likeData),
+			ContentType = "application/json"
+		}).AsTask();
+
+		await IncrementFields("levels", levelId, "likesCount", 1);
+		await IncrementFields("users", userId, "likedLevelsCount", 1);
+	}
+
+	private async Task Unlike(string levelId, string likeDocUrl, string token, string userId)
+	{
+		await RestClient.Delete(new RequestHelper
+		{
+			Uri = likeDocUrl,
+			Headers = FirestoreRestConfig.GetAuthHeader(token)
+		}).AsTask();
+
+		await IncrementFields("levels", levelId, "likesCount", -1);
+		await IncrementFields("users", userId, "likedLevelsCount", -1);
+	}
+
+	public async Task<bool> HasCurrentUserLiked(string levelId)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return false;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		string likeDocId = $"{user.UserId}_{levelId}";
+		string likeDocUrl = FirestoreRestConfig.GetDocumentUrl("likes", likeDocId);
+
+		return await LikeExists(likeDocUrl, token);
 	}
 
 	// CLOUDINARY FUNCTION
@@ -217,8 +340,8 @@ public class LevelRestService : MonoBehaviour
 			authorId = userId,
 			authorName = "", // you can fetch from user document later
 
-			createdAt = DateTime.UtcNow.ToString("o"),
-			updatedAt = DateTime.UtcNow.ToString("o"),
+			//createdAt = DateTime.UtcNow.ToString("o"),
+			//updatedAt = DateTime.UtcNow.ToString("o"),
 
 			likesCount = 0,
 
@@ -230,6 +353,71 @@ public class LevelRestService : MonoBehaviour
 			isDeleted = false,
 			deletedAt = null
 		};
+	}
+
+	private async Task IncrementFields(string collection, string docId, string fieldName, int amount)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		int currentValue = await GetIntField(collection, docId, fieldName);
+		int newValue = Mathf.Max(0, currentValue + amount);
+
+		string url = FirestoreRestConfig.GetDocumentUrl(collection, docId) + $"?updateMask.fieldPaths={fieldName}";
+
+		var body = new
+		{
+			fields = new Dictionary<string, object>
+			{
+				{ fieldName, new Dictionary<string, object> {{"integerValue", newValue.ToString()}} }
+			}
+		};
+
+		await RestClient.Patch(new RequestHelper
+		{
+			Uri = url,
+			Headers = FirestoreRestConfig.GetAuthHeader(token),
+			BodyString = JsonConvert.SerializeObject(body),
+			ContentType = "application/json"
+		}).AsTask();
+	}
+
+	public async Task<int> GetIntField(string collection, string documentId, string fieldName)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return 0;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		string url = FirestoreRestConfig.GetDocumentUrl(collection, documentId)
+					 + $"?mask.fieldPaths={fieldName}";
+
+		var response = await RestClient.Get(new RequestHelper
+		{
+			Uri = url,
+			Headers = FirestoreRestConfig.GetAuthHeader(token)
+		}).AsTask();
+
+		JObject json = JObject.Parse(response.Text);
+
+		if (json["fields"]?[fieldName]?["integerValue"] != null)
+		{
+			return Convert.ToInt32(
+				json["fields"][fieldName]["integerValue"].ToString()
+			);
+		}
+
+		return 0;
 	}
 }
 

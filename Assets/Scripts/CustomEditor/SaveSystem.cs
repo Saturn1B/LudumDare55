@@ -64,14 +64,22 @@ public class SaveSystem : MonoBehaviour
 	[ContextMenu("Upload")]
 	public async void UploadData()
 	{
+		if (isUploading) return;
+
+		isUploading = true;
+		uploadButtonFillImage.fillAmount = 0f;
+
 		SceneData sceneData = SaveSceneData();
 		Texture2D thumbnail = Capture();
 
-		await LevelRestService.Instance.UploadLevel(sceneData, thumbnail);
+		await LevelRestService.Instance.UploadLevel(sceneData, thumbnail, progress => { uploadButtonFillImage.fillAmount = progress * .8f; });
 
 		currentUploadId = sceneData.uploadId;
 
-		SaveOnDisk(sceneData);
+		await SaveOnDisk(sceneData, diskProgress => { uploadButtonFillImage.fillAmount = .8f + diskProgress * .2f; });
+
+		uploadButtonFillImage.fillAmount = 1f;
+		isUploading = false;
 	}
 
 	[ContextMenu("Save")]
@@ -164,7 +172,7 @@ public class SaveSystem : MonoBehaviour
 		return sceneData;
 	}
 
-	public void SaveOnDisk(SceneData customSceneData = null)
+	public async Task SaveOnDisk(SceneData customSceneData = null, Action<float> onProgress = null)
 	{
 		SceneData sceneData;
 
@@ -172,6 +180,8 @@ public class SaveSystem : MonoBehaviour
 			sceneData = customSceneData;
 		else
 			sceneData = SaveSceneData();
+
+		onProgress?.Invoke(0f);
 
 		string sceneDataString = JsonUtility.ToJson(sceneData, true);
 
@@ -188,11 +198,16 @@ public class SaveSystem : MonoBehaviour
 
 		LevelDataTransfer.SceneDataToLoad = sceneData;
 
-		File.WriteAllTextAsync(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
+		await File.WriteAllTextAsync(saveFilePath + $"{saveFileNameId}.json", sceneDataString);
+
+		onProgress?.Invoke(.5f);
 
 		Texture2D screenshot = Capture();
 		byte[] pngBytes = screenshot.EncodeToPNG();
-		File.WriteAllBytesAsync(saveFilePath + $"{saveFileNameId}.png", pngBytes);
+
+		await File.WriteAllBytesAsync(saveFilePath + $"{saveFileNameId}.png", pngBytes);
+
+		onProgress?.Invoke(1f);
 	}
 
 	public void Load(SceneData selectedSceneData = null)
