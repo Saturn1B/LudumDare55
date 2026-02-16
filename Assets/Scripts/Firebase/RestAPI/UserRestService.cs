@@ -34,7 +34,7 @@ public class UserRestService : MonoBehaviour
 		string token = await user.TokenAsync(true);
 		string userId = user.UserId;
 
-		string getUrl = FirestoreRestConfig.GetDocumentUrl("users") + $"{userId}";
+		string getUrl = FirestoreRestConfig.GetDocumentUrl("users", userId);
 
 		try
 		{
@@ -47,9 +47,17 @@ public class UserRestService : MonoBehaviour
 			Debug.Log("User already exists");
 			return;
 		}
-		catch
+		catch (RequestException e)
 		{
-			Debug.Log("User does not exist. Creating...");
+			if (e.StatusCode == 404)
+			{
+				Debug.Log("User does not exist. Creating...");
+			}
+			else
+			{
+				Debug.LogError($"Unexpected error: {e.StatusCode}");
+				throw;
+			}
 		}
 
 		var body = new
