@@ -14,6 +14,7 @@ public class AuthenticationManager : MonoBehaviour
 		await InitializeFirebase();
 		await SignInAnonymously();
 		await UserRestService.Instance.CreateUserIfNeeded();
+		await UserRestService.Instance.RecalculateLikedLevelsCount();
 	}
 
 	private async Task InitializeFirebase()

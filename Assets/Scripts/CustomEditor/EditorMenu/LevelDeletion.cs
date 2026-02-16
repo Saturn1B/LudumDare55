@@ -21,7 +21,7 @@ public class LevelDeletion : MonoBehaviour
 	public async void DeleteLevel()
 	{
 		if (!string.IsNullOrEmpty(toDeleteSceneData.uploadId))
-			await FirestoreManager.Instance.DeleteLevel(toDeleteSceneData.uploadId);
+			await LevelRestService.Instance.SoftDeleteLevel(toDeleteSceneData.uploadId);
 
 		File.Delete(SaveSystem.saveFilePath + toDeleteSceneData.levelName + toDeleteSceneData.levelId + ".json");
 		File.Delete(SaveSystem.saveFilePath + toDeleteSceneData.levelName + toDeleteSceneData.levelId + ".png");

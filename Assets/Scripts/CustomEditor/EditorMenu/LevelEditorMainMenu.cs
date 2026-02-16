@@ -105,7 +105,7 @@ public class LevelEditorMainMenu : MonoBehaviour
 		onlineLevelsText.text = $"-> {section2}";
 		onlineLevelsText.color = highlightButtonColor;
 
-		List<LevelData> levelsData = await LevelRestService.Instance.GetAllLevels();
+		List<LevelData> levelsData = await LevelRestService.Instance.GetAllLevels(levelSortType);
 
 		foreach (LevelData level in levelsData)
 		{

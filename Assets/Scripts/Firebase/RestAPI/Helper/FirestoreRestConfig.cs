@@ -7,6 +7,11 @@ public static class FirestoreRestConfig
 
 	private static string BaseUrl => $"https://firestore.googleapis.com/v1/projects/{ProjectId}/databases/(default)/documents";
 
+	public static string GetBaseUrl()
+	{
+		return BaseUrl;
+	}
+
 	public static string GetDocumentUrl(string collection)
 	{
 		return $"{BaseUrl}/{collection}";

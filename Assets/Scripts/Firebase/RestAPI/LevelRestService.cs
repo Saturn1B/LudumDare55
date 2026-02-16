@@ -8,6 +8,13 @@ using System;
 using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
 
+public enum LevelSortType
+{
+	LIKED = 0,
+	NEWEST = 1,
+	UPDATED = 2
+}
+
 public class LevelRestService : MonoBehaviour
 {
 	public static LevelRestService Instance;
@@ -129,7 +136,7 @@ public class LevelRestService : MonoBehaviour
 
 	// FETCH LEVEL
 
-	public async Task<List<LevelData>> GetAllLevels()
+	public async Task<List<LevelData>> GetAllLevels(LevelSortType sortType)
 	{
 		var user = FirebaseAuth.DefaultInstance.CurrentUser;
 		if (user == null)
@@ -140,7 +147,23 @@ public class LevelRestService : MonoBehaviour
 
 		string token = await user.TokenAsync(true);
 
-		string url = FirestoreRestConfig.GetDocumentUrl("levels");
+		string orderByField = "createdAt";
+		string direction = "desc";
+
+		switch (sortType)
+		{
+			case LevelSortType.LIKED:
+				orderByField = "likesCount";
+				break;
+			case LevelSortType.NEWEST:
+				orderByField = "createdAt";
+				break;
+			case LevelSortType.UPDATED:
+				orderByField = "updatedAt";
+				break;
+		}
+
+		string url = FirestoreRestConfig.GetDocumentUrl("levels") + $"?orderBy={orderByField}%20{direction}";
 
 		var response = await RestClient.Get(new RequestHelper
 		{
@@ -267,6 +290,41 @@ public class LevelRestService : MonoBehaviour
 		string likeDocUrl = FirestoreRestConfig.GetDocumentUrl("likes", likeDocId);
 
 		return await LikeExists(likeDocUrl, token);
+	}
+
+	// DELETE LEVEL
+
+	public async Task SoftDeleteLevel(string levelId)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return;
+		}
+
+		string token = await user.TokenAsync(true);
+
+		string url = FirestoreRestConfig.GetDocumentUrl("levels", levelId) + "?updateMask.fieldPaths=isDeleted&updateMask.fieldPaths=deletedAt";
+
+		var body = new
+		{
+			fields = new Dictionary<string, object>
+			{
+				{"isDeleted", new Dictionary<string, object>{{"booleanValue", true}}},
+				{"deletedAt", new Dictionary<string, object>{{"timestampValue", DateTime.UtcNow.ToString("o")}}}
+			}
+		};
+
+		await RestClient.Patch(new RequestHelper
+		{
+			Uri = url,
+			Headers = FirestoreRestConfig.GetAuthHeader(token),
+			BodyString = JsonConvert.SerializeObject(body),
+			ContentType = "application/json"
+		}).AsTask();
+
+		await IncrementFields("users", user.UserId, "uploadedLevelsCount", -1);
 	}
 
 	// CLOUDINARY FUNCTION

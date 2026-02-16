@@ -10,13 +10,6 @@ using UnityEngine.Networking;
 using System.Text;
 using Newtonsoft.Json;
 
-public enum LevelSortType
-{
-	LIKED = 0,
-	NEWEST = 1,
-	UPDATED = 2
-}
-
 public class FirestoreManager : MonoBehaviour
 {
 	public static FirestoreManager Instance { get; private set; }
