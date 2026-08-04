@@ -25,8 +25,24 @@ public class MainMenu : MonoBehaviour
 		}
 	}
 
-	public void SwitchPanel(GameObject newPanel)
+	public async void SwitchPanel(GameObject newPanel)
 	{
+
+		if (newPanel == levelEditorPanel)
+		{
+			bool success = await AuthenticationManager.Instance.EnsureGoogleSignedInAsync();
+
+			if (success)
+			{
+				currentPanel.SetActive(false);
+				currentPanel = newPanel;
+				currentPanel.SetActive(true);
+			}
+			//else display signed in failed
+
+			return;
+		}
+
 		currentPanel.SetActive(false);
 		currentPanel = newPanel;
 		currentPanel.SetActive(true);
@@ -52,4 +68,10 @@ public class MainMenu : MonoBehaviour
 	{
 		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
 	}
+
+	//private void SetBusy(bool busy)
+	//{
+	//	if (connectingIndicator != null)
+	//		connectingIndicator.SetActive(busy);
+	//}
 }
