@@ -1,17 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-	[SerializeField] private GameObject mainPanel, creditsPanel, controlsPanel, levelEditorPanel;
+	[SerializeField] private GameObject mainPanel, creditsPanel, controlsPanel, levelEditorPanel, accountPanel;
+	[SerializeField] private TMPro.TMP_Text username, status;
+	[SerializeField] private GameObject connectingIndicator;
 	private GameObject currentPanel;
 
 	private void Start()
 	{
 		currentPanel = mainPanel;
 		currentPanel.SetActive(true);
+
+		if (AuthenticationManager.IsSignedIn && !string.IsNullOrEmpty(AuthenticationManager.CurrentUsername))
+		{
+			accountPanel.SetActive(true);
+			username.text = AuthenticationManager.CurrentUsername;
+		}
 
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
@@ -30,15 +39,32 @@ public class MainMenu : MonoBehaviour
 
 		if (newPanel == levelEditorPanel)
 		{
+			currentPanel.SetActive(false);
+
+			SetBusy(true);
+			status.gameObject.SetActive(true);
+			status.text = "CONNECTING";
+
 			bool success = await AuthenticationManager.Instance.EnsureGoogleSignedInAsync();
+
+			SetBusy(false);
 
 			if (success)
 			{
-				currentPanel.SetActive(false);
+				username.text = await AuthenticationManager.Instance.RefreshUsernameAsync();
+
+				status.gameObject.SetActive(false);
 				currentPanel = newPanel;
 				currentPanel.SetActive(true);
+				accountPanel.SetActive(true);
 			}
-			//else display signed in failed
+			else
+			{
+				status.text = "<color=red>FAILED CONNECTION</color>";
+				await Task.Delay(2500);
+				status.gameObject.SetActive(false);
+				currentPanel.SetActive(true);
+			}
 
 			return;
 		}
@@ -69,9 +95,18 @@ public class MainMenu : MonoBehaviour
 		SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
 	}
 
-	//private void SetBusy(bool busy)
-	//{
-	//	if (connectingIndicator != null)
-	//		connectingIndicator.SetActive(busy);
-	//}
+	public void LogOut()
+	{
+		accountPanel.SetActive(false);
+		AuthenticationManager.Instance.SignOut();
+
+		if (currentPanel == levelEditorPanel)
+			SwitchPanel(mainPanel);
+	}
+
+	private void SetBusy(bool busy)
+	{
+		if (connectingIndicator != null)
+			connectingIndicator.SetActive(busy);
+	}
 }

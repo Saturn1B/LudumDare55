@@ -396,7 +396,7 @@ public class LevelRestService : MonoBehaviour
 			uploadId = sceneData.uploadId,
 			levelName = sceneData.levelName,
 			authorId = userId,
-			authorName = "", // you can fetch from user document later
+			authorName = AuthenticationManager.CurrentUsername,
 
 			//createdAt = DateTime.UtcNow.ToString("o"),
 			//updatedAt = DateTime.UtcNow.ToString("o"),

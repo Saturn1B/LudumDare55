@@ -12,6 +12,9 @@ public class AuthenticationManager : MonoBehaviour
 	public static bool IsSignedIn => auth?.CurrentUser != null;
 	public static bool IsAnonymous => auth?.CurrentUser != null && auth.CurrentUser.IsAnonymous;
 
+	/// Cached locally, no network call - safe to read from UI every frame if needed.
+	public static string CurrentUsername { get; private set; } = "";
+
 	private const string GoogleRefreshTokenKey = "GoogleRefreshToken";
 
 	private async void Awake()
@@ -60,6 +63,34 @@ public class AuthenticationManager : MonoBehaviour
 		return await SignInWithGoogleFresh();
 	}
 
+	/// Re-fetches the username from Firestore (e.g. after the player edits it elsewhere)
+	/// and updates the cache. Returns the fresh value.
+	public async Task<string> RefreshUsernameAsync()
+	{
+		if (!IsSignedIn)
+		{
+			CurrentUsername = "";
+			return CurrentUsername;
+		}
+
+		CurrentUsername = await UserRestService.Instance.GetUsername();
+		return CurrentUsername;
+	}
+
+	/// Signs the player out and forgets the stored Google credential, so next time
+	/// EnsureGoogleSignedInAsync runs it prompts interactively instead of auto-connecting.
+	public void SignOut()
+	{
+		auth.SignOut();
+
+		PlayerPrefs.DeleteKey(GoogleRefreshTokenKey);
+		PlayerPrefs.Save();
+
+		CurrentUsername = "";
+
+		Debug.Log("Signed out and forgot stored credentials.");
+	}
+
 	private async Task<bool> SilentSignInAsync(string refreshToken)
 	{
 		GoogleDesktopAuth.GoogleTokens tokens;
@@ -85,6 +116,7 @@ public class AuthenticationManager : MonoBehaviour
 		await UserRestService.Instance.CreateUserIfNeeded(tokens.DisplayName);
 		await UserRestService.Instance.SyncGoogleUsernameIfNeeded(tokens.DisplayName);
 		await UserRestService.Instance.RecalculateLikedLevelsCount();
+		await RefreshUsernameAsync();
 
 		return true;
 	}
@@ -112,6 +144,7 @@ public class AuthenticationManager : MonoBehaviour
 		await UserRestService.Instance.CreateUserIfNeeded(tokens.DisplayName);
 		await UserRestService.Instance.SyncGoogleUsernameIfNeeded(tokens.DisplayName);
 		await UserRestService.Instance.RecalculateLikedLevelsCount();
+		await RefreshUsernameAsync();
 		return true;
 	}
 
@@ -143,6 +176,7 @@ public class AuthenticationManager : MonoBehaviour
 
 			await UserRestService.Instance.CreateUserIfNeeded(tokens.DisplayName);
 			await UserRestService.Instance.SyncGoogleUsernameIfNeeded(tokens.DisplayName);
+			await RefreshUsernameAsync();
 			return true;
 		}
 		catch (FirebaseAccountLinkException)
@@ -160,6 +194,7 @@ public class AuthenticationManager : MonoBehaviour
 			await UserRestService.Instance.SyncGoogleUsernameIfNeeded(tokens.DisplayName);
 			await UserRestService.Instance.RecalculateLikedLevelsCount();
 			await UserRestService.Instance.RecalculateUploadedLevelsCount();
+			await RefreshUsernameAsync();
 			return true;
 		}
 	}

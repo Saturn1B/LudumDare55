@@ -15,7 +15,7 @@ public enum LevelCardType
 public class LevelCardMenu : MonoBehaviour
 {
 	[SerializeField] private GameObject topSection, bottomSection, createSection, onlineBottomSection;
-	[SerializeField] private TMP_Text titleText;
+	[SerializeField] private TMP_Text titleText, userNameText;
 	[SerializeField] private Image levelImage;
 	[SerializeField] private RectTransform levelImageMask;
 	[SerializeField] private UnityEngine.UI.Button createLevelButton, deleteLevelButton, likeButton;
@@ -44,6 +44,7 @@ public class LevelCardMenu : MonoBehaviour
 				onlineBottomSection.SetActive(false);
 				createSection.SetActive(false);
 				titleText.text = sceneData.levelName;
+				userNameText.text = "";
 
 				if(sceneData != null)
 					deleteLevelButton.onClick.AddListener(() => { deleteCallback?.Invoke(sceneData, gameObject); });
@@ -71,6 +72,7 @@ public class LevelCardMenu : MonoBehaviour
 		onlineBottomSection.SetActive(true);
 		createSection.SetActive(false);
 		titleText.text = levelData.sceneData.levelName;
+		userNameText.text = levelData.authorName;
 
 		if (levelData != null)
 			likeButton.onClick.AddListener(() => { ToggleLikeLevelButton(levelData); });

@@ -276,6 +276,38 @@ public class UserRestService : MonoBehaviour
 		}).AsTask();
 	}
 
+	public async Task<string> GetUsername(string userId = null)
+	{
+		var user = FirebaseAuth.DefaultInstance.CurrentUser;
+		if (user == null)
+		{
+			Debug.LogError("No authenticated user.");
+			return "";
+		}
+
+		string token = await user.TokenAsync(true);
+		string targetId = userId ?? user.UserId;
+
+		string url = FirestoreRestConfig.GetDocumentUrl("users", targetId) + "?mask.fieldPaths=userName";
+
+		try
+		{
+			var response = await RestClient.Get(new RequestHelper
+			{
+				Uri = url,
+				Headers = FirestoreRestConfig.GetAuthHeader(token)
+			}).AsTask();
+
+			JObject json = JObject.Parse(response.Text);
+			return json["fields"]?["userName"]?["stringValue"]?.ToString() ?? "";
+		}
+		catch (RequestException e)
+		{
+			Debug.LogError($"Failed to fetch username: {e.StatusCode}");
+			return "";
+		}
+	}
+
 	// HELPER FUNCTION
 
 	private async Task IncrementFieldExact(string collection, string documentId, string fieldName, int value)
