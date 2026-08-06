@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
-using Firebase.Firestore;
-using Firebase.Extensions;
 using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Threading.Tasks;

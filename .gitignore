@@ -77,3 +77,7 @@ google-services-desktop.json
 
 #Google OAuth
 google-oauth-desktop.json
+
+#Cleanup scripts
+Tools/cleanup/firebase-service-account.json
+Tools/cleanup/node_modules

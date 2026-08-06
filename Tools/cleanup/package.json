@@ -1,0 +1,9 @@
+{
+  "name": "matlab-db-cleanup",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "cloudinary": "^2.0.0"
+  }
+}
