@@ -12,10 +12,7 @@ public class AuthenticationManager : MonoBehaviour
 	public static bool IsSignedIn => auth?.CurrentUser != null;
 	public static bool IsAnonymous => auth?.CurrentUser != null && auth.CurrentUser.IsAnonymous;
 
-	/// Cached locally, no network call - safe to read from UI every frame if needed.
 	public static string CurrentUsername { get; private set; } = "";
-
-	private const string GoogleRefreshTokenKey = "GoogleRefreshToken";
 
 	private async void Awake()
 	{
@@ -25,8 +22,7 @@ public class AuthenticationManager : MonoBehaviour
 
 		await InitializeFirebase();
 
-		string storedRefreshToken = PlayerPrefs.GetString(GoogleRefreshTokenKey, "");
-		if (!string.IsNullOrEmpty(storedRefreshToken))
+		if (SecureCredentialStore.TryGet(out string storedRefreshToken))
 			await SilentSignInAsync(storedRefreshToken);
 	}
 
@@ -43,18 +39,12 @@ public class AuthenticationManager : MonoBehaviour
 		auth = FirebaseAuth.DefaultInstance;
 	}
 
-	/// <summary>
-	/// Call this right before opening the level editor (or any Google-gated feature).
-	/// Silently restores a returning session if we have a stored refresh token, links
-	/// a first-time anonymous session, or opens the interactive Google sign-in.
-	/// </summary>
 	public async Task<bool> EnsureGoogleSignedInAsync()
 	{
 		if (IsSignedIn && !IsAnonymous)
 			return true;
 
-		string storedRefreshToken = PlayerPrefs.GetString(GoogleRefreshTokenKey, "");
-		if (!string.IsNullOrEmpty(storedRefreshToken) && await SilentSignInAsync(storedRefreshToken))
+		if (SecureCredentialStore.TryGet(out string storedRefreshToken) && await SilentSignInAsync(storedRefreshToken))
 			return true;
 
 		if (IsSignedIn && IsAnonymous)
@@ -63,8 +53,6 @@ public class AuthenticationManager : MonoBehaviour
 		return await SignInWithGoogleFresh();
 	}
 
-	/// Re-fetches the username from Firestore (e.g. after the player edits it elsewhere)
-	/// and updates the cache. Returns the fresh value.
 	public async Task<string> RefreshUsernameAsync()
 	{
 		if (!IsSignedIn)
@@ -77,14 +65,11 @@ public class AuthenticationManager : MonoBehaviour
 		return CurrentUsername;
 	}
 
-	/// Signs the player out and forgets the stored Google credential, so next time
-	/// EnsureGoogleSignedInAsync runs it prompts interactively instead of auto-connecting.
 	public void SignOut()
 	{
 		auth.SignOut();
 
-		PlayerPrefs.DeleteKey(GoogleRefreshTokenKey);
-		PlayerPrefs.Save();
+		SecureCredentialStore.Delete();
 
 		CurrentUsername = "";
 
@@ -102,7 +87,7 @@ public class AuthenticationManager : MonoBehaviour
 		catch (Exception e)
 		{
 			Debug.LogWarning($"Silent Google sign-in failed, will need interactive sign-in: {e.Message}");
-			PlayerPrefs.DeleteKey(GoogleRefreshTokenKey);
+			SecureCredentialStore.Delete();
 			return false;
 		}
 
@@ -204,7 +189,6 @@ public class AuthenticationManager : MonoBehaviour
 		if (string.IsNullOrEmpty(refreshToken))
 			return;
 
-		PlayerPrefs.SetString(GoogleRefreshTokenKey, refreshToken);
-		PlayerPrefs.Save();
+		SecureCredentialStore.Set(refreshToken);
 	}
 }
