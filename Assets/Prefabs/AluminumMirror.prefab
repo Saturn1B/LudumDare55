@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5684988971006347462
 Transform:
   m_ObjectHideFlags: 0
@@ -212,7 +212,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7257123070549896147
 Transform:
   m_ObjectHideFlags: 0
@@ -511,7 +511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2383072074280490492
 Transform:
   m_ObjectHideFlags: 0
@@ -600,7 +600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1040321263335188164
 Transform:
   m_ObjectHideFlags: 0
@@ -788,6 +788,7 @@ GameObject:
   - component: {fileID: 6185921106835697839}
   - component: {fileID: 8859501645291464359}
   - component: {fileID: -2986388639273254534}
+  - component: {fileID: 960830790965109138}
   m_Layer: 0
   m_Name: AluminumMirror
   m_TagString: Object
@@ -880,6 +881,19 @@ MonoBehaviour:
   platform: {fileID: 0}
   receiver: {fileID: 0}
   objectImage: {fileID: 21300000, guid: 2fa5f7672800d2b44b0630bf9212da54, type: 3}
+--- !u!114 &960830790965109138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7646132291893047476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad29a123faf1a846b5cf905ee89f248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  laserPrefab: {fileID: 465205289376615288, guid: 5b78c4160ee14f240807bfe968a33035, type: 3}
 --- !u!1001 &7423965577951101645
 PrefabInstance:
   m_ObjectHideFlags: 0

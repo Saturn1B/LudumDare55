@@ -18,7 +18,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8043991039363994546
 Transform:
   m_ObjectHideFlags: 0
@@ -203,6 +203,7 @@ GameObject:
   - component: {fileID: 6185921106835697839}
   - component: {fileID: 8859501645291464359}
   - component: {fileID: -7105836848751200302}
+  - component: {fileID: 481323963487902392}
   m_Layer: 0
   m_Name: GlassCube
   m_TagString: Object
@@ -292,6 +293,19 @@ MonoBehaviour:
   platform: {fileID: 0}
   receiver: {fileID: 0}
   objectImage: {fileID: 21300000, guid: 97f26bc7f70a08b4f90878e6b2778c1b, type: 3}
+--- !u!114 &481323963487902392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7646132291893047476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32bb0cebbd16e04685a4264096aeffd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  laserPrefab: {fileID: 465205289376615288, guid: 5b78c4160ee14f240807bfe968a33035, type: 3}
 --- !u!1001 &1185561273595190235
 PrefabInstance:
   m_ObjectHideFlags: 0

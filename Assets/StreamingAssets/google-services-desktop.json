@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "425325775159",
+    "project_id": "matlab-c258c",
+    "storage_bucket": "matlab-c258c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425325775159:android:5ba56b3918d90734bdf2b2",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.MATLAB"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "425325775159-p109jk0kcqt4n7crc6fq6656td23r0ji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-Z_QwwIc4W7EIcgiDU8-FJW2fo6YrzsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "425325775159-p109jk0kcqt4n7crc6fq6656td23r0ji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
