@@ -2,11 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaterialDispenser : MonoBehaviour
+public class MaterialDispenser : MonoBehaviour, IInteractable
 {
-	private bool hasPlayer;
-	private Transform playerTransform;
-
 	[SerializeField] private Materials dispenserMaterial;
 	[SerializeField, Range(0, 5)] private int availableMaterial;
 
@@ -42,36 +39,23 @@ public class MaterialDispenser : MonoBehaviour
 		center.GetComponent<MeshRenderer>().material = availableMaterial <= 0 ? matOff[(int)dispenserMaterial - 1] : matOn[(int)dispenserMaterial - 1];
 	}
 
-	private void Update()
+	public void Interact(Transform user)
 	{
-		if(hasPlayer && Input.GetKeyDown(KeyCode.E) && availableMaterial > 0)
+		if (availableMaterial > 0)
 		{
-			if(!playerTransform.GetComponentInChildren<CreationGun>().SwitchMaterials(dispenserMaterial)) return;
+			if (!user.GetComponentInChildren<CreationGun>().SwitchMaterials(dispenserMaterial)) return;
 			availableMaterial--;
-			if (availableMaterial <= 0)
-				HUDManager.Instance.HideIndication();
+
 			UpdateGraph();
 		}
 	}
 
-	private void OnTriggerEnter(Collider other)
+	public void EndInteraction()
 	{
-		if (other.CompareTag("Player"))
-		{
-			hasPlayer = true;
-			playerTransform = other.transform;
-			if(availableMaterial > 0)
-				HUDManager.Instance.DiplayIndication();
-		}
 	}
 
-	private void OnTriggerExit(Collider other)
+	public bool CanInteract()
 	{
-		if (other.CompareTag("Player"))
-		{
-			hasPlayer = false;
-			playerTransform = null;
-			HUDManager.Instance.HideIndication();
-		}
+		return availableMaterial > 0;
 	}
 }
