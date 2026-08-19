@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PressurePlate : Activator
+public class PressurePlate : Activator, IPlayerDetector
 {
 	private int objectCounter;
 	[SerializeField] private Animator animator;
@@ -19,13 +19,28 @@ public class PressurePlate : Activator
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if (collision.transform.CompareTag("Player") || collision.transform.CompareTag("Object"))
+		if (collision.transform.CompareTag("Object"))
 		{
-			if (collision.transform.CompareTag("Object"))
-			{
-				collision.transform.GetComponent<Object>().plate = this;
-			}
+			collision.transform.GetComponent<Object>().plate = this;
 
+			CollisionDetect(true);
+		}
+	}
+
+	private void OnCollisionExit(Collision collision)
+	{
+		if (collision.transform.CompareTag("Object"))
+		{
+			collision.transform.GetComponent<Object>().plate = null;
+
+			CollisionDetect(false);
+		}
+	}
+
+	private void CollisionDetect(bool entering)
+	{
+		if (entering)
+		{
 			if (objectCounter == 0)
 			{
 				animator.Play("Base Layer.PlateDown", 0, 0);
@@ -33,17 +48,8 @@ public class PressurePlate : Activator
 			}
 			objectCounter++;
 		}
-	}
-
-	private void OnCollisionExit(Collision collision)
-	{
-		if (collision.transform.CompareTag("Player") || collision.transform.CompareTag("Object"))
+		else
 		{
-			if (collision.transform.CompareTag("Object"))
-			{
-				collision.transform.GetComponent<Object>().plate = null;
-			}
-
 			objectCounter--;
 			if (objectCounter == 0)
 			{
@@ -51,5 +57,15 @@ public class PressurePlate : Activator
 				PowerDown();
 			}
 		}
+	}
+
+	public void StartDetection(Transform player)
+	{
+		CollisionDetect(true);
+	}
+
+	public void EndDetection()
+	{
+		CollisionDetect(false);
 	}
 }

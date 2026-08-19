@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    [SerializeField] private MovingPlatform platform;
+	[SerializeField] private MovingPlatform platform;
 
 	public List<Transform> objectOnPlatform = new List<Transform>();
-
 
 	private void OnTriggerEnter(Collider other)
 	{
@@ -19,12 +18,9 @@ public class Platform : MonoBehaviour
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		if(collision.transform.CompareTag("Player") || collision.transform.CompareTag("Object"))
+		if (collision.transform.CompareTag("Object"))
 		{
-			if (collision.transform.CompareTag("Object"))
-			{
-				collision.transform.GetComponent<Object>().platform = this;
-			}
+			collision.transform.GetComponent<Object>().platform = this;
 
 			objectOnPlatform.Add(collision.transform);
 		}
@@ -32,12 +28,9 @@ public class Platform : MonoBehaviour
 
 	private void OnCollisionExit(Collision collision)
 	{
-		if (collision.transform.CompareTag("Player") || collision.transform.CompareTag("Object"))
+		if (collision.transform.CompareTag("Object"))
 		{
-			if (collision.transform.CompareTag("Object"))
-			{
-				collision.transform.GetComponent<Object>().platform = null;
-			}
+			collision.transform.GetComponent<Object>().platform = null;
 
 			objectOnPlatform.Remove(collision.transform);
 		}

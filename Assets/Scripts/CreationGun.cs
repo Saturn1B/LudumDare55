@@ -46,7 +46,8 @@ public class CreationGun : MonoBehaviour
 
 	private void Update()
 	{
-		shoulder.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, 0, 0);
+		if(shoulder != null)
+			shoulder.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, 0, 0);
 
 		RaycastHit hit;
 		//Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * 100, Color.red, 1);
@@ -62,7 +63,7 @@ public class CreationGun : MonoBehaviour
 
 				Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
 				GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
-				go.transform.localEulerAngles = playerCamera.transform.parent.localEulerAngles;
+				go.transform.localEulerAngles = playerCamera.transform.parent.parent.localEulerAngles;
 				materials = Materials.EMPTY;
 				foreach (var ring in rings)
 				{
@@ -92,7 +93,7 @@ public class CreationGun : MonoBehaviour
 			Vector3 summonPoint = barrelEnd.transform.position + barrelEnd.transform.forward * offset.z;
 
 			GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
-			go.transform.localEulerAngles = playerCamera.transform.parent.localEulerAngles;
+			go.transform.localEulerAngles = playerCamera.transform.parent.parent.localEulerAngles;
 			go.GetComponent<Rigidbody>().AddForce(playerCamera.transform.forward * 20, ForceMode.Impulse);
 
 			materials = Materials.EMPTY;

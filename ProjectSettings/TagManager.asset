@@ -9,6 +9,7 @@ TagManager:
   - PlatformEndPoint
   - Kill
   - Laser
+  - MovingPlatform
   layers:
   - Default
   - TransparentFX
