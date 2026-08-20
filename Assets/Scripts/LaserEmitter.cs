@@ -5,8 +5,11 @@ using UnityEngine;
 public class LaserEmitter : MonoBehaviour
 {
 	[SerializeField] private Transform laser;
+	public bool safe;
 	[SerializeField] private LayerMask layer;
 	private IReflectiveSurface currentReflector;
+	public LaserReceiver receiver;
+
 
 	private void Update()
 	{
@@ -47,6 +50,10 @@ public class LaserEmitter : MonoBehaviour
 
 	private void OnDestroy()
 	{
+		if(receiver != null)
+		{
+			receiver.GlobalPowerDown();
+		}
 		if(currentReflector != null)
 		{
 			currentReflector.RemoveReflection(this);

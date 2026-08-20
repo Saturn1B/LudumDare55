@@ -14,6 +14,7 @@ public class LaserReceiver : Activator
 		if (other.CompareTag("Laser"))
 		{
 			other.GetComponentInParent<Object>().receiver = this;
+			other.GetComponentInParent<LaserEmitter>().receiver = this;
 
 			PowerUp();
 			centerRenderer.material = on;
@@ -26,6 +27,7 @@ public class LaserReceiver : Activator
 		if (other.CompareTag("Laser"))
 		{
 			other.GetComponentInParent<Object>().receiver = null;
+			other.GetComponentInParent<LaserEmitter>().receiver = null;
 
 			PowerDown();
 			centerRenderer.material = off;

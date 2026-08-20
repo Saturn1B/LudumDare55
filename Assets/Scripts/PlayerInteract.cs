@@ -65,9 +65,14 @@ public class PlayerInteract : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("Kill") || other.CompareTag("Laser"))
+		if (other.CompareTag("Kill"))
 		{
 			SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+		}
+		if (other.TryGetComponent(out LaserEmitter laser))
+		{
+			if(!laser.safe)
+				SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 		}
 	}
 }

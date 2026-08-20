@@ -213,6 +213,10 @@ public class CharacterMovement : MonoBehaviour
 					lastPlatformPosition = activePlatform.position;
 				}
 			}
+			if(hit.transform.TryGetComponent(out JumpPad jumpPad))
+			{
+				velocity.y = 10;
+			}
 		}
 	}
 }

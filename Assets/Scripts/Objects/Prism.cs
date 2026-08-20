@@ -4,7 +4,7 @@ using UnityEngine;
 public class Prism : MonoBehaviour, IReflectiveSurface
 {
     [SerializeField] private GameObject laserPrefab;
-    [SerializeField] private float spawnOffset = 0.05f;
+    [SerializeField] private float spawnOffset = 0.01f;
 
     private static readonly float[] angles = { 0f, 90f, -90f };
 
@@ -29,39 +29,47 @@ public class Prism : MonoBehaviour, IReflectiveSurface
         for (int i = 0; i < angles.Length; i++)
         {
             Vector3 castDir = Quaternion.AngleAxis(angles[i], transform.up) * baseDir;
-            Vector3 exitPoint = GetExitPoint(castDir);
+            RefractedRayData exitPoint = GetExitPoint(castDir);
 
-            // derive the real travel direction from the geometry itself,
-            // instead of reusing castDir (which may not exactly match)
-            Vector3 travelDir = (exitPoint - transform.position).normalized;
-            Vector3 spawnPos = exitPoint + travelDir * spawnOffset;
+			// derive the real travel direction from the geometry itself,
+			// instead of reusing castDir (which may not exactly match)
+			Debug.DrawRay(hitPosition, hitNormal, Color.green, 1);
+
+            Vector3 spawnPos = exitPoint.spawnPos + exitPoint.spawnDir * spawnOffset;
 
             if (lasers[i] == null)
             {
-                lasers[i] = Instantiate(laserPrefab, spawnPos, Quaternion.LookRotation(travelDir), this.transform);
+                lasers[i] = Instantiate(laserPrefab, spawnPos, Quaternion.LookRotation(exitPoint.spawnDir), this.transform);
             }
             else
             {
                 lasers[i].transform.position = spawnPos;
-                lasers[i].transform.rotation = Quaternion.LookRotation(travelDir);
+                lasers[i].transform.rotation = Quaternion.LookRotation(exitPoint.spawnDir);
             }
         }
     }
 
     // finds where the ray exits the prism collider on the far side of its center
-    private Vector3 GetExitPoint(Vector3 direction)
+    private RefractedRayData GetExitPoint(Vector3 direction)
     {
         float castDistance = 100f;
         Vector3 farPoint = transform.position + direction * castDistance;
-        Ray ray = new Ray(farPoint, -direction);
+		Ray ray = new Ray(farPoint, -direction);
 
-        if (prismCollider.Raycast(ray, out RaycastHit exitHit, castDistance * 2f))
-        {
-            return exitHit.point;
+        RefractedRayData refractedRay = new RefractedRayData();
+
+		if (prismCollider.Raycast(ray, out RaycastHit exitHit, castDistance * 2f))
+		{
+			refractedRay.spawnPos = exitHit.point;
+            refractedRay.spawnDir = exitHit.normal;
+
+            Debug.DrawRay(exitHit.point, Vector3.up, Color.green, 1);
+            Debug.DrawRay(exitHit.point, exitHit.normal, Color.green, 1);
+            return refractedRay;
         }
 
         // fallback, shouldn't normally trigger for a convex collider
-        return transform.position;
+        return refractedRay;
     }
 
     public void RemoveReflection(LaserEmitter source)
@@ -75,4 +83,10 @@ public class Prism : MonoBehaviour, IReflectiveSurface
             reflections.Remove(source);
         }
     }
+
+    class RefractedRayData
+	{
+        public Vector3 spawnPos;
+        public Vector3 spawnDir;
+	}
 }

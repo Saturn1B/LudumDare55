@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laser: {fileID: 2974746746604622585}
+  safe: 0
   layer:
     serializedVersion: 2
     m_Bits: 128
@@ -242,6 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laser: {fileID: 1184211972082591327}
+  safe: 0
   layer:
     serializedVersion: 2
     m_Bits: 128
@@ -541,6 +543,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laser: {fileID: 388781299756212417}
+  safe: 0
   layer:
     serializedVersion: 2
     m_Bits: 128
@@ -630,6 +633,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laser: {fileID: 584465007702747586}
+  safe: 0
   layer:
     serializedVersion: 2
     m_Bits: 128
@@ -894,6 +898,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laserPrefab: {fileID: 465205289376615288, guid: 5b78c4160ee14f240807bfe968a33035, type: 3}
+  laserHarmlessPrefab: {fileID: 465205289376615288, guid: d7517d8ef8726214488642e35e1f571e, type: 3}
 --- !u!1001 &7423965577951101645
 PrefabInstance:
   m_ObjectHideFlags: 0

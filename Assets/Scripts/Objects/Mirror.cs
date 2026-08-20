@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Mirror : MonoBehaviour, IReflectiveSurface
 {
-	[SerializeField] private GameObject laserPrefab;
+	[SerializeField] private GameObject laserPrefab, laserHarmlessPrefab;
 	private Dictionary<LaserEmitter, GameObject> reflections = new Dictionary<LaserEmitter, GameObject>();
 
 	public void GenerateReflection(LaserEmitter source, Vector3 hitPosition, Vector3 hitNormal, Vector3 incomingDirection, Vector3 direction)
@@ -16,7 +16,8 @@ public class Mirror : MonoBehaviour, IReflectiveSurface
 		}
 		else
 		{
-			GameObject newLaser = Instantiate(laserPrefab, hitPosition, Quaternion.LookRotation(direction), this.transform);
+			GameObject toInstantiate = source.safe ? laserHarmlessPrefab : laserPrefab;
+			GameObject newLaser = Instantiate(toInstantiate, hitPosition, Quaternion.LookRotation(direction), this.transform);
 			reflections[source] = newLaser;
 		}
 	}
