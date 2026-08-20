@@ -15,8 +15,13 @@ public class CharacterMovement : MonoBehaviour
 	[SerializeField] private float sprintSpeed;
 	[SerializeField] private float crouchSpeed;
 	[SerializeField] private float jumpHeight;
+	[Tooltip("How strongly input can steer velocity while airborne. Low = Portal-like momentum preservation.")]
+	[SerializeField] private float airControl = 2f;
+	[Tooltip("Soft cap on horizontal speed gained purely from air control (momentum from jumps/falls can still exceed this).")]
+	[SerializeField] private float maxAirSpeed = 6f;
 
 	[Header("Crouch")]
+	[SerializeField] private bool canCrouch;
 	[SerializeField] private float standingHeight;
 	[SerializeField] private float crouchingHeight;
 
@@ -60,7 +65,8 @@ public class CharacterMovement : MonoBehaviour
 
 		HandlePlatformMovement();
 		HandleMovement();
-		HandleCrouch();
+		if (canCrouch)
+			HandleCrouch();
 	}
 
 	private void HandlePlatformMovement()
@@ -86,18 +92,39 @@ public class CharacterMovement : MonoBehaviour
 
 	private void HandleMovement()
 	{
-		float currentSpeed = isCrouching ? crouchSpeed : Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
+		bool grounded = characterController.isGrounded || activePlatform != null;
 
-		float horizontal = Input.GetAxis("Horizontal") * currentSpeed;
-		float vertical = Input.GetAxis("Vertical") * currentSpeed;
+		float horizontal = Input.GetAxis("Horizontal");
+		float vertical = Input.GetAxis("Vertical");
 
-		Vector3 moveDirection = new Vector3(horizontal, 0.0f, vertical);
-		moveDirection = transform.rotation * moveDirection;
+		Vector3 inputDirection = transform.rotation * new Vector3(horizontal, 0.0f, vertical);
 
 		HandleJump();
 
-		velocity.x = moveDirection.x;
-		velocity.z = moveDirection.z;
+		if (grounded)
+		{
+			float currentSpeed = isCrouching ? crouchSpeed : Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
+			Vector3 moveDirection = inputDirection * currentSpeed;
+
+			velocity.x = moveDirection.x;
+			velocity.z = moveDirection.z;
+		}
+		else
+		{
+			Vector3 horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
+			Vector3 addedVelocity = inputDirection * airControl * Time.deltaTime;
+
+			Vector3 newHorizontalVelocity = horizontalVelocity + addedVelocity;
+
+			if (newHorizontalVelocity.magnitude > horizontalVelocity.magnitude &&
+				newHorizontalVelocity.magnitude > maxAirSpeed)
+			{
+				newHorizontalVelocity = newHorizontalVelocity.normalized * Mathf.Max(maxAirSpeed, horizontalVelocity.magnitude);
+			}
+
+			velocity.x = newHorizontalVelocity.x;
+			velocity.z = newHorizontalVelocity.z;
+		}
 
 		characterController.Move(velocity * Time.deltaTime);
 	}
