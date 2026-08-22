@@ -1,0 +1,77 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DispenserNumberCommand : ICommand<DispenserEditor>
+{
+	public string actionDescription => $"Change dispenser number to {afterMaterialNumber.ToString()}";
+
+	private GameObject target;
+	private string targetId;
+	private int beforeMaterialNumber;
+	private int afterMaterialNumber;
+
+	public DispenserNumberCommand(GameObject target, string targetId, int beforeMaterialNumber, int afterMaterialNumber)
+	{
+		this.target = target;
+		this.targetId = targetId;
+		this.beforeMaterialNumber = beforeMaterialNumber;
+		this.afterMaterialNumber = afterMaterialNumber;
+	}
+
+	public DispenserEditor Execute(bool isRedo)
+	{
+		CheckTarget();
+
+		if (isRedo)
+		{
+			ObjectSelection.Instance.DeselectObject();
+			EditorHUDManager.Instance.CloseDispenserEditor();
+			EditorHUDManager.Instance.CloseInteractionEditor();
+		}
+
+		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
+		targetDispenserEditor.SetNumber(afterMaterialNumber);
+
+		if (afterMaterialNumber > 0)
+			targetDispenserEditor.SwitchWarningSignState(false);
+		else
+			targetDispenserEditor.SwitchWarningSignState(true);
+
+		return targetDispenserEditor;
+	}
+
+	void ICommandBase.Execute(bool isRedo) => Execute(isRedo);
+
+	public void Undo()
+	{
+		CheckTarget();
+
+		ObjectSelection.Instance.DeselectObject();
+		EditorHUDManager.Instance.CloseDispenserEditor();
+		EditorHUDManager.Instance.CloseInteractionEditor();
+
+		DispenserEditor targetDispenserEditor = target.GetComponent<DispenserEditor>();
+		targetDispenserEditor.SetNumber(beforeMaterialNumber);
+
+		if (beforeMaterialNumber > 0)
+			targetDispenserEditor.SwitchWarningSignState(false);
+		else
+			targetDispenserEditor.SwitchWarningSignState(true);
+	}
+
+	private void CheckTarget()
+	{
+		if (target == null && !string.IsNullOrEmpty(targetId))
+		{
+			foreach (var obj in SaveSystem.Instance.objectInScene)
+			{
+				if (obj.objectId == targetId)
+				{
+					target = obj.gameObject;
+					return;
+				}
+			}
+		}
+	}
+}

@@ -10,6 +10,8 @@ public class LevelVoice : MonoBehaviour
 
 	private void Start()
 	{
+		if (clip == null) return;
+
 		source = GetComponent<AudioSource>();
 
 		if (!PlayerPrefs.HasKey(SceneManager.GetActiveScene().name) || PlayerPrefs.GetInt(SceneManager.GetActiveScene().name) == 0)

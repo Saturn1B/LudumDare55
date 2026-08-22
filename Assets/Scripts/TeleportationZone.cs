@@ -12,7 +12,12 @@ public class TeleportationZone : MonoBehaviour
 		if (other.CompareTag("Player"))
 		{
 			if (!string.IsNullOrEmpty(nextScene))
-				SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
+			{
+				if(LevelDataTransfer.isEditing == false)
+					SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
+				else
+					SceneManager.LoadScene("EditorScene", LoadSceneMode.Single);
+			}
 			//else
 				//TO DO ending panel
 		}

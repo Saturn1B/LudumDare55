@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class Activator : MonoBehaviour
 {
-	[SerializeField] Activable linkedActivable;
+	public List<Activable> linkedActivable = new List<Activable>();
 
 	protected virtual void PowerUp()
 	{
-		linkedActivable.isPowered = true;
+		foreach (var activable in linkedActivable)
+		{
+			activable.isPowered = true;
+		}
 	}
 
 	protected virtual void PowerDown()
 	{
-		linkedActivable.isPowered = false;
+		foreach (var activable in linkedActivable)
+		{
+			activable.isPowered = false;
+		}
 	}
 }

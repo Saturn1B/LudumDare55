@@ -479,8 +479,8 @@ MonoBehaviour:
   m_text: 'You''ve finished all of our test chambers. I know there weren''t a lot
     of them, but we were out of budget. Apparently investing all of our money on
     NFTs wasn''t the best idea. Also you may ask yourself why you are not hearing
-    my voice. Well it''s simple, it''s because we had to sell the microphhone to
-    recover our *little* debt.
+    my voice. Well it''s simple, it''s because we had to sell the microphone to recover
+    our *little* debt.
 
     On that note, thanks for playing !'
   m_isRightToLeft: 0
@@ -1083,6 +1083,7 @@ MonoBehaviour:
   mainPanel: {fileID: 952115058}
   creditsPanel: {fileID: 0}
   controlsPanel: {fileID: 0}
+  levelEditorPanel: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Activable : MonoBehaviour
 {
-    [SerializeField] protected bool needPower;
+    public bool needPower;
     [HideInInspector] public bool isPowered;
 
 	private void Update()

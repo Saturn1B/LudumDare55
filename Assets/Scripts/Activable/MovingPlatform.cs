@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MovingPlatform : Activable
 {
-	[SerializeField] private Transform pointA, pointB;
+	public Transform pointA, pointB;
 	[SerializeField] private Platform platform;
 	[SerializeField] private float speed;
 	public bool reverse;

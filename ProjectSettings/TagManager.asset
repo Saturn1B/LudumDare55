@@ -9,7 +9,7 @@ TagManager:
   - PlatformEndPoint
   - Kill
   - Laser
-  - MovingPlatform
+  - Selectable
   layers:
   - Default
   - TransparentFX
@@ -19,11 +19,11 @@ TagManager:
   - UI
   - Ground
   - Laser
+  - Gizmo
   - Gun
-  - 
-  - 
-  - 
-  - 
+  - SpawnPoint
+  - OverSpawnPoint
+  - GhostObject
   - 
   - 
   - 
