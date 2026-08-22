@@ -16,7 +16,7 @@ public class MainMenu : MonoBehaviour
 		currentPanel = mainPanel;
 		currentPanel.SetActive(true);
 
-		if (AuthenticationManager.IsSignedIn && !string.IsNullOrEmpty(AuthenticationManager.CurrentUsername))
+		if (accountPanel != null && AuthenticationManager.IsSignedIn && !string.IsNullOrEmpty(AuthenticationManager.CurrentUsername))
 		{
 			accountPanel.SetActive(true);
 			username.text = AuthenticationManager.CurrentUsername;

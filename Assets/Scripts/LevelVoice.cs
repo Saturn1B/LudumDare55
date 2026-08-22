@@ -22,6 +22,7 @@ public class LevelVoice : MonoBehaviour
 
 	private IEnumerator PlayAudio()
 	{
+		Debug.Log("play clip");
 		source.PlayOneShot(clip);
 		yield return new WaitForSeconds(clip.length);
 		PlayerPrefs.SetInt(SceneManager.GetActiveScene().name, 1);

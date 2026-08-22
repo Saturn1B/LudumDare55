@@ -19,6 +19,8 @@ public class CharacterMovement : MonoBehaviour
 	[SerializeField] private float airControl = 2f;
 	[Tooltip("Soft cap on horizontal speed gained purely from air control (momentum from jumps/falls can still exceed this).")]
 	[SerializeField] private float maxAirSpeed = 6f;
+	[Tooltip("Speed added, in the belt's forward direction, each frame the player is standing on a Belt.")]
+	[SerializeField] private float beltForce = 16f;
 
 	[Header("Crouch")]
 	[SerializeField] private bool canCrouch;
@@ -42,6 +44,10 @@ public class CharacterMovement : MonoBehaviour
 	private Vector3 lastPlatformPosition;
 	private bool isTouchingPlatformThisFrame;
 
+	private bool isOnBelt;
+	private Vector3 beltDirection = Vector3.zero;
+	private bool isTouchingBeltThisFrame;
+
 	private void Start()
 	{
 		characterController = GetComponent<UnityEngine.CharacterController>();
@@ -64,6 +70,7 @@ public class CharacterMovement : MonoBehaviour
 		}
 
 		HandlePlatformMovement();
+		HandleBeltState();
 		HandleMovement();
 		if (canCrouch)
 			HandleCrouch();
@@ -88,6 +95,12 @@ public class CharacterMovement : MonoBehaviour
 
 			isTouchingPlatformThisFrame = false;
 		}
+	}
+
+	private void HandleBeltState()
+	{
+		isOnBelt = isTouchingBeltThisFrame;
+		isTouchingBeltThisFrame = false;
 	}
 
 	private void HandleMovement()
@@ -126,6 +139,12 @@ public class CharacterMovement : MonoBehaviour
 			velocity.z = newHorizontalVelocity.z;
 		}
 
+		if (isOnBelt)
+		{
+			velocity.x += beltDirection.x * beltForce;
+			velocity.z += beltDirection.z * beltForce;
+		}
+
 		characterController.Move(velocity * Time.deltaTime);
 	}
 
@@ -138,6 +157,11 @@ public class CharacterMovement : MonoBehaviour
 
 		transform.eulerAngles = new Vector3(0.0f, yaw, 0.0f);
 		playerCamera.transform.localEulerAngles = new Vector3(pitch, 0.0f, 0.0f);
+	}
+
+	public void SetYPlayerAngle(Vector3 newAngle)
+	{
+		yaw = newAngle.y;
 	}
 
 	private void HandleJump()
@@ -213,9 +237,14 @@ public class CharacterMovement : MonoBehaviour
 					lastPlatformPosition = activePlatform.position;
 				}
 			}
-			if(hit.transform.TryGetComponent(out JumpPad jumpPad))
+			if (hit.transform.TryGetComponent(out JumpPad jumpPad))
 			{
 				velocity.y = 10;
+			}
+			if (hit.transform.TryGetComponent(out Belt belt))
+			{
+				isTouchingBeltThisFrame = true;
+				beltDirection = hit.transform.forward;
 			}
 		}
 	}

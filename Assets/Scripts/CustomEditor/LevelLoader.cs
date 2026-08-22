@@ -59,13 +59,13 @@ public class LevelLoader : MonoBehaviour
 		int j = 0;
 		foreach (var permanentData in sceneData.permanentObjectsInScene)
 		{
-			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null || permanentObjects[j].transform.GetComponent<CharacterController>() != null)
+			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null || permanentObjects[j].transform.GetComponent<CharacterMovement>() != null)
 				permanentObjects[j].transform.position = permanentData.position + Vector3.up;
 			else
 				permanentObjects[j].transform.position = permanentData.position;
 
-			if (permanentObjects[j].transform.GetComponent<CharacterController>() != null)
-				permanentObjects[j].transform.GetComponent<CharacterController>().SetYPlayerAngle(permanentData.rotation);
+			if (permanentObjects[j].transform.GetComponent<CharacterMovement>() != null)
+				permanentObjects[j].transform.GetComponent<CharacterMovement>().SetYPlayerAngle(permanentData.rotation);
 			else
 				permanentObjects[j].transform.eulerAngles = permanentData.rotation;
 

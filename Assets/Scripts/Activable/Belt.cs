@@ -37,10 +37,9 @@ public class Belt : Activable
 	{
 		if (moveBelt)
 		{
-			if (collision.transform.CompareTag("Player") || collision.transform.CompareTag("Object"))
+			if (collision.transform.CompareTag("Object"))
 			{
 				collision.rigidbody.AddForce(transform.forward * 200, ForceMode.Force);
-				Debug.Log("MOVE PLAYER");
 			}
 		}
 	}
