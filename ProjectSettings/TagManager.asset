@@ -10,6 +10,7 @@ TagManager:
   - Kill
   - Laser
   - Selectable
+  - MovingPlatform
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - SpawnPoint
   - OverSpawnPoint
   - GhostObject
-  - 
+  - SummonedObject
   - 
   - 
   - 

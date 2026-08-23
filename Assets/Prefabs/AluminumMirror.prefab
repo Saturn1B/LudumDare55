@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8463721129601888193}
   - component: {fileID: 2917051144950452670}
   - component: {fileID: 8803976420434371595}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MirrorSide (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,6 +52,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 128
+  receiver: {fileID: 0}
 --- !u!65 &2917051144950452670
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -102,7 +103,7 @@ GameObject:
   - component: {fileID: 7357064505473565389}
   - component: {fileID: 6895307556368483719}
   - component: {fileID: 2306792925223736406}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Laser
   m_TagString: Laser
   m_Icon: {fileID: 0}
@@ -207,7 +208,7 @@ GameObject:
   - component: {fileID: 7662433312900802371}
   - component: {fileID: 7288128527849699468}
   - component: {fileID: 8224823173068994657}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MirrorSide (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -247,6 +248,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 128
+  receiver: {fileID: 0}
 --- !u!65 &7288128527849699468
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -297,7 +299,7 @@ GameObject:
   - component: {fileID: 8800329264581627663}
   - component: {fileID: 2720462000613881623}
   - component: {fileID: 5853571232531155354}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Laser
   m_TagString: Laser
   m_Icon: {fileID: 0}
@@ -402,7 +404,7 @@ GameObject:
   - component: {fileID: 5200907900643318806}
   - component: {fileID: 8995812545735927608}
   - component: {fileID: 1488751811244334029}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Laser
   m_TagString: Laser
   m_Icon: {fileID: 0}
@@ -507,7 +509,7 @@ GameObject:
   - component: {fileID: 3211958221413983545}
   - component: {fileID: 2818252754929634136}
   - component: {fileID: 6713134720838222212}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MirrorSide (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -547,6 +549,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 128
+  receiver: {fileID: 0}
 --- !u!65 &2818252754929634136
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -597,7 +600,7 @@ GameObject:
   - component: {fileID: 1764949751774395998}
   - component: {fileID: 5316056738393306506}
   - component: {fileID: 8337965061938653418}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MirrorSide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -637,6 +640,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 128
+  receiver: {fileID: 0}
 --- !u!65 &5316056738393306506
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -687,7 +691,7 @@ GameObject:
   - component: {fileID: 4450357067540033966}
   - component: {fileID: 7790697762879656182}
   - component: {fileID: 1150669678794259880}
-  m_Layer: 7
+  m_Layer: 13
   m_Name: Laser
   m_TagString: Laser
   m_Icon: {fileID: 0}
@@ -793,7 +797,7 @@ GameObject:
   - component: {fileID: 8859501645291464359}
   - component: {fileID: -2986388639273254534}
   - component: {fileID: 960830790965109138}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: AluminumMirror
   m_TagString: Object
   m_Icon: {fileID: 0}
@@ -849,7 +853,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7646132291893047476}
   serializedVersion: 4
-  m_Mass: 100
+  m_Mass: 7
   m_Drag: 2
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -866,7 +870,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &-2986388639273254534
 MonoBehaviour:
@@ -954,6 +958,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ac51b3a4ca5e53b489c2e0e74a944dbb, type: 3}
       propertyPath: m_Name
       value: Box
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ac51b3a4ca5e53b489c2e0e74a944dbb, type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

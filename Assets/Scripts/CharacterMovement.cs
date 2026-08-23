@@ -15,11 +15,9 @@ public class CharacterMovement : MonoBehaviour
 	[SerializeField] private float sprintSpeed;
 	[SerializeField] private float crouchSpeed;
 	[SerializeField] private float jumpHeight;
-	[Tooltip("How strongly input can steer velocity while airborne. Low = Portal-like momentum preservation.")]
 	[SerializeField] private float airControl = 2f;
-	[Tooltip("Soft cap on horizontal speed gained purely from air control (momentum from jumps/falls can still exceed this).")]
 	[SerializeField] private float maxAirSpeed = 6f;
-	[Tooltip("Speed added, in the belt's forward direction, each frame the player is standing on a Belt.")]
+	[SerializeField] private float airDrag = 0.3f;
 	[SerializeField] private float beltForce = 16f;
 
 	[Header("Crouch")]
@@ -135,6 +133,8 @@ public class CharacterMovement : MonoBehaviour
 				newHorizontalVelocity = newHorizontalVelocity.normalized * Mathf.Max(maxAirSpeed, horizontalVelocity.magnitude);
 			}
 
+			newHorizontalVelocity *= Mathf.Exp(-airDrag * Time.deltaTime);
+
 			velocity.x = newHorizontalVelocity.x;
 			velocity.z = newHorizontalVelocity.z;
 		}
@@ -223,6 +223,8 @@ public class CharacterMovement : MonoBehaviour
 		return Mathf.Clamp(angle, min, max);
 	}
 
+	float pushPower = .5f;
+
 	private void OnControllerColliderHit(ControllerColliderHit hit)
 	{
 		if (hit.moveDirection.y < -0.9f && hit.normal.y > 0.5f)
@@ -247,5 +249,15 @@ public class CharacterMovement : MonoBehaviour
 				beltDirection = hit.transform.forward;
 			}
 		}
+
+		Rigidbody body = hit.collider.attachedRigidbody;
+
+		if (body == null || body.isKinematic) return;
+
+		if (hit.moveDirection.y < -0.3f) return;
+
+		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+
+		body.AddForceAtPosition(pushDir * pushPower, hit.point, ForceMode.Impulse);
 	}
 }

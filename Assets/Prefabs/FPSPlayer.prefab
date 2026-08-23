@@ -617,6 +617,65 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &7423488710169156461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6019417467841095004}
+  - component: {fileID: 4467752128430705277}
+  m_Layer: 8
+  m_Name: Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6019417467841095004
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7423488710169156461}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8250175596996399936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &4467752128430705277
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7423488710169156461}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7531670489593797412
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +813,7 @@ Transform:
   m_Children:
   - {fileID: 6401066524519442614}
   - {fileID: 7970622944365648182}
+  - {fileID: 6019417467841095004}
   m_Father: {fileID: 3559126284466455040}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4203387692335683638
@@ -794,6 +854,13 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 128
+  summonObjectLayer:
+    serializedVersion: 2
+    m_Bits: 8192
+  spring: 500
+  damper: 50
+  maxForce: 250
+  baseRotationSpeed: 3000
 --- !u!1 &8230363674662915736
 GameObject:
   m_ObjectHideFlags: 0
@@ -952,7 +1019,8 @@ MonoBehaviour:
   crouchSpeed: 2
   jumpHeight: 4.25
   airControl: 30
-  maxAirSpeed: 4
+  maxAirSpeed: 12
+  airDrag: 4
   beltForce: 8
   canCrouch: 0
   standingHeight: 2

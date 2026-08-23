@@ -34,8 +34,23 @@ public class CreationGun : MonoBehaviour
 
 	[SerializeField] private LayerMask layer;
 
+	[Header("Object pick up")]
+	[SerializeField] private LayerMask summonObjectLayer;
+	[SerializeField] private float spring = 500f;
+	[SerializeField] private float damper = 50f;
+	[SerializeField] private float maxForce = 250f;
+	[SerializeField] private float baseRotationSpeed;
+	private Rigidbody holder;
+	private Transform currentpickedUp;
+	private ConfigurableJoint currentJoint;
+	private float holdDistance;
+	private float currentYaw;
+	private float yawVelocity;
+
 	private void Start()
 	{
+		holder = GetComponentInChildren<Rigidbody>();
+
 		foreach (var ring in rings)
 		{
 			ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
@@ -46,7 +61,32 @@ public class CreationGun : MonoBehaviour
 
 	private void Update()
 	{
-		if(shoulder != null)
+		if (currentpickedUp != null)
+		{
+			Vector3 targetPos = playerCamera.transform.position + playerCamera.transform.forward * holdDistance;
+			holder.MovePosition(targetPos);
+
+			//Rotate picked object with mouse wheel
+			float scroll = Input.mouseScrollDelta.y;
+
+			float currentMass = Mathf.Sqrt(currentpickedUp.GetComponent<Rigidbody>().mass);
+
+			if (Mathf.Abs(scroll) > .01f)
+			{
+				yawVelocity += (scroll * 20) / currentMass;
+			}
+
+			float maxSpeedForMass = 2000 / currentMass;
+			yawVelocity = Mathf.Clamp(yawVelocity, -maxSpeedForMass, maxSpeedForMass);
+
+			yawVelocity = Mathf.Lerp(yawVelocity, 0f, 3 * Time.deltaTime);
+
+			currentYaw += yawVelocity * Time.deltaTime;
+
+			holder.transform.rotation =  Quaternion.AngleAxis(currentYaw, Vector3.up);
+		}
+
+		if (shoulder != null)
 			shoulder.transform.localEulerAngles = new Vector3(playerCamera.transform.localEulerAngles.x, 0, 0);
 
 		RaycastHit hit;
@@ -54,7 +94,7 @@ public class CreationGun : MonoBehaviour
 		if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out hit, 100, ~layer))
 		{
 			//Right clic
-			if (Input.GetKeyDown(KeyCode.Mouse1) && materials != Materials.EMPTY)
+			if (currentpickedUp == null && Input.GetKeyDown(KeyCode.Mouse1) && materials != Materials.EMPTY)
 			{
 				Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
 
@@ -73,7 +113,7 @@ public class CreationGun : MonoBehaviour
 			}
 
 			//Middle clic
-			if (Input.GetKeyDown(KeyCode.Mouse2) && hit.transform.CompareTag("Object"))
+			if (currentpickedUp == null && Input.GetKeyDown(KeyCode.Mouse2) && hit.transform.CompareTag("Object"))
 			{
 				if (materials == Materials.EMPTY)
 				{
@@ -84,8 +124,19 @@ public class CreationGun : MonoBehaviour
 		}
 
 		//Left clic
-		if (Input.GetKeyDown(KeyCode.Mouse0) && materials != Materials.EMPTY)
+		if (Input.GetKeyDown(KeyCode.Mouse0))
 		{
+			Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+			if (Physics.Raycast(ray, out RaycastHit hit2, 5, summonObjectLayer))
+			{
+				Debug.Log("pickObject");
+				PickUp(hit2.transform.gameObject);
+				return;
+			}
+
+			if (materials == Materials.EMPTY) return;
+
 			Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
 
 			Vector3 offset = objectSize * 0.5f;
@@ -102,6 +153,12 @@ public class CreationGun : MonoBehaviour
 				ring.GetComponent<MeshRenderer>().material = ringColor[(int)materials];
 			}
 			objectIcon.sprite = emptyIcon;
+		}
+
+		//Release left clic
+		if (currentpickedUp != null && Input.GetKeyUp(KeyCode.Mouse0))
+		{
+			Release();
 		}
 
 		if (materials != Materials.EMPTY)
@@ -150,5 +207,40 @@ public class CreationGun : MonoBehaviour
 		}
 
 		return true;
+	}
+
+	private void PickUp(GameObject toPickUp)
+	{
+		holdDistance = Vector3.Distance(playerCamera.transform.position, toPickUp.transform.position);
+
+		Vector3 targetPos = playerCamera.transform.position + playerCamera.transform.forward * holdDistance;
+		holder.transform.position = targetPos;
+
+		currentJoint = toPickUp.AddComponent<ConfigurableJoint>();
+
+		currentJoint.connectedBody = holder;
+
+		currentJoint.autoConfigureConnectedAnchor = false;
+		currentJoint.anchor = Vector3.zero;
+		currentJoint.connectedAnchor = Vector3.zero;
+
+		JointDrive drive = new JointDrive { positionSpring = spring, positionDamper = damper, maximumForce = maxForce };
+		currentJoint.xDrive = drive;
+		currentJoint.yDrive = drive;
+		currentJoint.zDrive = drive;
+
+		currentJoint.angularXDrive = drive;
+		currentJoint.slerpDrive = drive;
+		currentJoint.rotationDriveMode = RotationDriveMode.Slerp;
+
+		currentpickedUp = toPickUp.transform;
+	}
+
+	private void Release()
+	{
+		Destroy(currentJoint);
+		currentpickedUp = null;
+		holder.transform.localPosition = Vector3.zero;
+		currentYaw = 0;
 	}
 }

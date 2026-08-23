@@ -69,9 +69,10 @@ public class PlayerInteract : MonoBehaviour
 		{
 			SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 		}
-		if (other.TryGetComponent(out LaserEmitter laser))
+		if (other.CompareTag("Laser"))
 		{
-			if(!laser.safe)
+
+			if(!other.transform.GetComponentInParent<LaserEmitter>().safe)
 				SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 		}
 	}
