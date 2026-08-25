@@ -243,7 +243,7 @@ public class CharacterMovement : MonoBehaviour
 			{
 				velocity.y = 10;
 			}
-			if (hit.transform.TryGetComponent(out Belt belt))
+			if (hit.transform.TryGetComponent(out Belt belt) && belt.isPowered)
 			{
 				isTouchingBeltThisFrame = true;
 				beltDirection = hit.transform.forward;

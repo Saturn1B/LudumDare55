@@ -59,8 +59,15 @@ public class LevelLoader : MonoBehaviour
 		int j = 0;
 		foreach (var permanentData in sceneData.permanentObjectsInScene)
 		{
-			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null || permanentObjects[j].transform.GetComponent<CharacterMovement>() != null)
+			if(permanentObjects[j].transform.GetComponent<TeleportationZone>() != null)
 				permanentObjects[j].transform.position = permanentData.position + Vector3.up;
+			else if (permanentObjects[j].transform.TryGetComponent(out UnityEngine.CharacterController characterMovement))
+			{
+				characterMovement.enabled = false;
+				Debug.Log(permanentData.position + Vector3.up);
+				characterMovement.transform.position = permanentData.position + Vector3.up * 1.25f;
+				characterMovement.enabled = true;
+			}
 			else
 				permanentObjects[j].transform.position = permanentData.position;
 
