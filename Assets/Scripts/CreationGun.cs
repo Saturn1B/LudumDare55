@@ -47,9 +47,12 @@ public class CreationGun : MonoBehaviour
 	private float currentYaw;
 	private float yawVelocity;
 
+	private CharacterMovement characterMovement;
+
 	private void Start()
 	{
 		holder = GetComponentInChildren<Rigidbody>();
+		characterMovement = GetComponentInParent<CharacterMovement>();
 
 		foreach (var ring in rings)
 		{
@@ -83,7 +86,7 @@ public class CreationGun : MonoBehaviour
 
 			currentYaw += yawVelocity * Time.deltaTime;
 
-			holder.transform.rotation =  Quaternion.AngleAxis(currentYaw, Vector3.up);
+			holder.transform.rotation = Quaternion.AngleAxis(currentYaw, Vector3.up);
 		}
 
 		if (shoulder != null)
@@ -97,11 +100,13 @@ public class CreationGun : MonoBehaviour
 			if (currentpickedUp == null && Input.GetKeyDown(KeyCode.Mouse1) && materials != Materials.EMPTY)
 			{
 				Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
-
 				Vector3 offset = objectSize * 0.5f;
-				var offsety = objectSize.y * 0.5f;
 
 				Vector3 summonPoint = hit.point + hit.normal * offset.magnitude;
+				Quaternion summonRotation = Quaternion.Euler(playerCamera.transform.parent.parent.localEulerAngles);
+
+				if (!IsSpaceFree(summonPoint, summonRotation, offset)) return;
+
 				GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
 				go.transform.localEulerAngles = playerCamera.transform.parent.parent.localEulerAngles;
 				materials = Materials.EMPTY;
@@ -138,10 +143,12 @@ public class CreationGun : MonoBehaviour
 			if (materials == Materials.EMPTY) return;
 
 			Vector3 objectSize = prefabObject.GetComponentInChildren<Renderer>().bounds.size;
-
 			Vector3 offset = objectSize * 0.5f;
 
 			Vector3 summonPoint = barrelEnd.transform.position + barrelEnd.transform.forward * offset.z;
+			Quaternion summonRotation = Quaternion.Euler(playerCamera.transform.parent.parent.localEulerAngles);
+
+			if (!IsSpaceFree(summonPoint, summonRotation, offset)) return;
 
 			GameObject go = Instantiate(currentObject[currentIndex[(int)materials - 1]], summonPoint, Quaternion.identity);
 			go.transform.localEulerAngles = playerCamera.transform.parent.parent.localEulerAngles;
@@ -175,6 +182,13 @@ public class CreationGun : MonoBehaviour
 
 			objectIcon.sprite = currentObject[currentIndex[(int)materials - 1]].GetComponent<Object>().objectImage;
 		}
+	}
+
+	private bool IsSpaceFree(Vector3 position, Quaternion rotation, Vector3 halfExtents)
+	{
+		Collider[] overlaps = Physics.OverlapBox(position, halfExtents * 0.95f, rotation, ~layer, QueryTriggerInteraction.Ignore);
+		Debug.Log(overlaps.Length);
+		return overlaps.Length == 0;
 	}
 
 	public bool SwitchMaterials(Materials newMat)
@@ -234,6 +248,7 @@ public class CreationGun : MonoBehaviour
 		currentJoint.rotationDriveMode = RotationDriveMode.Slerp;
 
 		currentpickedUp = toPickUp.transform;
+		characterMovement.SetHeldObject(toPickUp.transform);
 	}
 
 	private void Release()
@@ -242,5 +257,6 @@ public class CreationGun : MonoBehaviour
 		currentpickedUp = null;
 		holder.transform.localPosition = Vector3.zero;
 		currentYaw = 0;
+		characterMovement.SetHeldObject(null);
 	}
 }

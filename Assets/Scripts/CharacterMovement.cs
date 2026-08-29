@@ -13,12 +13,15 @@ public class CharacterMovement : MonoBehaviour
 	[Header("Player Movement")]
 	[SerializeField] private float moveSpeed;
 	[SerializeField] private float sprintSpeed;
+	[SerializeField] private bool canSprint;
 	[SerializeField] private float crouchSpeed;
 	[SerializeField] private float jumpHeight;
 	[SerializeField] private float airControl = 2f;
 	[SerializeField] private float maxAirSpeed = 6f;
 	[SerializeField] private float airDrag = 0.3f;
 	[SerializeField] private float beltForce = 16f;
+	[Tooltip("A collision normal with y below this is treated as a wall (not floor/ramp) for air-collision speed cancellation.")]
+	[SerializeField] private float wallNormalYThreshold = 0.3f;
 
 	[Header("Crouch")]
 	[SerializeField] private bool canCrouch;
@@ -46,6 +49,10 @@ public class CharacterMovement : MonoBehaviour
 	private Vector3 beltDirection = Vector3.zero;
 	private bool isTouchingBeltThisFrame;
 
+	private Transform currentlyHeldObject;
+	private bool isGroundedValid;
+	private bool isTouchingValidGroundThisFrame;
+
 	private void Start()
 	{
 		characterController = GetComponent<UnityEngine.CharacterController>();
@@ -69,6 +76,7 @@ public class CharacterMovement : MonoBehaviour
 
 		HandlePlatformMovement();
 		HandleBeltState();
+		HandleGroundedState();
 		HandleMovement();
 		if (canCrouch)
 			HandleCrouch();
@@ -103,7 +111,7 @@ public class CharacterMovement : MonoBehaviour
 
 	private void HandleMovement()
 	{
-		bool grounded = characterController.isGrounded || activePlatform != null;
+		bool grounded = isGroundedValid || activePlatform != null;
 
 		float horizontal = Input.GetAxis("Horizontal");
 		float vertical = Input.GetAxis("Vertical");
@@ -114,7 +122,7 @@ public class CharacterMovement : MonoBehaviour
 
 		if (grounded)
 		{
-			float currentSpeed = isCrouching ? crouchSpeed : Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : moveSpeed;
+			float currentSpeed = isCrouching ? crouchSpeed : Input.GetKey(KeyCode.LeftShift) && canSprint ? sprintSpeed : moveSpeed;
 			Vector3 moveDirection = inputDirection * currentSpeed;
 
 			velocity.x = moveDirection.x;
@@ -166,7 +174,7 @@ public class CharacterMovement : MonoBehaviour
 
 	private void HandleJump()
 	{
-		bool grounded = characterController.isGrounded || activePlatform != null;
+		bool grounded = isGroundedValid || activePlatform != null;
 
 		if (grounded)
 		{
@@ -227,8 +235,28 @@ public class CharacterMovement : MonoBehaviour
 
 	private void OnControllerColliderHit(ControllerColliderHit hit)
 	{
-		if (hit.moveDirection.y < -0.9f && hit.normal.y > 0.5f)
+		bool grounded = characterController.isGrounded || activePlatform != null;
+
+		bool isHeldObject = currentlyHeldObject != null && hit.collider.transform == currentlyHeldObject;
+
+		if (!grounded && hit.normal.y < wallNormalYThreshold)
 		{
+			Vector3 horizontalVelocity = new Vector3(velocity.x, 0f, velocity.z);
+			Vector3 horizontalNormal = new Vector3(hit.normal.x, 0f, hit.normal.z).normalized;
+
+			float velocityIntoWall = Vector3.Dot(horizontalVelocity, horizontalNormal);
+			if (velocityIntoWall < 0f)
+			{
+				Vector3 cancelledVelocity = horizontalVelocity - horizontalNormal * velocityIntoWall;
+				velocity.x = cancelledVelocity.x;
+				velocity.z = cancelledVelocity.z;
+			}
+		}
+
+		if (hit.moveDirection.y < -0.9f && hit.normal.y > 0.5f && !isHeldObject)
+		{
+			isTouchingValidGroundThisFrame = true;
+
 			if (hit.collider.CompareTag("MovingPlatform"))
 			{
 				isTouchingPlatformThisFrame = true;
@@ -259,5 +287,16 @@ public class CharacterMovement : MonoBehaviour
 		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
 
 		body.AddForceAtPosition(pushDir * pushPower, hit.point, ForceMode.Impulse);
+	}
+
+	public void SetHeldObject(Transform heldObject)
+	{
+		currentlyHeldObject = heldObject;
+	}
+
+	private void HandleGroundedState()
+	{
+		isGroundedValid = isTouchingValidGroundThisFrame;
+		isTouchingValidGroundThisFrame = false;
 	}
 }
